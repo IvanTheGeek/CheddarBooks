@@ -19,7 +19,27 @@ Current understanding:
 
 ## First-Pass Durable Events
 
-### 1. `LaundryExpenseEntryAdded`
+### 1. `LaundryLocationCaptured`
+
+Meaning:
+
+- the laundry activity now has a durably known location
+
+Likely carried facts:
+
+- user-facing location text
+- capture method
+- optional coordinates when available
+- possible matched-location identity when reuse is available
+- recorded time
+
+Why it likely matters:
+
+- location is the first meaningful business context for the journal
+- one location can anchor multiple washer and dryer entries
+- later reuse, matching, and sharing all depend on having a durable location record
+
+### 2. `LaundryExpenseEntryAdded`
 
 Meaning:
 
@@ -39,7 +59,7 @@ Why it likely matters:
 
 - this is the core audit-defense journal event
 - current-session totals can derive from repeated additions
-- batch entry naturally becomes repeated instances of this event
+- washer and dryer entries can both be represented by repeated instances of this event
 
 ## Strong Candidates For Soon-After
 
@@ -57,6 +77,12 @@ Useful when:
 
 - we need an explicit reversal/removal path
 
+### `LaundryLocationRefined`
+
+Useful when:
+
+- we later want a durable way to improve an initially rough location record without pretending the earlier capture never happened
+
 ## Derived Or Deferred Session Concepts
 
 These may still matter, but they currently look more like derived session-window behavior or later workflow boundaries than first-pass durable events:
@@ -71,7 +97,7 @@ Useful when:
 
 Useful when:
 
-- location needs its own durable change history rather than simply being carried on an entry
+- we later decide location belongs to a session-window concept instead of a more direct location-capture event
 
 ### `LaundrySessionEnded`
 
@@ -86,6 +112,7 @@ Do not force these into the first path yet:
 - `PaymentStatementLineMatched`
 - `ReceiptEvidenceAttached`
 - `LocationSuggestedFromDevice`
+- `ExistingLocationMatchedFromCoordinates`
 - `LaundrySessionMergedAcrossDevices`
 - `TaxReportEntryPrepared`
 

@@ -25,7 +25,7 @@ That means screen work should stay aligned with:
 
 Purpose:
 
-- begin a laundry session by establishing location context
+- capture or confirm the location before the first expense entry
 
 Current expected elements:
 
@@ -62,7 +62,7 @@ Current likely elements:
 Current direction:
 
 - location is the first or top-most information
-- session context depends on location
+- current laundry context depends on location
 - location should remain obvious once set
 
 ### Machine Type Section

@@ -8,9 +8,10 @@ We are not trying to model the whole future CheddarBooks system yet.
 
 We are trying to model the smallest real LaundryLog behavior that is useful:
 
-- set the location context
-- log the first expense
-- show the current session window from that expense history
+- capture the location
+- log a washer expense
+- log a dryer expense
+- show the current session window from that activity history
 
 That should be enough to establish the first real event line.
 
@@ -22,13 +23,14 @@ In this pass, stay focused on:
 - one device
 - one derived current session window
 - one location
-- one or more expense entries
+- washer and dryer entries at that location
 
 Defer for now:
 
 - multi-device convergence details
 - card-statement matching
 - receipt/image capture
+- GPS-versus-manual location branches beyond the first durable location result
 - reporting views
 - tax/report exports
 - advanced correction flows

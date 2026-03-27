@@ -11,13 +11,20 @@ Should "session" remain a derived read boundary:
 
 ## Location Boundary
 
-Should location be:
+Should the first durable location event be `LaundryLocationCaptured`:
 
-- part of `LaundryExpenseEntryAdded`
-- its own event: `LaundrySessionLocationSet`
-- or draft UI context that only becomes durable when the first entry is logged
+- with one broad shape that covers manual entry, GPS-assisted matching, and later coordinate capture
+- or should those become more separate events earlier
 
-Current leaning is to avoid forcing a separate start event too early.
+Current leaning is that location should be the first durable business event, even if the acquisition variants are deferred behind that shared result.
+
+## Location Acquisition Depth
+
+For the first path, should `LaundryLocationCaptured` carry:
+
+- just the user-facing location text
+- text plus optional coordinates when available
+- or also a reusable location identity when an existing location is matched
 
 ## Entry Identity
 
@@ -42,6 +49,16 @@ For the first path, should payment method be:
 - required
 - optional
 - or deferred until later
+
+## Primary Happy Path Scope
+
+Is the first happy path complete once it proves:
+
+- location captured
+- washer expense logged
+- dryer expense logged
+
+Current leaning is yes. Supplies, corrections, and alternate location-acquisition branches can expand from there.
 
 ## Session End
 
