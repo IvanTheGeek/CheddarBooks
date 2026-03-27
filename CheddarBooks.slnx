@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CheddarBooks.LaundryLog.UI/CheddarBooks.LaundryLog.UI.fsproj" />
+    <Project Path="src/CheddarBooks.LaundryLog/CheddarBooks.LaundryLog.fsproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CheddarBooks.Tests/CheddarBooks.Tests.fsproj" />
+  </Folder>
+  <Project Path="../FnTools/src/FnTools.FnHCI.UI/FnTools.FnHCI.UI.fsproj" />
+  <Project Path="../FnTools/src/FnTools.FnHCI/FnTools.FnHCI.fsproj" />
+</Solution>

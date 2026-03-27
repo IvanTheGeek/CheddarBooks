@@ -1,0 +1,14 @@
+schema_version = 1
+artifact_kind = "cheddarbooks_repo_bootstrap"
+source_repo = "NEXUS-EMERGING"
+source_commit = "cfc25c2d"
+bootstrap_fntools_root = "/home/ivan/NEXUS/FnTools"
+
+[[projects]]
+path = "src/CheddarBooks.LaundryLog/CheddarBooks.LaundryLog.fsproj"
+
+[[projects]]
+path = "src/CheddarBooks.LaundryLog.UI/CheddarBooks.LaundryLog.UI.fsproj"
+
+[[tests]]
+path = "tests/CheddarBooks.Tests/CheddarBooks.Tests.fsproj"
