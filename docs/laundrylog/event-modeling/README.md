@@ -7,6 +7,7 @@ The visual board can live in an external tool.
 These docs are the repo memory that records:
 
 - the current modeling scope
+- the first commands we think we need
 - the first events we think we need
 - the first `PATH` we want to model
 - the open questions that should not stay trapped in chat or on a temporary board
@@ -17,13 +18,15 @@ For the next step, we are intentionally starting small:
 
 1. identify the first events needed
 2. shape the first `PATH`
-3. defer commands, reads, policies, and exceptions until the first event line is stable enough
+3. define the first commands that should produce that path
+4. defer deeper reads, policies, and exceptions until the first command and event line is stable enough
 
 That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
 
 ## Start Here
 
 - [`starting-point.md`](starting-point.md)
+- [`commands.md`](commands.md)
 - [`events.md`](events.md)
 - [`path-1-first-entry.md`](path-1-first-entry.md)
 - [`open-questions.md`](open-questions.md)

@@ -1,0 +1,75 @@
+# LaundryLog Candidate Commands
+
+This note captures the current first-pass candidate commands for LaundryLog.
+
+These commands are still early, but they give us the intent-side shape that should lead to the first durable events.
+
+## First-Pass Commands
+
+### 1. `CaptureLaundryLocation`
+
+Meaning:
+
+- the user wants the app to treat a specific location as the active laundry location
+
+Why it likely matters:
+
+- it is the business-side intent that leads to `LaundryLocationCaptured`
+- it works for the manual typed path we are modeling now
+- it can later also cover GPS-assisted or matched-location flows once those variants exist
+
+Current first-pass properties:
+
+- `location_name`
+  the user-facing location text the user is confirming
+- `capture_method`
+  how the location is being captured in this path
+
+Current optional properties:
+
+- `coordinates`
+  only when GPS or map-assisted capture is actually involved
+- `matched_location_id`
+  only when an existing reusable location has already been matched
+- `notes`
+  only if we later decide location notes belong at command time
+
+First concrete example: manual typed location
+
+```toml
+command_name = "CaptureLaundryLocation"
+location_name = "Love's #123 - Springfield, OH"
+capture_method = "manual-text"
+```
+
+Expected resulting event:
+
+```toml
+event_name = "LaundryLocationCaptured"
+location_name = "Love's #123 - Springfield, OH"
+capture_method = "manual-text"
+recorded_at_utc = "2026-03-27T13:42:00Z"
+```
+
+What this command example pressures:
+
+- the first command can stay simple for the manual path
+- command fields do not need to carry every future GPS/matching detail yet
+- durable event time can be added at event-recording time instead of being forced into the command
+- the same command may still be broad enough for later acquisition variants
+
+### 2. `LogLaundryExpense`
+
+Meaning:
+
+- the user wants to record one laundry expense under the active location context
+
+Why it likely matters:
+
+- it is the business-side intent that leads to `LaundryExpenseLogged`
+- it stays aligned with the app name and the journaling idea
+- repeated washer and dryer entries can use the same command shape
+
+Current next step:
+
+- define first-pass properties and examples for washer and dryer cases

@@ -33,6 +33,20 @@ The first pass likely wants this durable event line:
 2. `LaundryExpenseLogged` for washer
 3. `LaundryExpenseLogged` for dryer
 
+## Current Command Hypothesis
+
+The first pass likely wants this command line:
+
+1. `CaptureLaundryLocation`
+2. `LogLaundryExpense` for washer
+3. `LogLaundryExpense` for dryer
+
+That gives us:
+
+- one clear command that asks the app to establish the active location
+- one reusable expense-logging command for repeated washer and dryer entries
+- a cleaner separation between user intent and the durable facts that result
+
 That is enough to prove:
 
 - the journal begins with durable location context

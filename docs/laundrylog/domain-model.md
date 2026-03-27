@@ -6,7 +6,9 @@ This note captures the current domain language and the core functional requireme
 
 The current domain language should prefer:
 
+- command: `CaptureLaundryLocation`
 - command: `LogLaundryExpense`
+- event: `LaundryLocationCaptured`
 - event: `LaundryExpenseLogged`
 
 The current understanding is that:
