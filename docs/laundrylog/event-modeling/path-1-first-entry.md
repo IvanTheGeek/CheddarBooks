@@ -29,14 +29,14 @@ A user can:
 The first pass likely wants this durable event line:
 
 1. `LaundryLocationCaptured`
-2. `LaundryExpenseEntryAdded` for washer
-3. `LaundryExpenseEntryAdded` for dryer
+2. `LaundryExpenseLogged` for washer
+3. `LaundryExpenseLogged` for dryer
 
 That is enough to prove:
 
 - the journal begins with durable location context
 - the journal has at least one durable expense line
-- repeated expense entries can accumulate under one captured location
+- repeated logged expenses can accumulate under one captured location
 - the current session view can be derived from recent entries
 
 ## First Read/Reaction Expectations

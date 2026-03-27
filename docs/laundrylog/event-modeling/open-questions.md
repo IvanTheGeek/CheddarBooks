@@ -28,7 +28,7 @@ For the first path, should `LaundryLocationCaptured` carry:
 
 ## Entry Identity
 
-Should `LaundryExpenseEntryAdded` carry:
+Should `LaundryExpenseLogged` carry:
 
 - a stable entry id
 - or should entry identity remain implicit until correction/removal paths appear

@@ -39,11 +39,11 @@ Why it likely matters:
 - one location can anchor multiple washer and dryer entries
 - later reuse, matching, and sharing all depend on having a durable location record
 
-### 2. `LaundryExpenseEntryAdded`
+### 2. `LaundryExpenseLogged`
 
 Meaning:
 
-- one expense line was logged into the journal
+- one laundry expense was logged into the journal
 
 Likely carried facts:
 
@@ -58,20 +58,20 @@ Likely carried facts:
 Why it likely matters:
 
 - this is the core audit-defense journal event
-- current-session totals can derive from repeated additions
-- washer and dryer entries can both be represented by repeated instances of this event
+- current-session totals can derive from repeated logged expenses
+- washer and dryer expenses can both be represented by repeated instances of this event
 
 ## Strong Candidates For Soon-After
 
 These are plausible but can wait until the first path is stable:
 
-### `LaundryExpenseEntryCorrected`
+### `LaundryExpenseCorrected`
 
 Useful when:
 
 - we want correction without pretending the original entry never happened
 
-### `LaundryExpenseEntryRemoved`
+### `LaundryExpenseRemoved`
 
 Useful when:
 
