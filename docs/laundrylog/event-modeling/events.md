@@ -6,37 +6,24 @@ These are not final.
 
 They are the working list we should pressure during the first Event Modeling pass.
 
-## First-Pass Events
+## Current Session Meaning
 
-### 1. `LaundrySessionStarted`
+For now, "session" is better treated as a UX/read-model concept than as a required first-class domain event.
 
-Meaning:
+Current understanding:
 
-- a new laundry session/journal session has begun
+- the app shows a current session window over recent laundry entries
+- that window exists to make the active laundry period easy to follow on screen
+- if enough time passes since the last entry, the next open should naturally feel like a new session
+- that grouping can be derived without forcing a `LaundrySessionStarted` event
 
-Why it likely matters:
+## First-Pass Durable Events
 
-- gives the session its own durable identity
-- separates one laundromat visit from another
-- supports later grouping, totals, and audit trails
-
-### 2. `LaundrySessionLocationSet`
-
-Meaning:
-
-- the session has been given a human-meaningful location
-
-Why it likely matters:
-
-- location is part of the journal value
-- the current app flow is explicitly location-first
-- it is a likely audit/usefulness boundary for later reports
-
-### 3. `LaundryExpenseEntryAdded`
+### 1. `LaundryExpenseEntryAdded`
 
 Meaning:
 
-- one expense line was logged against the current session
+- one expense line was logged into the journal
 
 Likely carried facts:
 
@@ -45,12 +32,13 @@ Likely carried facts:
 - unit price
 - total
 - payment method
+- location context
 - occurred/recorded time
 
 Why it likely matters:
 
 - this is the core audit-defense journal event
-- session totals can derive from repeated additions
+- current-session totals can derive from repeated additions
 - batch entry naturally becomes repeated instances of this event
 
 ## Strong Candidates For Soon-After
@@ -69,11 +57,27 @@ Useful when:
 
 - we need an explicit reversal/removal path
 
+## Derived Or Deferred Session Concepts
+
+These may still matter, but they currently look more like derived session-window behavior or later workflow boundaries than first-pass durable events:
+
+### `LaundrySessionStarted`
+
+Useful when:
+
+- we later decide an explicit start boundary has audit value beyond the first recorded entry
+
+### `LaundrySessionLocationSet`
+
+Useful when:
+
+- location needs its own durable change history rather than simply being carried on an entry
+
 ### `LaundrySessionEnded`
 
 Useful when:
 
-- we want a formal close-out boundary for a session
+- we want a formal close-out boundary instead of deriving session end from inactivity or later reads
 
 ## Deferred For Later Modeling
 

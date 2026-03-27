@@ -4,19 +4,20 @@ These are the questions we should keep visible while working the first LaundryLo
 
 ## Session Boundary
 
-Should `LaundrySessionStarted` happen:
+Should "session" remain a derived read boundary:
 
-- before location is known
-- or only once location is confirmed
+- inferred from recent entries and inactivity gaps
+- or promoted into an explicit stored event later if audit/reporting needs justify it
 
 ## Location Boundary
 
 Should location be:
 
+- part of `LaundryExpenseEntryAdded`
 - its own event: `LaundrySessionLocationSet`
-- or part of `LaundrySessionStarted`
+- or draft UI context that only becomes durable when the first entry is logged
 
-Current leaning is to keep it separate because the current path is explicitly location-first and the distinction may matter later.
+Current leaning is to avoid forcing a separate start event too early.
 
 ## Entry Identity
 
@@ -44,4 +45,4 @@ For the first path, should payment method be:
 
 ## Session End
 
-Do we need `LaundrySessionEnded` in the first modeled path, or can that stay deferred until the first entry flow is solid?
+Do we need `LaundrySessionEnded` at all in the first modeled path, or should current-session boundaries stay derived from inactivity until the first entry flow is solid?

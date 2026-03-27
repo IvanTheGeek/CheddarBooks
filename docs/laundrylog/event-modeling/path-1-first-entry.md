@@ -1,4 +1,4 @@
-# LaundryLog PATH 1: Start Session Through First Entry
+# LaundryLog PATH 1: First Entry Through Current Session View
 
 This is the first `PATH` we should model.
 
@@ -8,41 +8,39 @@ It is intentionally small and concrete.
 
 A user can:
 
-- begin a laundry session
-- set the location
+- set or confirm the location context
 - record the first expense
+- see that expense in the current session view
 
 ## Intended Happy Path
 
 1. user opens the app
-2. user begins a new laundry session
-3. user enters the location
-4. user confirms the location
-5. user enters the first laundry expense
-6. user logs the expense
+2. user enters the location
+3. user confirms the location
+4. user enters the first laundry expense
+5. user logs the expense
+6. the app shows the current session with that entry and running total
 7. user can now continue adding more entries in the same session
 
 ## Current Event Hypothesis
 
-The first pass likely wants this event line:
+The first pass likely wants this durable event line:
 
-1. `LaundrySessionStarted`
-2. `LaundrySessionLocationSet`
-3. `LaundryExpenseEntryAdded`
+1. `LaundryExpenseEntryAdded`
 
 That is enough to prove:
 
-- the session exists
-- the location is part of the record
 - the journal has at least one durable expense line
+- the location can be part of the durable record without forcing a separate session-start event
+- the current session view can be derived from recent entries
 
 ## First Read/Reaction Expectations
 
 Even before we model reads formally, this path implies a few obvious reactions:
 
-- after `LaundrySessionStarted`, the app should know there is an active session
-- after `LaundrySessionLocationSet`, the app should show location context
 - after `LaundryExpenseEntryAdded`, the app should show at least one logged entry and a running total
+- the app should treat that entry as the anchor for the current session window
+- later opens after a long enough gap should naturally show a fresh session window instead of the old one
 
 Those are not the main modeling focus yet, but they are useful pressure when checking whether the event line feels complete.
 
@@ -53,5 +51,6 @@ As we work this path in the visual Event Modeling tool, we should watch for:
 - missing events
 - event names that are actually commands in disguise
 - facts that belong on a different event
-- whether location should be part of session start or remain its own event
+- whether location should be part of `LaundryExpenseEntryAdded` or remain its own event
+- whether "current session" should stay a derived read concern rather than a stored event boundary
 - whether the first-entry path needs an explicit session-close event right away

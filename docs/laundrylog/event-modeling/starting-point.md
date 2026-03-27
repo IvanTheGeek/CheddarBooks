@@ -8,9 +8,9 @@ We are not trying to model the whole future CheddarBooks system yet.
 
 We are trying to model the smallest real LaundryLog behavior that is useful:
 
-- start a laundry session
-- set the location
+- set the location context
 - log the first expense
+- show the current session window from that expense history
 
 That should be enough to establish the first real event line.
 
@@ -20,7 +20,7 @@ In this pass, stay focused on:
 
 - one user
 - one device
-- one laundry session
+- one derived current session window
 - one location
 - one or more expense entries
 
@@ -47,6 +47,6 @@ The current order is:
 
 LaundryLog exists to create a trustworthy journal of laundry expenses over time.
 
-That means the event history matters more than the first UI polish pass.
+That means the durable expense-entry history matters more than the first UI polish pass.
 
-If we get the first event line right, the UI, storage, and later convergence work have something stable to grow from.
+If we get the first durable event line right, the UI, storage, derived current-session view, and later convergence work have something stable to grow from.

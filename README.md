@@ -19,6 +19,6 @@ Current included test project:
 
 Start here:
 
-- `docs/foundation.md`
-- `docs/laundrylog/introduction.md`
-- `docs/laundrylog/requirements.md`
+- [`docs/foundation.md`](docs/foundation.md)
+- [`docs/laundrylog/introduction.md`](docs/laundrylog/introduction.md)
+- [`docs/laundrylog/requirements.md`](docs/laundrylog/requirements.md)

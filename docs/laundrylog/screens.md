@@ -11,6 +11,8 @@ Primary source threads include:
 
 Current direction is to treat each meaningful visual state as a full screen or board, built from reusable components.
 
+In the current LaundryLog language, the "current session" is a user-facing window over recent laundry entries, not necessarily a first-class stored event.
+
 That means screen work should stay aligned with:
 
 - path states
@@ -105,6 +107,7 @@ Current direction:
 Current direction:
 
 - running session total should remain visible and easy to scan
+- it should reflect the current session window derived from recent entries
 - it should not feel secondary to the line-entry controls
 
 ## Screen State Progression
