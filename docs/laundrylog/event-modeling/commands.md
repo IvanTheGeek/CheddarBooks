@@ -18,6 +18,19 @@ Why it likely matters:
 - it works for the manual typed path we are modeling now
 - it can later also cover GPS-assisted or matched-location flows once those variants exist
 
+Current actor screen for this command slice:
+
+- `Screen.NewSession`
+
+![Set Location actor screen](../ScreenShots/S_SetLocation.png)
+
+What this actor screen shows:
+
+- the location-first prompt
+- an optional GPS path that does not block the manual path
+- the manually typed location example: `Love's #123 - Springfield, OH`
+- the `Set Location` action that expresses the `CaptureLaundryLocation` intent
+
 Current first-pass properties:
 
 - `location_name`

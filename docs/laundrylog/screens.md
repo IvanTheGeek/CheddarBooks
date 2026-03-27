@@ -27,6 +27,10 @@ Purpose:
 
 - capture or confirm the location before the first expense entry
 
+Current example screen:
+
+![Set Location screen](ScreenShots/S_SetLocation.png)
+
 Current expected elements:
 
 - `Input.Location`
