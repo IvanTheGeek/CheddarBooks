@@ -39,6 +39,40 @@ Why it likely matters:
 - one location can anchor multiple washer and dryer entries
 - later reuse, matching, and sharing all depend on having a durable location record
 
+Current first-pass properties:
+
+- `location_name`
+  the user-facing name that will be shown in the log
+- `capture_method`
+  how the location was captured
+- `recorded_at`
+  when the location record was captured in the app
+
+Current optional properties:
+
+- `coordinates`
+  only when GPS or map-assisted capture is actually used
+- `matched_location_id`
+  only when the app matched an existing reusable location record
+- `notes`
+  only if we later decide freeform location notes are worth carrying
+
+First concrete example: manual typed location
+
+```toml
+event_name = "LaundryLocationCaptured"
+location_name = "Love's #123 - Springfield, OH"
+capture_method = "manual-text"
+recorded_at = "2026-03-27T09:42:00-04:00"
+```
+
+What this example pressures:
+
+- `location_name` is probably required in the first path
+- `capture_method` should likely be explicit rather than inferred
+- coordinates do not need to be forced into the manual-entry path
+- a reusable matched location can remain deferred until GPS or lookup flows are modeled
+
 ### 2. `LaundryExpenseLogged`
 
 Meaning:

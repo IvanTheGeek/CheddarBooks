@@ -17,6 +17,7 @@ A user can:
 
 1. user opens the app
 2. user enters or confirms the location
+   example: `Love's #123 - Springfield, OH`
 3. the app captures that location as the active laundry context
 4. user enters a washer expense
 5. user logs the washer expense
@@ -38,6 +39,12 @@ That is enough to prove:
 - the journal has at least one durable expense line
 - repeated logged expenses can accumulate under one captured location
 - the current session view can be derived from recent entries
+
+Current concrete starting example:
+
+- `LaundryLocationCaptured`
+  `location_name = "Love's #123 - Springfield, OH"`
+  `capture_method = "manual-text"`
 
 ## First Read/Reaction Expectations
 
