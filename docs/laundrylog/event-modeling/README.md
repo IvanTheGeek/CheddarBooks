@@ -7,10 +7,10 @@ The visual board can live in an external tool.
 These docs are the repo memory that records:
 
 - the current modeling scope
-- the first commands we think we need
+- the first CommandSlices we think we need
 - the first events we think we need
 - the first `PATH` we want to model
-- the first business-lens Views or "screenshots" we think we need
+- the first business-lens ViewSlices or "screenshots" we think we need
 - the open questions that should not stay trapped in chat or on a temporary board
 
 ## Current Modeling Approach
@@ -19,9 +19,9 @@ For the next step, we are intentionally starting small:
 
 1. identify the first events needed
 2. shape the first `PATH`
-3. define the first commands that should produce that path
-4. define the first View or business screenshot for that path
-5. defer deeper policies and exceptions until the first command, event, and View line is stable enough
+3. define the first CommandSlices that should produce that path
+4. define the first ViewSlices or business screenshots for that path
+5. defer deeper policies and exceptions until the first command, event, and View slice line is stable enough
 
 That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
 

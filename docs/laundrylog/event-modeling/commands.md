@@ -1,8 +1,10 @@
-# LaundryLog Candidate Commands
+# LaundryLog Candidate Commands And CommandSlices
 
 This note captures the current first-pass candidate commands for LaundryLog.
 
 These commands are still early, but they give us the intent-side shape that should lead to the first durable events.
+
+In the preferred Event Modeling language here, this is the `CommandSlice` side.
 
 ## First-Pass Commands
 

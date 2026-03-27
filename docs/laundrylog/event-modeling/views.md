@@ -1,4 +1,4 @@
-# LaundryLog Views And Business Screenshots
+# LaundryLog Views, ViewSlices, And Business Screenshots
 
 This note captures the first View shape for LaundryLog in Event Modeling terms.
 
@@ -6,13 +6,15 @@ In the business lens, this is the closest thing to the "screenshot" idea.
 
 If someone comes in using Event Modeling search terms, this is roughly the place they may expect "read model" language, but the preferred LaundryLog term is `View`.
 
+In the preferred Event Modeling language here, this is the `ViewSlice` side.
+
 This note is about:
 
 - what the user can see
 - what the business state appears to be
 - what decision the user can make next
 
-## First View
+## First ViewSlice
 
 ### `CurrentLaundrySession`
 

@@ -35,7 +35,7 @@ The first pass likely wants this durable event line:
 
 ## Current Command Hypothesis
 
-The first pass likely wants this command line:
+The first pass likely wants this CommandSlice line:
 
 1. `CaptureLaundryLocation`
 2. `LogLaundryExpense` for washer
@@ -60,7 +60,7 @@ Current concrete starting example:
   `location_name = "Love's #123 - Springfield, OH"`
   `capture_method = "manual-text"`
 
-## First Read/Reaction Expectations
+## First ViewSlice Expectations
 
 Even before we model reads formally, this path implies a few obvious reactions:
 
