@@ -1,0 +1,35 @@
+# CheddarBooks LaundryLog Event Modeling
+
+This area is the durable markdown counterpart to the visual Event Modeling work.
+
+The visual board can live in an external tool.
+
+These docs are the repo memory that records:
+
+- the current modeling scope
+- the first events we think we need
+- the first `PATH` we want to model
+- the open questions that should not stay trapped in chat or on a temporary board
+
+## Current Modeling Approach
+
+For the next step, we are intentionally starting small:
+
+1. identify the first events needed
+2. shape the first `PATH`
+3. defer commands, reads, policies, and exceptions until the first event line is stable enough
+
+That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
+
+## Start Here
+
+- [`starting-point.md`](starting-point.md)
+- [`events.md`](events.md)
+- [`path-1-first-entry.md`](path-1-first-entry.md)
+- [`open-questions.md`](open-questions.md)
+
+## Working Rule
+
+The external visual model is useful for thinking and discussion.
+
+The markdown notes here are the durable repo memory that future humans and AI should be able to read without needing access to the external modeling tool.
