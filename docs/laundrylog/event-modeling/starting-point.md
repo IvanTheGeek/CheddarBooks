@@ -8,7 +8,7 @@ We are not trying to model the whole future CheddarBooks system yet.
 
 We are trying to model the smallest real LaundryLog behavior that is useful:
 
-- start a laundry outing
+- start a laundry session
 - set the location
 - log the first expense
 
@@ -20,7 +20,7 @@ In this pass, stay focused on:
 
 - one user
 - one device
-- one laundry outing
+- one laundry session
 - one location
 - one or more expense entries
 

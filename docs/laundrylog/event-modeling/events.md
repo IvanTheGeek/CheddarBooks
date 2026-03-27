@@ -12,11 +12,11 @@ They are the working list we should pressure during the first Event Modeling pas
 
 Meaning:
 
-- a new laundry outing/journal session has begun
+- a new laundry session/journal session has begun
 
 Why it likely matters:
 
-- gives the outing its own durable identity
+- gives the session its own durable identity
 - separates one laundromat visit from another
 - supports later grouping, totals, and audit trails
 
@@ -73,7 +73,7 @@ Useful when:
 
 Useful when:
 
-- we want a formal close-out boundary for an outing
+- we want a formal close-out boundary for a session
 
 ## Deferred For Later Modeling
 

@@ -8,7 +8,7 @@ It is intentionally small and concrete.
 
 A user can:
 
-- begin a laundry outing
+- begin a laundry session
 - set the location
 - record the first expense
 
