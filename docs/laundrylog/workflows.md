@@ -33,6 +33,7 @@ Current first path:
 
 This is the current happy-path foundation.
 GPS lookup and location matching are intentionally deferred behind the same durable location result for the first path.
+Once captured, the location should remain the active context until the user changes it.
 
 ## Workflow 2: Log Washer Then Dryer Entries
 
@@ -66,6 +67,8 @@ That means the workflow is:
 5. watch session total accumulate
 
 This is why batch-style entry is more important than a separate single-entry mode.
+
+If future GPS assistance is available, it should help suggest or refine location rather than automatically replacing the current active location.
 
 ## Workflow 4: Batch Entry As The Primary Mode
 

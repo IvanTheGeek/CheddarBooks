@@ -38,6 +38,7 @@ Important state behavior:
 - `Set Location` hidden when there is no draft location
 - `Set Location` visible when a location has been entered
 - GPS is future-facing and should not block the first manual path
+- once a location is captured, it should stay visible until the user changes it
 
 ### Screen.EntryForm
 
@@ -64,6 +65,7 @@ Current direction:
 - location is the first or top-most information
 - current laundry context depends on location
 - location should remain obvious once set
+- future GPS help should propose a better location rather than silently overwriting the current one
 
 ### Machine Type Section
 

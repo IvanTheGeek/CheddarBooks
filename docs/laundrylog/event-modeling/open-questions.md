@@ -26,6 +26,15 @@ For the first path, should `LaundryLocationCaptured` carry:
 - text plus optional coordinates when available
 - or also a reusable location identity when an existing location is matched
 
+## Location Persistence
+
+Should the last captured location remain active:
+
+- until the user explicitly changes it
+- or should future GPS activity be allowed to replace it automatically
+
+Current leaning is to keep the last captured location active until the user changes it. GPS should suggest or refine, not silently overwrite.
+
 ## Entry Identity
 
 Should `LaundryExpenseLogged` carry:

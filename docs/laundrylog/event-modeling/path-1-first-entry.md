@@ -51,6 +51,7 @@ Current concrete starting example:
 Even before we model reads formally, this path implies a few obvious reactions:
 
 - after `LaundryLocationCaptured`, the app should show active location context
+- that location should remain active for later entries until the user changes it
 - after the washer entry, the app should show one logged entry and a running total
 - after the dryer entry, the app should show both entries and the updated total
 - the app should treat that grouped recent activity as the current session window
@@ -67,6 +68,7 @@ As we work this path in the visual Event Modeling tool, we should watch for:
 - facts that belong on a different event
 - whether `LaundryLocationCaptured` is the right first durable boundary
 - whether location matching/GPS details belong on that event or in later refinement events
+- whether future GPS help should suggest a location change instead of automatically replacing the active location
 - whether "current session" should stay a derived read concern rather than a stored event boundary
 - whether the washer-plus-dryer happy path is enough before expanding to supplies and corrections
 - whether the first-entry path needs an explicit session-close event right away

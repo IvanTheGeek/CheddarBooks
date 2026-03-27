@@ -70,8 +70,10 @@ What this example pressures:
 
 - `location_name` is probably required in the first path
 - `capture_method` should likely be explicit rather than inferred
+- the last captured location can reasonably remain the active location until the user changes it
 - coordinates do not need to be forced into the manual-entry path
 - a reusable matched location can remain deferred until GPS or lookup flows are modeled
+- later GPS help should probably suggest or refine location rather than silently replacing the active location
 
 ### 2. `LaundryExpenseLogged`
 
