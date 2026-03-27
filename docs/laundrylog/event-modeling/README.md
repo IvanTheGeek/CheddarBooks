@@ -10,6 +10,7 @@ These docs are the repo memory that records:
 - the first commands we think we need
 - the first events we think we need
 - the first `PATH` we want to model
+- the first business-lens read models or "screenshots" we think we need
 - the open questions that should not stay trapped in chat or on a temporary board
 
 ## Current Modeling Approach
@@ -19,7 +20,8 @@ For the next step, we are intentionally starting small:
 1. identify the first events needed
 2. shape the first `PATH`
 3. define the first commands that should produce that path
-4. defer deeper reads, policies, and exceptions until the first command and event line is stable enough
+4. define the first read model or business screenshot for that path
+5. defer deeper policies and exceptions until the first command, event, and read line is stable enough
 
 That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
 
@@ -29,6 +31,7 @@ That keeps the first pass grounded in desired behavior rather than prematurely d
 - [`commands.md`](commands.md)
 - [`events.md`](events.md)
 - [`path-1-first-entry.md`](path-1-first-entry.md)
+- [`read-models.md`](read-models.md)
 - [`open-questions.md`](open-questions.md)
 
 ## Working Rule

@@ -73,6 +73,8 @@ Even before we model reads formally, this path implies a few obvious reactions:
 
 Those are not the main modeling focus yet, but they are useful pressure when checking whether the event line feels complete.
 
+See the first business-lens read states in [`read-models.md`](read-models.md).
+
 ## What To Look For During Modeling
 
 As we work this path in the visual Event Modeling tool, we should watch for:
