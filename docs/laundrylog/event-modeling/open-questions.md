@@ -44,12 +44,15 @@ Should `LaundryExpenseLogged` carry:
 
 ## Time Semantics
 
-Do we want to distinguish:
+Current decision direction:
 
-- when the expense happened
-- when the user recorded it
+- store durable event times in UTC
+- adjust or localize those times in views
 
-That may matter for later audit/reporting value.
+The remaining open question is:
+
+- do we need both `occurred_at_utc` and `recorded_at_utc` in the first path
+- or is `recorded_at_utc` enough until later audit/reporting pressure says otherwise
 
 ## Payment Detail Depth
 

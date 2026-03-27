@@ -55,6 +55,17 @@ Purpose:
 - log one expense entry in the current session
 - support repeat entry within the same session
 - keep running session total visible
+- display UTC-backed event times in user-local view form when time is shown
+
+## Time View Rule
+
+LaundryLog should treat UTC as the durable storage and event-model basis for time.
+
+Views should:
+
+- render UTC-backed timestamps in the user's local view context
+- avoid making the underlying stored time ambiguous
+- keep the model/storage rule and the view/display rule separate
 
 ## Code Boundary
 

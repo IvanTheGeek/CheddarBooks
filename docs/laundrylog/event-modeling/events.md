@@ -45,8 +45,8 @@ Current first-pass properties:
   the user-facing name that will be shown in the log
 - `capture_method`
   how the location was captured
-- `recorded_at`
-  when the location record was captured in the app
+- `recorded_at_utc`
+  when the location record was captured in the app, stored in UTC
 
 Current optional properties:
 
@@ -63,13 +63,14 @@ First concrete example: manual typed location
 event_name = "LaundryLocationCaptured"
 location_name = "Love's #123 - Springfield, OH"
 capture_method = "manual-text"
-recorded_at = "2026-03-27T09:42:00-04:00"
+recorded_at_utc = "2026-03-27T13:42:00Z"
 ```
 
 What this example pressures:
 
 - `location_name` is probably required in the first path
 - `capture_method` should likely be explicit rather than inferred
+- durable event time should be stored in UTC
 - the last captured location can reasonably remain the active location until the user changes it
 - coordinates do not need to be forced into the manual-entry path
 - a reusable matched location can remain deferred until GPS or lookup flows are modeled
@@ -89,13 +90,15 @@ Likely carried facts:
 - total
 - payment method
 - location context
-- occurred/recorded time
+- `occurred_at_utc`
+- `recorded_at_utc`
 
 Why it likely matters:
 
 - this is the core audit-defense journal event
 - current-session totals can derive from repeated logged expenses
 - washer and dryer expenses can both be represented by repeated instances of this event
+- views can still present local time without losing a stable UTC basis in storage
 
 ## Strong Candidates For Soon-After
 

@@ -14,6 +14,7 @@ The current understanding is that:
 - the expense is the key business fact
 - washer, dryer, and supplies are expense types, not separate event kinds
 - session context is useful in the UI and workflow, but is not more important than the expense fact itself
+- durable event time should use UTC as the model/storage basis, with localization deferred to views
 
 ## Functional Requirements
 
