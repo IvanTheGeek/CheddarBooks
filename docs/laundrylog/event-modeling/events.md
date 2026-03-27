@@ -8,7 +8,7 @@ They are the working list we should pressure during the first Event Modeling pas
 
 ## Current Session Meaning
 
-For now, "session" is better treated as a UX/read-model concept than as a required first-class domain event.
+For now, "session" is better treated as a UX/View concept than as a required first-class domain event.
 
 Current understanding:
 

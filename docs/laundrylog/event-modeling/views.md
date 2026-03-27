@@ -1,14 +1,18 @@
-# LaundryLog Read Models And Business Screenshots
+# LaundryLog Views And Business Screenshots
 
-This note captures the first read-model shape for LaundryLog in Event Modeling terms.
+This note captures the first View shape for LaundryLog in Event Modeling terms.
 
-In the business lens, this is the closest thing to the "screenshot" idea:
+In the business lens, this is the closest thing to the "screenshot" idea.
+
+If someone comes in using Event Modeling search terms, this is roughly the place they may expect "read model" language, but the preferred LaundryLog term is `View`.
+
+This note is about:
 
 - what the user can see
 - what the business state appears to be
 - what decision the user can make next
 
-## First Read Model
+## First View
 
 ### `CurrentLaundrySession`
 
@@ -19,9 +23,9 @@ Purpose:
 - show the running total
 - make the next likely action obvious
 
-This is the read model that should sit behind the current-session view in the app.
+This is the View dataset/structure that should sit behind the current-session view in the app.
 
-## Current First-Pass Fields
+## Current First-Pass View Fields
 
 - `active_location_name`
 - `active_location_capture_method`
@@ -32,8 +36,8 @@ This is the read model that should sit behind the current-session view in the ap
 Notes:
 
 - durable event time stays in UTC
-- the read model localizes time for display
-- the read model is derived from the durable event line, not stored as the source of truth
+- the View localizes time for display
+- the View is derived from the durable event line, not stored as the source of truth
 
 ## PATH 1 Business Screenshots
 

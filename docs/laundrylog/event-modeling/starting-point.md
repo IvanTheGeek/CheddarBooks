@@ -42,9 +42,9 @@ The current order is:
 1. agree on the first events
 2. lay out `PATH 1`
 3. shape the first commands that should produce that path
-4. define the first business-lens read model or screenshot
-5. notice missing events or missing reads
-6. revise the event, command, and read list
+4. define the first business-lens View or screenshot
+5. notice missing events or missing Views
+6. revise the event, command, and View list
 7. only then start shaping deeper policies and view reactions
 
 ## Why Events First
@@ -53,4 +53,4 @@ LaundryLog exists to create a trustworthy journal of laundry expenses over time.
 
 That means the durable expense-entry history matters more than the first UI polish pass.
 
-If we get the first durable command, event, and read line right, the UI, storage, derived current-session view, and later convergence work have something stable to grow from.
+If we get the first durable command, event, and View line right, the UI, storage, derived current-session view, and later convergence work have something stable to grow from.
