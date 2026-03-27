@@ -85,6 +85,19 @@ Why it likely matters:
 - it stays aligned with the app name and the journaling idea
 - repeated washer and dryer entries can use the same command shape
 
+Current actor screen for the first washer expense command slice:
+
+- `Screen.EntryForm`
+
+![Log Laundry Expense actor screen](../ScreenShots/S_LogLaundryExpense.png)
+
+What this actor screen shows:
+
+- the active location context carried forward from the prior location capture
+- washer as the first machine/expense choice being logged
+- quantity and amount controls for one laundry expense
+- the action surface that expresses the `LogLaundryExpense` intent
+
 Current next step:
 
 - define first-pass properties and examples for washer and dryer cases

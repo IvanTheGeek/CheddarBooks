@@ -50,6 +50,10 @@ Purpose:
 
 - capture one expense entry inside the current location/session context
 
+Current example screen:
+
+![Log Laundry Expense screen](ScreenShots/S_LogLaundryExpense.png)
+
 Current likely elements:
 
 - location context display
