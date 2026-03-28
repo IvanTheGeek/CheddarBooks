@@ -279,6 +279,13 @@ Current observed behavior:
 
 So the instance path is still the correct architectural seam for reuse, but Penpot currently appears to have a render-sync or override-application bug in this workflow.
 
+Current non-fixes already tested:
+
+- detach the instance before writing the LaundryLog-specific text
+- force a text reflow by resizing the text nodes after the write
+
+Both of those still rendered the stale master/default text in the current Penpot lab.
+
 Current refinements now locked in:
 
 - shell headers now use:
