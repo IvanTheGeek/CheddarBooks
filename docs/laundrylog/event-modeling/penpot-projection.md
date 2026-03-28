@@ -9,6 +9,8 @@ Penpot should be treated as a projection surface for the Event Modeling work, no
 That means:
 
 - the durable business meaning still lives in repo memory
+- the live Penpot backend is the current working state for the board
+- an exported `.penpot` file is a snapshot of that state, not the live store
 - Penpot is where we project that meaning into a visual board
 - the board should be optimized for reading, discussion, and iteration
 - the board does not need to carry every semantic concern directly inside the Penpot file
@@ -105,3 +107,19 @@ The best current reading is:
 - Penpot carries a chosen visual projection of that meaning
 
 For the current concrete starting point in the existing `LaundryLog.penpot` file, see [Penpot Board Seed](penpot-board-seed.md).
+
+## Current Live Workflow
+
+The current practical working loop is:
+
+1. edit the live Penpot file
+2. use that live backend state as the current projection
+3. export a `.penpot` file only when a checkpoint artifact is needed
+
+So the exported file should be read as:
+
+- portable
+- inspectable
+- useful
+
+but still as a snapshot rather than the always-current live board.
