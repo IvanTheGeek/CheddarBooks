@@ -57,9 +57,15 @@ The current clean slice rebuild also produced a reusable component family that n
 - `SliceRow.Command.Clean.V1`
 - `SliceRow.Event.Clean.V1`
 - `SliceRow.View.Clean.V1`
-- `SliceRow.Ref.Clean.V1`
 - `CommandSlice.Clean.V1`
 - `ViewSlice.Clean.V1`
+
+Current `ViewSlice` correction:
+
+- the clean default is now the classic Event Modeling reading
+- that means the green `View` is the default visible content
+- event reference content is not part of the default `ViewSlice`
+- screen/actor context is a lens-specific add-on rather than the default classic shape
 
 So the current task is not to invent the page from nothing.
 

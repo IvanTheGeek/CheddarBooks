@@ -230,6 +230,23 @@ Current practical interpretation:
 - path-row instances are now the projection seam
 - this is a better direction for later `FnHCI` / `FnUI` derivation than the earlier detached-shell workaround
 
+## Current ViewSlice Rule
+
+The clean `ViewSlice` direction is now corrected to match the current Event Modeling rule more closely.
+
+Current rule:
+
+- in classic Event Modeling reading, the `ViewSlice` shows the green `View`
+- the event that produced that view is not shown inside the `ViewSlice`
+- a screen or actor surface may be shown above the `View` only when a different lens explicitly allows that additional context
+
+So the current clean default is:
+
+- `ViewSlice.Clean.V1`
+  classic, green `View` only
+
+That means the earlier `Event Ref` idea is no longer part of the default clean `ViewSlice` language for LaundryLog.
+
 For the detailed naming and component conventions, see [Penpot Slice Components](penpot-slice-components.md).
 
 ## Multiple Actor Lanes

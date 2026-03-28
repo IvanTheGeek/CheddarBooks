@@ -24,7 +24,6 @@ Current row components:
 - `SliceRow.Command.Clean.V1`
 - `SliceRow.Event.Clean.V1`
 - `SliceRow.View.Clean.V1`
-- `SliceRow.Ref.Clean.V1`
 
 Current shell components:
 
@@ -64,15 +63,15 @@ The current row family is carrying these roles:
   what became true
 - `View`
   current business-visible state
-- `Event Ref`
-  source event for a `ViewSlice`
 
 That means the current shell composition is:
 
 - `CommandSlice`
   `Screen -> Command -> Event`
 - `ViewSlice`
-  `Event Ref -> View -> Screen`
+  classic Event Modeling default: `View`
+
+If a different lens wants to show a screen or actor surface above the `View`, that should be treated as a lens-specific projection rather than the default `ViewSlice` shape.
 
 ## Current Token Direction
 
@@ -140,6 +139,16 @@ The next screen-oriented upgrade should prefer:
 - or a screenshot-like projection from the real screen board
 
 without changing the underlying slice meaning.
+
+## Current Event Ref Rule
+
+`Event Ref` is not part of the current default LaundryLog `ViewSlice` language.
+
+Why:
+
+- the `ViewSlice` should not show the event in classic Event Modeling reading
+- the event belongs in the preceding `CommandSlice`
+- if we need a later supporting reference row for some other lens, that should be introduced deliberately instead of being baked into the default `ViewSlice`
 
 ## Current Naming Rule
 
