@@ -68,65 +68,6 @@ module SliceBlockState =
                       Content = content
                       FooterBadgeText = footerBadgeText |> Option.map (fun (value: string) -> value.Trim()) }
 
-/// Describes one fully rendered CommandSlice card.
-type CommandSliceCardState =
-    { AppName: string
-      Title: string
-      Description: string
-      Screen: SliceBlockState
-      Command: SliceBlockState
-      Event: SliceBlockState }
-
-[<RequireQualifiedAccess>]
-module CommandSliceCardState =
-    /// Creates a validated CommandSlice card state.
-    let tryCreate appName title description screen command event =
-        if String.IsNullOrWhiteSpace appName then
-            Error "CommandSlice cards must provide an app name."
-        elif String.IsNullOrWhiteSpace title then
-            Error "CommandSlice cards must provide a title."
-        elif String.IsNullOrWhiteSpace description then
-            Error "CommandSlice cards must provide a description."
-        else
-            Ok
-                { AppName = appName.Trim()
-                  Title = title.Trim()
-                  Description = description.Trim()
-                  Screen = screen
-                  Command = command
-                  Event = event }
-
-/// Describes one fully rendered ViewSlice card.
-type ViewSliceCardState =
-    { AppName: string
-      Title: string
-      Description: string
-      Screen: SliceBlockState option
-      View: SliceBlockState }
-
-[<RequireQualifiedAccess>]
-module ViewSliceCardState =
-    /// Creates a validated ViewSlice card state.
-    let tryCreate appName title description screen view =
-        if String.IsNullOrWhiteSpace appName then
-            Error "ViewSlice cards must provide an app name."
-        elif String.IsNullOrWhiteSpace title then
-            Error "ViewSlice cards must provide a title."
-        elif String.IsNullOrWhiteSpace description then
-            Error "ViewSlice cards must provide a description."
-        else
-            Ok
-                { AppName = appName.Trim()
-                  Title = title.Trim()
-                  Description = description.Trim()
-                  Screen = screen
-                  View = view }
-
-/// Distinguishes the supported slice cards that can appear in a rendered path row.
-type PathSliceCard =
-    | CommandSlice of CommandSliceCardState
-    | ViewSlice of ViewSliceCardState
-
 /// Distinguishes the first supported scenario stages for GWT-style path bands.
 type GwtStage =
     | Given
@@ -182,7 +123,7 @@ module SliceGwtKind =
         | SliceGwtKind.CommandRules -> "command"
         | SliceGwtKind.ViewProjection -> "view"
 
-/// Describes one per-slice GWT card aligned beneath a rendered path row.
+/// Describes one per-slice GWT card rendered inside a slice frame.
 type SliceGwtCard =
     { Kind: SliceGwtKind
       Clauses: GwtClause list }
@@ -198,36 +139,80 @@ module SliceGwtCard =
                 { Kind = kind
                   Clauses = clauses }
 
-/// Describes one rendered GWT row aligned beneath the path slices.
-type PathGwtRow =
-    { Title: string
-      Cards: SliceGwtCard list }
+/// Describes one fully rendered CommandSlice card.
+type CommandSliceCardState =
+    { AppName: string
+      Title: string
+      Description: string
+      Screen: SliceBlockState
+      Command: SliceBlockState
+      Event: SliceBlockState
+      Gwt: SliceGwtCard option }
 
 [<RequireQualifiedAccess>]
-module PathGwtRow =
-    /// Creates a validated GWT row for a path band.
-    let tryCreate title cards =
-        if String.IsNullOrWhiteSpace title then
-            Error "GWT rows must provide a title."
-        elif List.isEmpty cards then
-            Error "GWT rows must contain at least one card."
+module CommandSliceCardState =
+    /// Creates a validated CommandSlice card state.
+    let tryCreate appName title description screen command event gwt =
+        if String.IsNullOrWhiteSpace appName then
+            Error "CommandSlice cards must provide an app name."
+        elif String.IsNullOrWhiteSpace title then
+            Error "CommandSlice cards must provide a title."
+        elif String.IsNullOrWhiteSpace description then
+            Error "CommandSlice cards must provide a description."
         else
             Ok
-                { Title = title.Trim()
-                  Cards = cards }
+                { AppName = appName.Trim()
+                  Title = title.Trim()
+                  Description = description.Trim()
+                  Screen = screen
+                  Command = command
+                  Event = event
+                  Gwt = gwt }
+
+/// Describes one fully rendered ViewSlice card.
+type ViewSliceCardState =
+    { AppName: string
+      Title: string
+      Description: string
+      Screen: SliceBlockState option
+      View: SliceBlockState
+      Gwt: SliceGwtCard option }
+
+[<RequireQualifiedAccess>]
+module ViewSliceCardState =
+    /// Creates a validated ViewSlice card state.
+    let tryCreate appName title description screen view gwt =
+        if String.IsNullOrWhiteSpace appName then
+            Error "ViewSlice cards must provide an app name."
+        elif String.IsNullOrWhiteSpace title then
+            Error "ViewSlice cards must provide a title."
+        elif String.IsNullOrWhiteSpace description then
+            Error "ViewSlice cards must provide a description."
+        else
+            Ok
+                { AppName = appName.Trim()
+                  Title = title.Trim()
+                  Description = description.Trim()
+                  Screen = screen
+                  View = view
+                  Gwt = gwt }
+
+/// Distinguishes the supported slice cards that can appear in a rendered path row.
+type PathSliceCard =
+    | CommandSlice of CommandSliceCardState
+    | ViewSlice of ViewSliceCardState
 
 /// Describes one rendered PATH row.
 type PathRowState =
     { PathId: string
       Title: string
       Description: string
-      SliceCards: PathSliceCard list
-      GwtRows: PathGwtRow list }
+      SliceCards: PathSliceCard list }
 
 [<RequireQualifiedAccess>]
 module PathRowState =
     /// Creates a validated PATH row state.
-    let tryCreate pathId title description sliceCards gwtRows =
+    let tryCreate pathId title description sliceCards =
         if String.IsNullOrWhiteSpace pathId then
             Error "Path rows must provide a stable path identifier."
         elif String.IsNullOrWhiteSpace title then
@@ -241,8 +226,7 @@ module PathRowState =
                 { PathId = pathId.Trim()
                   Title = title.Trim()
                   Description = description.Trim()
-                  SliceCards = sliceCards
-                  GwtRows = gwtRows }
+                  SliceCards = sliceCards }
 
 /// Describes the current rendering options for the HTML path projection.
 type SliceRenderOptions =
@@ -280,8 +264,8 @@ module SliceHtmlExamples =
         SliceBlockState.tryCreate kind title badges content footerBadgeText
         |> expect $"slice block '{title}'"
 
-    let private commandSlice appName title description screen command event =
-        CommandSliceCardState.tryCreate appName title description screen command event
+    let private commandSlice appName title description screen command event gwt =
+        CommandSliceCardState.tryCreate appName title description screen command event gwt
         |> expect $"command slice '{title}'"
         |> PathSliceCard.CommandSlice
 
@@ -301,12 +285,8 @@ module SliceHtmlExamples =
         SliceGwtCard.tryCreate kind clauses
         |> expect "gwt card"
 
-    let private gwtRow title cards =
-        PathGwtRow.tryCreate title cards
-        |> expect $"gwt row '{title}'"
-
-    let private viewSlice appName title description screen view =
-        ViewSliceCardState.tryCreate appName title description screen view
+    let private viewSlice appName title description screen view gwt =
+        ViewSliceCardState.tryCreate appName title description screen view gwt
         |> expect $"view slice '{title}'"
         |> PathSliceCard.ViewSlice
 
@@ -490,6 +470,48 @@ module SliceHtmlExamples =
                 (PropertyLines (formatViewState washerDryerView))
                 (Some "classic em")
 
+        let captureLocationGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseText GwtStage.Given "no active laundry location has been captured yet"
+                  gwtClauseBlocks GwtStage.When [ captureLocationCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ locationCapturedEventBlock ] ]
+
+        let readyViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session for the active location"
+                  gwtClauseBlocks GwtStage.Then [ readyViewBlock ] ]
+
+        let washerCommandGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                  gwtClauseBlocks GwtStage.When [ washerCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ washerLoggedEventBlock ] ]
+
+        let washerViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                  gwtClauseBlocks GwtStage.Then [ washerVisibleViewBlock ] ]
+
+        let dryerCommandGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                  gwtClauseBlocks GwtStage.When [ dryerCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ dryerLoggedEventBlock ] ]
+
+        let dryerViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock; dryerLoggedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                  gwtClauseBlocks GwtStage.Then [ washerDryerVisibleViewBlock ] ]
+
         PathRowState.tryCreate
             "path1"
             "PATH 1: Manual Location -> Washer -> Dryer"
@@ -501,12 +523,14 @@ module SliceHtmlExamples =
                   setLocationScreenBlock
                   captureLocationCommandBlock
                   locationCapturedEventBlock
+                  (Some captureLocationGwt)
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "ready to log the first washer expense"
                   (Some readyScreenBlock)
                   readyViewBlock
+                  (Some readyViewGwt)
               commandSlice
                   "LaundryLog"
                   "Log Washer Expense"
@@ -514,12 +538,14 @@ module SliceHtmlExamples =
                   readyScreenBlock
                   washerCommandBlock
                   washerLoggedEventBlock
+                  (Some washerCommandGwt)
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "washer entry is visible in the current session"
                   (Some washerVisibleScreenBlock)
                   washerVisibleViewBlock
+                  (Some washerViewGwt)
               commandSlice
                   "LaundryLog"
                   "Log Dryer Expense"
@@ -527,44 +553,14 @@ module SliceHtmlExamples =
                   washerVisibleScreenBlock
                   dryerCommandBlock
                   dryerLoggedEventBlock
+                  (Some dryerCommandGwt)
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "washer and dryer are visible in the current session"
                   (Some washerDryerVisibleScreenBlock)
-                  washerDryerVisibleViewBlock ]
-            [ gwtRow
-                  "PATH 1 GWT"
-                  [ gwtCard
-                        SliceGwtKind.CommandRules
-                        [ gwtClauseText GwtStage.Given "no active laundry location has been captured yet"
-                          gwtClauseBlocks GwtStage.When [ captureLocationCommandBlock ]
-                          gwtClauseBlocks GwtStage.Then [ locationCapturedEventBlock ] ]
-                    gwtCard
-                        SliceGwtKind.ViewProjection
-                        [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
-                          gwtClauseText GwtStage.When "project the current laundry session for the active location"
-                          gwtClauseBlocks GwtStage.Then [ readyViewBlock ] ]
-                    gwtCard
-                        SliceGwtKind.CommandRules
-                        [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
-                          gwtClauseBlocks GwtStage.When [ washerCommandBlock ]
-                          gwtClauseBlocks GwtStage.Then [ washerLoggedEventBlock ] ]
-                    gwtCard
-                        SliceGwtKind.ViewProjection
-                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
-                          gwtClauseText GwtStage.When "project the current laundry session over visible entries"
-                          gwtClauseBlocks GwtStage.Then [ washerVisibleViewBlock ] ]
-                    gwtCard
-                        SliceGwtKind.CommandRules
-                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
-                          gwtClauseBlocks GwtStage.When [ dryerCommandBlock ]
-                          gwtClauseBlocks GwtStage.Then [ dryerLoggedEventBlock ] ]
-                    gwtCard
-                        SliceGwtKind.ViewProjection
-                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock; dryerLoggedEventBlock ]
-                          gwtClauseText GwtStage.When "project the current laundry session over visible entries"
-                          gwtClauseBlocks GwtStage.Then [ washerDryerVisibleViewBlock ] ] ] ]
+                  washerDryerVisibleViewBlock
+                  (Some dryerViewGwt) ]
         |> expect "path1 row"
 
 /// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
@@ -679,91 +675,6 @@ module SliceHtmlRenderer =
 
         appendLine builder "</div>"
 
-    let private renderSliceCardShell
-        (builder: StringBuilder)
-        options
-        sliceCssClass
-        appName
-        kindLabel
-        title
-        description
-        rows
-        =
-        appendLine builder $"<article class=\"slice-card {sliceCssClass}\">"
-        appendLine builder "<div class=\"slice-card__header\">"
-        appendLine builder "<div class=\"slice-card__topline\">"
-        renderBadge builder "slice-card__app-pill" appName
-        appendLine builder $"<div class=\"slice-card__kind\">{htmlEncode kindLabel}</div>"
-        appendLine builder "</div>"
-        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode title}</h2>"
-        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode description}</p>"
-        appendLine builder "</div>"
-        appendLine builder "<div class=\"slice-card__body\">"
-
-        rows
-        |> List.iter (renderCardRow builder options)
-
-        appendLine builder "</div>"
-        appendLine builder "</article>"
-
-    let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
-        renderSliceCardShell
-            builder
-            options
-            "slice-card--command"
-            sliceState.AppName
-            "COMMAND SLICE"
-            sliceState.Title
-            sliceState.Description
-            [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
-              detailRow (SliceCardRowContent.BlockRow sliceState.Command)
-              detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
-
-    let private renderViewSlice (builder: StringBuilder) options (sliceState: ViewSliceCardState) =
-        renderSliceCardShell
-            builder
-            options
-            "slice-card--view"
-            sliceState.AppName
-            "VIEW SLICE"
-            sliceState.Title
-            sliceState.Description
-            [ if options.ShowViewScreens then
-                  match sliceState.Screen with
-                  | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
-                  | None -> screenRow SliceCardRowContent.EmptyRow
-              else
-                  screenRow SliceCardRowContent.EmptyRow
-              detailRow (SliceCardRowContent.BlockRow sliceState.View)
-              detailRow SliceCardRowContent.EmptyRow ]
-
-    let private renderSliceCard (builder: StringBuilder) options =
-        function
-        | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
-        | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
-
-    let private renderScript (builder: StringBuilder) =
-        appendLine builder "<script>"
-        appendLine builder "document.addEventListener('DOMContentLoaded', function () {"
-        appendLine builder "  const expandButton = document.querySelector('[data-action=\"expand-properties\"]');"
-        appendLine builder "  const collapseButton = document.querySelector('[data-action=\"collapse-properties\"]');"
-        appendLine builder "  if (expandButton) {"
-        appendLine builder "    expandButton.addEventListener('click', function () {"
-        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
-        appendLine builder "        panel.open = true;"
-        appendLine builder "      });"
-        appendLine builder "    });"
-        appendLine builder "  }"
-        appendLine builder "  if (collapseButton) {"
-        appendLine builder "    collapseButton.addEventListener('click', function () {"
-        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
-        appendLine builder "        panel.open = false;"
-        appendLine builder "      });"
-        appendLine builder "    });"
-        appendLine builder "  }"
-        appendLine builder "});"
-        appendLine builder "</script>"
-
     let private renderGwtBlockReference (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
         let blockCssClass = SliceBlockKind.cssClass blockState.Kind
 
@@ -801,25 +712,113 @@ module SliceHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "</div>"
 
-    let private renderGwtCard (builder: StringBuilder) (card: SliceGwtCard) =
+    let private renderEmbeddedGwtCard (builder: StringBuilder) (card: SliceGwtCard) =
         let kindCssClass = SliceGwtKind.cssClass card.Kind
 
-        appendLine builder $"<article class=\"path-document__gwt-card path-document__gwt-card--{kindCssClass}\">"
-        appendLine builder "<div class=\"path-document__gwt-topline\">"
-        renderBadge builder "path-document__gwt-kind" (SliceGwtKind.label card.Kind)
+        appendLine builder $"<section class=\"slice-card__gwt-card slice-card__gwt-card--{kindCssClass}\">"
+        appendLine builder "<div class=\"slice-card__gwt-topline\">"
+        renderBadge builder "slice-card__gwt-kind" (SliceGwtKind.label card.Kind)
         appendLine builder "</div>"
-        appendLine builder "<div class=\"path-document__gwt-clauses\">"
+        appendLine builder "<div class=\"slice-card__gwt-clauses\">"
         card.Clauses |> List.iter (renderGwtClause builder)
+        appendLine builder "</div>"
+        appendLine builder "</section>"
+
+    let private renderSliceCardShell
+        (builder: StringBuilder)
+        options
+        sliceCssClass
+        appName
+        kindLabel
+        title
+        description
+        rows
+        gwt
+        =
+        appendLine builder $"<article class=\"slice-card {sliceCssClass}\">"
+        appendLine builder "<div class=\"slice-card__header\">"
+        appendLine builder "<div class=\"slice-card__topline\">"
+        renderBadge builder "slice-card__app-pill" appName
+        appendLine builder $"<div class=\"slice-card__kind\">{htmlEncode kindLabel}</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode title}</h2>"
+        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode description}</p>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"slice-card__body\">"
+
+        rows
+        |> List.iter (renderCardRow builder options)
+
+        appendLine builder "</div>"
+
+        appendLine builder "<div class=\"slice-card__gwt-row\">"
+
+        match gwt with
+        | Some gwtCard -> renderEmbeddedGwtCard builder gwtCard
+        | None -> appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
+
         appendLine builder "</div>"
         appendLine builder "</article>"
 
-    let private renderGwtRow (builder: StringBuilder) (row: PathGwtRow) =
-        appendLine builder "<section class=\"path-document__gwt-row-wrap\">"
-        appendLine builder $"<h2 class=\"path-document__gwt-row-title\">{htmlEncode row.Title}</h2>"
-        appendLine builder "<div class=\"path-document__gwt-row\">"
-        row.Cards |> List.iter (renderGwtCard builder)
-        appendLine builder "</div>"
-        appendLine builder "</section>"
+    let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--command"
+            sliceState.AppName
+            "COMMAND SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Command)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
+            sliceState.Gwt
+
+    let private renderViewSlice (builder: StringBuilder) options (sliceState: ViewSliceCardState) =
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--view"
+            sliceState.AppName
+            "VIEW SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ if options.ShowViewScreens then
+                  match sliceState.Screen with
+                  | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
+                  | None -> screenRow SliceCardRowContent.EmptyRow
+              else
+                  screenRow SliceCardRowContent.EmptyRow
+              detailRow (SliceCardRowContent.BlockRow sliceState.View)
+              detailRow SliceCardRowContent.EmptyRow ]
+            sliceState.Gwt
+
+    let private renderSliceCard (builder: StringBuilder) options =
+        function
+        | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
+        | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
+
+    let private renderScript (builder: StringBuilder) =
+        appendLine builder "<script>"
+        appendLine builder "document.addEventListener('DOMContentLoaded', function () {"
+        appendLine builder "  const expandButton = document.querySelector('[data-action=\"expand-properties\"]');"
+        appendLine builder "  const collapseButton = document.querySelector('[data-action=\"collapse-properties\"]');"
+        appendLine builder "  if (expandButton) {"
+        appendLine builder "    expandButton.addEventListener('click', function () {"
+        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = true;"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "  if (collapseButton) {"
+        appendLine builder "    collapseButton.addEventListener('click', function () {"
+        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = false;"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "});"
+        appendLine builder "</script>"
 
     let private renderStyles (builder: StringBuilder) =
         appendLine builder "<style>"
@@ -832,17 +831,7 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }"
         appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
         appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
-        appendLine builder ".path-document__row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--slice-card-width); grid-template-rows: auto var(--slice-title-height) var(--slice-description-height) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
-        appendLine builder ".path-document__gwt-bands { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }"
-        appendLine builder ".path-document__gwt-row-wrap { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".path-document__gwt-row-title { margin: 0; font-size: 0.72rem; line-height: 1.1; color: #35506a; }"
-        appendLine builder ".path-document__gwt-row { display: grid; grid-template-columns: repeat(var(--slice-columns), var(--slice-card-width)); column-gap: 10px; align-items: stretch; overflow-x: auto; padding: 1px 2px 2px; }"
-        appendLine builder ".path-document__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".path-document__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }"
-        appendLine builder ".path-document__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }"
-        appendLine builder ".path-document__gwt-topline { display: flex; justify-content: flex-start; }"
-        appendLine builder ".path-document__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; text-transform: lowercase; }"
-        appendLine builder ".path-document__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--slice-card-width); grid-template-rows: auto var(--slice-title-height) var(--slice-description-height) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
         appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
         appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
         appendLine builder ".path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }"
@@ -860,7 +849,7 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }"
         appendLine builder ".path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }"
         appendLine builder ".path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }"
-        appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 6; align-content: start; }"
+        appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
         appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
         appendLine builder ".slice-card__header, .slice-card__body { display: contents; }"
@@ -873,6 +862,13 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-card__row--screen { grid-row: 4; }"
         appendLine builder ".slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }"
         appendLine builder ".slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }"
+        appendLine builder ".slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; }"
+        appendLine builder ".slice-card__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }"
+        appendLine builder ".slice-card__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }"
+        appendLine builder ".slice-card__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }"
+        appendLine builder ".slice-card__gwt-topline { display: flex; justify-content: flex-start; }"
+        appendLine builder ".slice-card__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; text-transform: lowercase; }"
+        appendLine builder ".slice-card__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
         appendLine builder ".slice-card__row > .slice-block { flex: 1; }"
         appendLine builder ".slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }"
         appendLine builder ".slice-card__slot--row-fill { flex: 1; }"
@@ -905,7 +901,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
         appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
-        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row, .path-document__gwt-row { column-gap: 8px; } }"
+        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"
         appendLine builder "</style>"
 
     /// Renders a full self-contained HTML document for the supplied PATH row.
@@ -933,11 +929,6 @@ module SliceHtmlRenderer =
         appendLine builder "<section class=\"path-document__row\">"
         pathRow.SliceCards |> List.iter (renderSliceCard builder options)
         appendLine builder "</section>"
-
-        if not (List.isEmpty pathRow.GwtRows) then
-            appendLine builder "<section class=\"path-document__gwt-bands\">"
-            pathRow.GwtRows |> List.iter (renderGwtRow builder)
-            appendLine builder "</section>"
 
         appendLine builder "</main>"
         renderScript builder

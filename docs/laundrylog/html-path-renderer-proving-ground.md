@@ -54,15 +54,14 @@ It now also uses explicit CSS grid row contracts for the outer path row and shar
 
 - `CommandSlice` and `ViewSlice` can stay in horizontal rhythm
 - screen, detail, and future supporting bands can share stable heights
-- later `GWT` rows can be added as deliberate bands instead of improvised offsets
-- the first `GWT` band can align directly beneath the slice columns without pairing slices together
+- `GWT` can live as a deliberate row inside each slice frame instead of floating outside the slice
 
 The current first path is:
 
 - manual location capture
 - washer expense
 - dryer expense
-- one aligned per-slice `GWT` row spanning all six slice columns
+- one embedded per-slice `GWT` section inside each slice frame
 
 The current rule is:
 
@@ -72,6 +71,7 @@ The current rule is:
 - view-side `GWT` expresses projection logic from facts into the visible `View`
 - command-side `GWT` should prefer mini representations of the participating command and event surfaces when that improves readability
 - view-side `GWT` can mix fact/view representations with short projection text
+- the slice frame itself should include that slice's `GWT`, not push it into a separate board-wide band
 
 ## Lens Rule
 
@@ -106,7 +106,7 @@ So the current order is:
 The next likely moves are:
 
 - refine the slice-card visual language
-- keep shared row contracts strong enough for later `GWT` and scenario bands
+- keep shared row contracts strong enough for later `GWT` and scenario bands that remain local to the slice frame
 - decide which `GWT` bands are always visible versus lens-controlled
 - decide how much property detail a compact `GWT` block reference should show by default
 - keep the projection deterministic and self-contained

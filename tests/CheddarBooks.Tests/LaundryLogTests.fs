@@ -229,7 +229,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "CurrentLaundrySession" "Expected the current-session view title in the rendered document."
                   Expect.stringContains htmlDocument "classic em" "Expected the current lens footer badge.")
 
-              testCase "Classic path renderer includes a per-slice GWT band" (fun () ->
+              testCase "Classic path renderer includes per-slice embedded GWT cards" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 
                   let htmlDocument =
@@ -237,7 +237,9 @@ module LaundryLogTests =
                           (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
                           pathRow
 
-                  Expect.stringContains htmlDocument "PATH 1 GWT" "Expected the first GWT-row title."
+                  Expect.stringContains htmlDocument "slice-card__gwt-row" "Expected each slice to reserve an embedded GWT row."
+                  Expect.stringContains htmlDocument "slice-card__gwt-card--command" "Expected command slices to render embedded command GWT cards."
+                  Expect.stringContains htmlDocument "slice-card__gwt-card--view" "Expected view slices to render embedded view GWT cards."
                   Expect.stringContains htmlDocument "command gwt" "Expected command-slice GWT cards."
                   Expect.stringContains htmlDocument "view gwt" "Expected view-slice GWT cards."
                   Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the GWT band."
