@@ -529,7 +529,7 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-chip--selected { background: #fff8e1; border-color: #ffcc80; color: #f57c00; }"
         appendLine builder ".ll-chip__icon { font-size: 1rem; line-height: 1; }"
         appendLine builder ".ll-chip__label { line-height: 1.1; }"
-        appendLine builder ".ll-two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }"
+        appendLine builder ".ll-two-up { display: grid; grid-template-columns: 1fr; gap: 12px; }"
         appendLine builder ".ll-stepper { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }"
         appendLine builder ".ll-stepper__button { width: 72px; height: 72px; border: none; background: #ffcc80; color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3); }"
         appendLine builder ".ll-stepper__button:active { transform: scale(0.95); background: #ffb74d; }"
@@ -569,7 +569,7 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }"
         appendLine builder ".ll-entry-card__detail { margin: 0; font-size: 0.8125rem; color: #64748b; font-weight: 500; }"
         appendLine builder ".ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
-        appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-two-up { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }"
+        appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }"
         appendLine builder "</style>"
 
     /// Renders a self-contained HTML document for the current LaundryLog screen proving ground.

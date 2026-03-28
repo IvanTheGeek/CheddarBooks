@@ -397,4 +397,16 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "<span class=\"ll-chip__subtext\">Historical</span>" "Expected the historical helper label."
                   Expect.stringContains htmlDocument "ll-feedback-banner" "Expected the visible success toast block."
                   Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block."
-                  Expect.stringContains htmlDocument "3 Washers @ $3.75 • Credit Card" "Expected the v7-aligned primary entry list.") ]
+                  Expect.stringContains htmlDocument "3 Washers @ $3.75 • Credit Card" "Expected the v7-aligned primary entry list.")
+
+              testCase "Screen renderer stacks quantity and unit price vertically like v7" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-two-up { display: grid; grid-template-columns: 1fr; gap: 12px; }"
+                      "Expected quantity and unit-price panels to stack vertically.") ]
