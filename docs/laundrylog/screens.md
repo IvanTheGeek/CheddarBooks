@@ -4,10 +4,11 @@ These notes describe the first concrete LaundryLog screen surfaces and screen st
 
 For the broader design rationale behind these screens, including the longer concept-page iteration thread, see [Concept UI Page](concept-ui-page.md).
 
-Primary source threads include:
+For the first reusable interaction-primitive interpretation of these screens, see [FnHCI Primitive Map](fnhci-primitive-map.md).
 
-- [`019d174e-e9e9-7732-8fb0-053fb558797f.toml`](../../../../NEXUS-EventStore/projections/conversations/019d174e-e9e9-7732-8fb0-053fb558797f.toml)
-- [`019d174e-ea7b-71ca-91ea-5f3ad56b32fd.toml`](../../../../NEXUS-EventStore/projections/conversations/019d174e-ea7b-71ca-91ea-5f3ad56b32fd.toml)
+Primary source discussion history still exists upstream in `NEXUS-EMERGING`, but the local durable summary to use in this extracted repo is:
+
+- [Concept UI Page](concept-ui-page.md)
 
 ## Screen Model
 

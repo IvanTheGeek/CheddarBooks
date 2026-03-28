@@ -4,6 +4,8 @@ This note captures the first code-facing view shape for LaundryLog as a tool app
 
 For the fuller visual and workflow rationale behind these view contracts, see [Concept UI Page](concept-ui-page.md).
 
+For the first reusable interaction-primitive bridge below the app-view level, see [FnHCI Primitive Map](fnhci-primitive-map.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.

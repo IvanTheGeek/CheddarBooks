@@ -4,10 +4,11 @@ LaundryLog is the first concrete tool app inside the CheddarBooks domain and bra
 
 Start here:
 
-- [`../README.md`](../README.md)
-- [`../../cheddarbooks-foundation.md`](../../cheddarbooks-foundation.md)
+- [`../../README.md`](../../README.md)
+- [`../foundation.md`](../foundation.md)
 - [`introduction.md`](introduction.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
+- [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`event-modeling/README.md`](event-modeling/README.md)
 - [`requirements.md`](requirements.md)
 - [`product.md`](product.md)
@@ -32,5 +33,7 @@ Current focus:
 If you want the user-facing explanation first, start with [`introduction.md`](introduction.md).
 
 If you want the richer UI-design origin and concept-page rationale, go to [`concept-ui-page.md`](concept-ui-page.md).
+
+If you want the first bridge from the current screens into reusable interaction primitives, go to [`fnhci-primitive-map.md`](fnhci-primitive-map.md).
 
 If you want to start the next implementation phase, go to [`event-modeling/README.md`](event-modeling/README.md).
