@@ -38,6 +38,24 @@ For the next step, we are intentionally starting small:
 
 That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
 
+## Event Modeling Is One Lens Here
+
+For LaundryLog, this Event Modeling area should be read as:
+
+- one selected business-flow lens over the app
+- not the whole model of the app
+
+Other concern lines will still matter and should stay able to pressure the model later, including:
+
+- screen and component behavior
+- design tokens and visual system concerns
+- runtime and execution concerns
+- device-specific adaptation
+- sample data and test pressure
+- customer feedback about how tasks should actually be completed
+
+So these notes should stay precise in Event Modeling terms without pretending they already cover every other concern line.
+
 ## Start Here
 
 - [`starting-point.md`](starting-point.md)

@@ -53,6 +53,24 @@ This makes Penpot a good home for:
 - UI path mockups
 - visual comparison between business flow and screen flow
 
+## Different Readers, Different Lenses
+
+The same Penpot board will often be read differently by different people.
+
+Examples:
+
+- a developer may look for implementation seams
+- a UX contributor may look for state and screen changes
+- a designer may look for component and token pressure
+- a customer or product owner may look for task completion and friction
+
+That means one Penpot board should not be expected to carry every concern equally well at the same time.
+
+The better rule is:
+
+- let the board serve a chosen lens well
+- and let other concerns pressure the model through other related surfaces
+
 ## Current Page Split
 
 For LaundryLog, the current Penpot page split should be:
