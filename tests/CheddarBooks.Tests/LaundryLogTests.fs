@@ -243,8 +243,10 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the GWT band."
                   Expect.stringContains htmlDocument "WHEN" "Expected the WHEN stage label in the GWT band."
                   Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the GWT band."
-                  Expect.stringContains htmlDocument "CaptureLaundryLocation is issued with manual text" "Expected the first command-slice WHEN clause."
-                  Expect.stringContains htmlDocument "the current laundry session is projected for that active location" "Expected the first view-slice WHEN clause.")
+                  Expect.stringContains htmlDocument "path-document__gwt-ref--command" "Expected command-side GWT references to render as command mini-blocks."
+                  Expect.stringContains htmlDocument "path-document__gwt-ref--event" "Expected event references to render as event mini-blocks."
+                  Expect.stringContains htmlDocument ">CaptureLaundryLocation</div>" "Expected the first command-slice WHEN clause to use the command block title."
+                  Expect.stringContains htmlDocument "project the current laundry session for the active location" "Expected the first view-slice WHEN clause.")
 
               testCase "Classic path renderer hides the view screen blocks" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()

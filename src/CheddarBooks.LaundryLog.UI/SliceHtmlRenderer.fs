@@ -145,18 +145,23 @@ module GwtStage =
 /// Describes one stage clause inside a per-slice GWT card.
 type GwtClause =
     { Stage: GwtStage
-      Text: string }
+      Text: string option
+      BlockReferences: SliceBlockState list }
 
 [<RequireQualifiedAccess>]
 module GwtClause =
     /// Creates a validated GWT clause for a single slice card.
-    let tryCreate stage text =
-        if String.IsNullOrWhiteSpace text then
-            Error "GWT clauses must provide text."
+    let tryCreate stage text blockReferences =
+        let text : string option = text
+        let normalizedText = text |> Option.map (fun value -> value.Trim()) |> Option.filter (String.IsNullOrWhiteSpace >> not)
+
+        if List.isEmpty blockReferences && normalizedText.IsNone then
+            Error "GWT clauses must provide text, block references, or both."
         else
             Ok
                 { Stage = stage
-                  Text = text.Trim() }
+                  Text = normalizedText
+                  BlockReferences = blockReferences }
 
 /// Distinguishes the two current per-slice GWT purposes.
 type SliceGwtKind =
@@ -280,8 +285,16 @@ module SliceHtmlExamples =
         |> expect $"command slice '{title}'"
         |> PathSliceCard.CommandSlice
 
-    let private gwtClause stage text =
-        GwtClause.tryCreate stage text
+    let private gwtClauseText stage text =
+        GwtClause.tryCreate stage (Some text) []
+        |> expect $"gwt clause '{text}'"
+
+    let private gwtClauseBlocks stage blocks =
+        GwtClause.tryCreate stage None blocks
+        |> expect "gwt block clause"
+
+    let private gwtClauseMixed stage text blocks =
+        GwtClause.tryCreate stage (Some text) blocks
         |> expect $"gwt clause '{text}'"
 
     let private gwtCard kind clauses =
@@ -373,6 +386,110 @@ module SliceHtmlExamples =
         let washerView = currentSession [ washerEntry ] "$3.00" (Some "2026-03-27 09:47")
         let washerDryerView = currentSession [ washerEntry; dryerEntry ] "$5.50" (Some "2026-03-27 10:03")
 
+        let setLocationScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Set Location Screen"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let captureLocationCommandBlock =
+            block
+                SliceBlockKind.Command
+                "CaptureLaundryLocation"
+                []
+                (PropertyLines [ $"location_name = {quoted (LocationName.value location)}"; $"capture_method = {captureMethodText}" ])
+                (Some "business")
+
+        let locationCapturedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryLocationCaptured"
+                []
+                (PropertyLines (formatLocationCaptureEvent "2026-03-27T13:42:00Z"))
+                (Some "business")
+
+        let readyScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Ready"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let readyViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState readyView))
+                (Some "classic em")
+
+        let washerCommandBlock =
+            block
+                SliceBlockKind.Command
+                "LogLaundryExpense"
+                []
+                (PropertyLines (formatExpenseCommand washerCommand))
+                (Some "business")
+
+        let washerLoggedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryExpenseLogged"
+                []
+                (PropertyLines (formatExpenseEvent "2026-03-27T13:47:00Z" washerCommand))
+                (Some "business")
+
+        let washerVisibleScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Washer Visible"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let washerVisibleViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState washerView))
+                (Some "classic em")
+
+        let dryerCommandBlock =
+            block
+                SliceBlockKind.Command
+                "LogLaundryExpense"
+                []
+                (PropertyLines (formatExpenseCommand dryerCommand))
+                (Some "business")
+
+        let dryerLoggedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryExpenseLogged"
+                []
+                (PropertyLines (formatExpenseEvent "2026-03-27T14:03:00Z" dryerCommand))
+                (Some "business")
+
+        let washerDryerVisibleScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Washer And Dryer Visible"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let washerDryerVisibleViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState washerDryerView))
+                (Some "classic em")
+
         PathRowState.tryCreate
             "path1"
             "PATH 1: Manual Location -> Washer -> Dryer"
@@ -381,151 +498,73 @@ module SliceHtmlExamples =
                   "LaundryLog"
                   "Capture Laundry Location"
                   "manual location entry starts the path"
-                  (block
-                      SliceBlockKind.Screen
-                      "Set Location Screen"
-                      [ "User" ]
-                      (ScreenshotPlaceholder "Screen snapshot")
-                      (Some "ui lens"))
-                  (block
-                      SliceBlockKind.Command
-                      "CaptureLaundryLocation"
-                      []
-                      (PropertyLines [ $"location_name = {quoted (LocationName.value location)}"; $"capture_method = {captureMethodText}" ])
-                      (Some "business"))
-                  (block
-                      SliceBlockKind.Event
-                      "LaundryLocationCaptured"
-                      []
-                      (PropertyLines (formatLocationCaptureEvent "2026-03-27T13:42:00Z"))
-                      (Some "business"))
+                  setLocationScreenBlock
+                  captureLocationCommandBlock
+                  locationCapturedEventBlock
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "ready to log the first washer expense"
-                  (Some
-                      (block
-                          SliceBlockKind.Screen
-                          "Log Expense Screen - Ready"
-                          [ "User" ]
-                          (ScreenshotPlaceholder "Screen snapshot")
-                          (Some "ui lens")))
-                  (block
-                      SliceBlockKind.View
-                      "CurrentLaundrySession"
-                      []
-                      (PropertyLines (formatViewState readyView))
-                      (Some "classic em"))
+                  (Some readyScreenBlock)
+                  readyViewBlock
               commandSlice
                   "LaundryLog"
                   "Log Washer Expense"
                   "first expense recorded in the active location"
-                  (block
-                      SliceBlockKind.Screen
-                      "Log Expense Screen - Ready"
-                      [ "User" ]
-                      (ScreenshotPlaceholder "Screen snapshot")
-                      (Some "ui lens"))
-                  (block
-                      SliceBlockKind.Command
-                      "LogLaundryExpense"
-                      []
-                      (PropertyLines (formatExpenseCommand washerCommand))
-                      (Some "business"))
-                  (block
-                      SliceBlockKind.Event
-                      "LaundryExpenseLogged"
-                      []
-                      (PropertyLines (formatExpenseEvent "2026-03-27T13:47:00Z" washerCommand))
-                      (Some "business"))
+                  readyScreenBlock
+                  washerCommandBlock
+                  washerLoggedEventBlock
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "washer entry is visible in the current session"
-                  (Some
-                      (block
-                          SliceBlockKind.Screen
-                          "Log Expense Screen - Washer Visible"
-                          [ "User" ]
-                          (ScreenshotPlaceholder "Screen snapshot")
-                          (Some "ui lens")))
-                  (block
-                      SliceBlockKind.View
-                      "CurrentLaundrySession"
-                      []
-                      (PropertyLines (formatViewState washerView))
-                      (Some "classic em"))
+                  (Some washerVisibleScreenBlock)
+                  washerVisibleViewBlock
               commandSlice
                   "LaundryLog"
                   "Log Dryer Expense"
                   "second expense recorded in the same session"
-                  (block
-                      SliceBlockKind.Screen
-                      "Log Expense Screen - Washer Visible"
-                      [ "User" ]
-                      (ScreenshotPlaceholder "Screen snapshot")
-                      (Some "ui lens"))
-                  (block
-                      SliceBlockKind.Command
-                      "LogLaundryExpense"
-                      []
-                      (PropertyLines (formatExpenseCommand dryerCommand))
-                      (Some "business"))
-                  (block
-                      SliceBlockKind.Event
-                      "LaundryExpenseLogged"
-                      []
-                      (PropertyLines (formatExpenseEvent "2026-03-27T14:03:00Z" dryerCommand))
-                      (Some "business"))
+                  washerVisibleScreenBlock
+                  dryerCommandBlock
+                  dryerLoggedEventBlock
               viewSlice
                   "LaundryLog"
                   "Current Laundry Session"
                   "washer and dryer are visible in the current session"
-                  (Some
-                      (block
-                          SliceBlockKind.Screen
-                          "Log Expense Screen - Washer And Dryer Visible"
-                          [ "User" ]
-                          (ScreenshotPlaceholder "Screen snapshot")
-                          (Some "ui lens")))
-                  (block
-                      SliceBlockKind.View
-                      "CurrentLaundrySession"
-                      []
-                      (PropertyLines (formatViewState washerDryerView))
-                      (Some "classic em")) ]
+                  (Some washerDryerVisibleScreenBlock)
+                  washerDryerVisibleViewBlock ]
             [ gwtRow
                   "PATH 1 GWT"
                   [ gwtCard
                         SliceGwtKind.CommandRules
-                        [ gwtClause GwtStage.Given "no active laundry location has been captured yet"
-                          gwtClause GwtStage.When "CaptureLaundryLocation is issued with manual text"
-                          gwtClause GwtStage.Then "LaundryLocationCaptured becomes true" ]
+                        [ gwtClauseText GwtStage.Given "no active laundry location has been captured yet"
+                          gwtClauseBlocks GwtStage.When [ captureLocationCommandBlock ]
+                          gwtClauseBlocks GwtStage.Then [ locationCapturedEventBlock ] ]
                     gwtCard
                         SliceGwtKind.ViewProjection
-                        [ gwtClause GwtStage.Given "LaundryLocationCaptured exists as the current location fact"
-                          gwtClause GwtStage.When "the current laundry session is projected for that active location"
-                          gwtClause GwtStage.Then "CurrentLaundrySession is ready with empty visible entries" ]
+                        [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                          gwtClauseText GwtStage.When "project the current laundry session for the active location"
+                          gwtClauseBlocks GwtStage.Then [ readyViewBlock ] ]
                     gwtCard
                         SliceGwtKind.CommandRules
-                        [ gwtClause GwtStage.Given "an active location is already captured for the session"
-                          gwtClause GwtStage.When "LogLaundryExpense is issued for one washer load"
-                          gwtClause GwtStage.Then "LaundryExpenseLogged records the washer expense" ]
+                        [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                          gwtClauseBlocks GwtStage.When [ washerCommandBlock ]
+                          gwtClauseBlocks GwtStage.Then [ washerLoggedEventBlock ] ]
                     gwtCard
                         SliceGwtKind.ViewProjection
-                        [ gwtClause GwtStage.Given "LaundryExpenseLogged includes a washer expense in the active location"
-                          gwtClause GwtStage.When "the current laundry session is projected over visible entries"
-                          gwtClause GwtStage.Then "CurrentLaundrySession shows the washer entry and $3.00 total" ]
+                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                          gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                          gwtClauseBlocks GwtStage.Then [ washerVisibleViewBlock ] ]
                     gwtCard
                         SliceGwtKind.CommandRules
-                        [ gwtClause GwtStage.Given "the current session already contains the washer expense"
-                          gwtClause GwtStage.When "LogLaundryExpense is issued for one dryer load"
-                          gwtClause GwtStage.Then "LaundryExpenseLogged records the dryer expense" ]
+                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                          gwtClauseBlocks GwtStage.When [ dryerCommandBlock ]
+                          gwtClauseBlocks GwtStage.Then [ dryerLoggedEventBlock ] ]
                     gwtCard
                         SliceGwtKind.ViewProjection
-                        [ gwtClause GwtStage.Given "washer and dryer expenses exist in the active location window"
-                          gwtClause GwtStage.When "the current laundry session is projected over visible entries"
-                          gwtClause GwtStage.Then "CurrentLaundrySession shows washer and dryer with $5.50 total" ] ] ]
+                        [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock; dryerLoggedEventBlock ]
+                          gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                          gwtClauseBlocks GwtStage.Then [ washerDryerVisibleViewBlock ] ] ] ]
         |> expect "path1 row"
 
 /// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
@@ -725,10 +764,41 @@ module SliceHtmlRenderer =
         appendLine builder "});"
         appendLine builder "</script>"
 
+    let private renderGwtBlockReference (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
+        let blockCssClass = SliceBlockKind.cssClass blockState.Kind
+
+        appendLine builder $"<div class=\"path-document__gwt-ref path-document__gwt-ref--{blockCssClass}\">"
+        appendLine builder "<div class=\"path-document__gwt-ref-topline\">"
+        renderBadge builder "path-document__gwt-ref-kind" (SliceBlockKind.badgeLabel blockState.Kind)
+        appendLine builder "</div>"
+        appendLine builder $"<div class=\"path-document__gwt-ref-title\">{htmlEncode blockState.Title}</div>"
+
+        match blockState.Content with
+        | PropertyLines propertyLines when showProperties ->
+            appendLine builder "<div class=\"path-document__gwt-ref-properties\">"
+            propertyLines |> List.iter (renderPropertyLine builder)
+            appendLine builder "</div>"
+        | ScreenshotPlaceholder label ->
+            appendLine builder $"<div class=\"path-document__gwt-ref-text\">{htmlEncode label}</div>"
+        | PropertyLines _ -> ()
+
+        appendLine builder "</div>"
+
     let private renderGwtClause (builder: StringBuilder) (clause: GwtClause) =
         appendLine builder "<div class=\"path-document__gwt-clause\">"
         renderBadge builder "path-document__gwt-stage" (GwtStage.label clause.Stage)
-        appendLine builder $"<div class=\"path-document__gwt-text\">{htmlEncode clause.Text}</div>"
+        appendLine builder "<div class=\"path-document__gwt-clause-body\">"
+
+        match clause.Text with
+        | Some text -> appendLine builder $"<div class=\"path-document__gwt-text\">{htmlEncode text}</div>"
+        | None -> ()
+
+        if not (List.isEmpty clause.BlockReferences) then
+            appendLine builder "<div class=\"path-document__gwt-ref-stack\">"
+            clause.BlockReferences |> List.iter (renderGwtBlockReference builder true)
+            appendLine builder "</div>"
+
+        appendLine builder "</div>"
         appendLine builder "</div>"
 
     let private renderGwtCard (builder: StringBuilder) (card: SliceGwtCard) =
@@ -755,7 +825,7 @@ module SliceHtmlRenderer =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.34rem; --slice-description-height: 1.04rem; --property-value-indent: 1.2rem; --gwt-row-height: 108px; padding: 8px 10px 10px; }"
+        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.34rem; --slice-description-height: 1.04rem; --property-value-indent: 1.2rem; --gwt-row-height: 148px; padding: 8px 10px 10px; }"
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
         appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
@@ -775,7 +845,21 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
         appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
         appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
+        appendLine builder ".path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }"
         appendLine builder ".path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }"
+        appendLine builder ".path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }"
+        appendLine builder ".path-document__gwt-ref { border: 1px solid #c7d7ea; border-radius: 8px; background: rgba(255,255,255,0.8); padding: 3px 4px 4px; display: flex; flex-direction: column; gap: 2px; }"
+        appendLine builder ".path-document__gwt-ref--command { background: rgba(74, 150, 255, 0.12); border-color: #8bc3ff; }"
+        appendLine builder ".path-document__gwt-ref--event { background: rgba(255, 167, 57, 0.14); border-color: #ffb777; }"
+        appendLine builder ".path-document__gwt-ref--view { background: rgba(103, 229, 130, 0.14); border-color: #78e39d; }"
+        appendLine builder ".path-document__gwt-ref-topline { display: flex; justify-content: flex-end; }"
+        appendLine builder ".path-document__gwt-ref-kind { display: inline-flex; align-items: center; justify-content: center; padding: 1px 5px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.46rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
+        appendLine builder ".path-document__gwt-ref-title { border-radius: 2px 2px 0 0; padding: 3px 5px; font-size: 0.56rem; font-weight: 600; line-height: 1.15; color: #ffffff; background: #0ea5e9; }"
+        appendLine builder ".path-document__gwt-ref--event .path-document__gwt-ref-title { background: #f97316; }"
+        appendLine builder ".path-document__gwt-ref--view .path-document__gwt-ref-title { background: #22c55e; }"
+        appendLine builder ".path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }"
+        appendLine builder ".path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }"
+        appendLine builder ".path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }"
         appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 6; align-content: start; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
         appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"

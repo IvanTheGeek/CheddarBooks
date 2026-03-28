@@ -70,6 +70,8 @@ The current rule is:
 - `CommandSlice` and `ViewSlice` use `GWT` differently
 - command-side `GWT` expresses command rules and outcomes
 - view-side `GWT` expresses projection logic from facts into the visible `View`
+- command-side `GWT` should prefer mini representations of the participating command and event surfaces when that improves readability
+- view-side `GWT` can mix fact/view representations with short projection text
 
 ## Lens Rule
 
@@ -106,6 +108,7 @@ The next likely moves are:
 - refine the slice-card visual language
 - keep shared row contracts strong enough for later `GWT` and scenario bands
 - decide which `GWT` bands are always visible versus lens-controlled
+- decide how much property detail a compact `GWT` block reference should show by default
 - keep the projection deterministic and self-contained
 - pressure which slice and badge concepts should later migrate into shared `FnTools`
 - keep the current LaundryLog proving ground honest before extracting a wider reusable engine
