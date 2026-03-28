@@ -307,6 +307,8 @@ type NewSessionPrimitiveState =
 /// Describes the first local primitive composition for the Entry Form view.
 type EntryFormPrimitiveState =
     { Header: HeaderBarState
+      LocationInput: TextInputState option
+      GpsAction: ActionButtonState option
       StatusChips: StatusChipState list
       MachineTypeOptions: OptionGroupState
       QuantityStepper: StepperState

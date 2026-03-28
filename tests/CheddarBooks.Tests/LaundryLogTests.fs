@@ -343,6 +343,7 @@ module LaundryLogTests =
                           "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
                           (ScreenHtmlExamples.laundryLogBaseScreens ())
 
+                  Expect.stringContains htmlDocument "Screen.EntryForm - v7 Primary" "Expected the v7 primary screen surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the awaiting-location screen surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Ready To Set" "Expected the ready-to-set screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the entry-form screen surface."
@@ -356,7 +357,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "✓ Entry logged — $5.00" "Expected the logged toast copy prefix."
                   Expect.stringContains htmlDocument "CASH" "Expected the logged toast payment text.")
 
-              testCase "Screen renderer presents the washer draft as the primary v7-aligned surface" (fun () ->
+              testCase "Screen renderer presents the dedicated v7 surface as the primary app screen" (fun () ->
                   let htmlDocument =
                       ScreenHtmlRenderer.renderDocument
                           "LaundryLog Screen Components"
@@ -365,13 +366,14 @@ module LaundryLogTests =
 
                   Expect.stringContains htmlDocument "ll-primary-surface" "Expected the primary screen wrapper."
                   Expect.stringContains htmlDocument "Supporting State Variants" "Expected the supporting-variants section."
+                  Expect.stringContains htmlDocument "Tap &#128205; or enter location" "Expected the primary surface to carry the v7 location card."
 
                   let primaryIndex = htmlDocument.IndexOf("ll-primary-surface")
-                  let washerDraftIndex = htmlDocument.IndexOf("Screen.EntryForm - Washer Draft")
+                  let v7PrimaryIndex = htmlDocument.IndexOf("Screen.EntryForm - v7 Primary")
                   let awaitingIndex = htmlDocument.IndexOf("Screen.NewSession - Awaiting Location")
 
-                  Expect.isGreaterThan washerDraftIndex primaryIndex "Expected the washer draft name inside the primary surface."
-                  Expect.isGreaterThan awaitingIndex washerDraftIndex "Expected the awaiting-location variant to appear after the primary washer draft surface.")
+                  Expect.isGreaterThan v7PrimaryIndex primaryIndex "Expected the v7 primary name inside the primary surface."
+                  Expect.isGreaterThan awaitingIndex v7PrimaryIndex "Expected the awaiting-location variant to appear after the primary surface.")
 
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
@@ -388,7 +390,8 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "ll-money-input" "Expected the money-input block."
                   Expect.stringContains htmlDocument "ll-quarter-button" "Expected the quarter-style price-adjust buttons."
                   Expect.stringContains htmlDocument "Choose Card" "Expected the progressive payment-detail section."
-                  Expect.stringContains htmlDocument "<span class=\"ll-chip__amount\">$3.00</span>" "Expected the historical helper amount."
+                  Expect.stringContains htmlDocument "<span class=\"ll-chip__amount\">$4.00</span>" "Expected the historical helper amount from the v7-aligned primary surface."
                   Expect.stringContains htmlDocument "<span class=\"ll-chip__subtext\">Historical</span>" "Expected the historical helper label."
                   Expect.stringContains htmlDocument "ll-feedback-banner" "Expected the visible success toast block."
-                  Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block.") ]
+                  Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block."
+                  Expect.stringContains htmlDocument "3 Washers @ $3.75 • Credit Card" "Expected the v7-aligned primary entry list.") ]

@@ -168,6 +168,15 @@ module PrimitiveStateMappings =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some(LocationName.value viewState.ActiveLocationName)) None
             |> expect "entry-form header"
+          LocationInput =
+            TextInputState.tryCreate
+                (controlId "location-input")
+                "Tap 📍 or enter location"
+                (Some(LocationName.value viewState.ActiveLocationName))
+                false
+            |> expect "entry-form location input"
+            |> Some
+          GpsAction = actionButton "use-gps-location" "Use GPS Location" true Supporting |> Some
           StatusChips =
             [ statusChip "status-location" "📍" "Location" Ready
               statusChip "status-type" "🌊" "Type" Ready

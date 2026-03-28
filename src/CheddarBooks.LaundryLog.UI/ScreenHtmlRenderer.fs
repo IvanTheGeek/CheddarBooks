@@ -29,7 +29,11 @@ module ScreenSurfaceState =
 module ScreenHtmlExamples =
     /// Returns the first concrete screen set used by the current HTML screen proving ground.
     let laundryLogBaseScreens () : ScreenSurfaceState list =
-        [ NewSessionScreen
+        [ EntryFormScreen
+              ( "Screen.EntryForm - v7 Primary",
+                Some "recovered Claude-era mobile source of truth",
+                PrimitiveStateExamples.entryFormV7PrimarySurface () )
+          NewSessionScreen
               ( "Screen.NewSession - Awaiting Location",
                 Some "manual location entry before the first expense",
                 PrimitiveStateExamples.newSessionAwaitingLocation () )
@@ -315,11 +319,11 @@ module ScreenHtmlRenderer =
     let private renderEntryCard (builder: StringBuilder) (entryCardState: EntryCardState) =
         appendLine builder "<article class=\"ll-entry-card\">"
         appendLine builder "<div class=\"ll-entry-card__topline\">"
-        appendLine builder $"<h4 class=\"ll-entry-card__title\">{htmlEncode entryCardState.TitleText}</h4>"
-
         match entryCardState.AmountText with
         | Some amountText -> appendLine builder $"<span class=\"ll-entry-card__amount\">{htmlEncode amountText}</span>"
-        | None -> ()
+        | None -> appendLine builder $"<span class=\"ll-entry-card__amount\">{htmlEncode entryCardState.TitleText}</span>"
+
+        appendLine builder $"<h4 class=\"ll-entry-card__title\">{htmlEncode entryCardState.TitleText}</h4>"
 
         appendLine builder "</div>"
 
@@ -369,10 +373,23 @@ module ScreenHtmlRenderer =
         renderHeaderBar builder screenState.Header
         appendLine builder "<div class=\"ll-screen-body\">"
 
-        match screenState.Header.Subtitle with
-        | Some subtitle ->
-            appendLine builder $"<div class=\"ll-location-context\">📍 {htmlEncode subtitle}</div>"
-        | None -> ()
+        match screenState.LocationInput, screenState.GpsAction with
+        | Some locationInput, Some gpsAction ->
+            appendLine builder "<section class=\"ll-panel ll-panel--location\">"
+            appendLine builder "<h3 class=\"ll-panel__title\">📍 Location</h3>"
+            appendLine builder "<div class=\"ll-location-section\">"
+            appendLine builder "<div class=\"ll-location-input\">"
+            renderTextInput builder "Location" locationInput
+            appendLine builder "<div class=\"ll-location-info\">GPS will check personal &amp; community data</div>"
+            appendLine builder "</div>"
+            appendLine builder $"<button type=\"button\" class=\"ll-gps-button\" data-control-id=\"{PrimitiveControlId.value gpsAction.ControlId}\">📍</button>"
+            appendLine builder "</div>"
+            appendLine builder "</section>"
+        | _ ->
+            match screenState.Header.Subtitle with
+            | Some subtitle ->
+                appendLine builder $"<div class=\"ll-location-context\">📍 {htmlEncode subtitle}</div>"
+            | None -> ()
 
         appendLine builder "<section class=\"ll-panel ll-panel--compact\">"
         renderOptionGroup builder None screenState.MachineTypeOptions
@@ -436,7 +453,7 @@ module ScreenHtmlRenderer =
     let private splitPrimarySurface (screenSurfaces: ScreenSurfaceState list) =
         let isPrimaryEntryForm =
             function
-            | EntryFormScreen (surfaceName, _, _) when surfaceName = "Screen.EntryForm - Washer Draft" -> true
+            | EntryFormScreen (surfaceName, _, _) when surfaceName = "Screen.EntryForm - v7 Primary" -> true
             | _ -> false
 
         match screenSurfaces |> List.tryFind isPrimaryEntryForm with
@@ -461,8 +478,8 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-document__title { margin: 0; font-size: 0.96rem; line-height: 1.06; font-weight: 700; }"
         appendLine builder ".ll-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; }"
         appendLine builder ".ll-primary-surface { display: flex; justify-content: center; margin-bottom: 22px; }"
-        appendLine builder ".ll-primary-surface .ll-screen-surface { width: 100%; max-width: 600px; }"
-        appendLine builder ".ll-primary-surface .ll-phone-screen { max-width: 600px; }"
+        appendLine builder ".ll-primary-surface .ll-screen-surface { width: 100%; max-width: 380px; }"
+        appendLine builder ".ll-primary-surface .ll-phone-screen { max-width: 380px; }"
         appendLine builder ".ll-primary-surface .ll-screen-surface__name { font-size: 0.68rem; }"
         appendLine builder ".ll-primary-surface .ll-screen-surface__note { font-size: 0.74rem; }"
         appendLine builder ".ll-supporting-surfaces { display: flex; flex-direction: column; gap: 10px; }"
@@ -472,7 +489,7 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-screen-surface__name { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }"
         appendLine builder ".ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }"
         appendLine builder ".ll-phone-screen { width: 100%; max-width: 360px; min-height: 667px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; gap: 0; }"
-        appendLine builder ".ll-phone-screen--tall { min-height: 920px; }"
+        appendLine builder ".ll-phone-screen--tall { min-height: 980px; }"
         appendLine builder ".ll-screen-body { padding: 1rem; }"
         appendLine builder ".ll-location-context { margin: 0 0 1rem; color: #64748b; font-size: 0.82rem; font-weight: 600; }"
         appendLine builder ".ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }"
@@ -548,9 +565,9 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-entry-list { display: flex; flex-direction: column; gap: 0.75rem; }"
         appendLine builder ".ll-entry-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #cbd5e1; }"
         appendLine builder ".ll-entry-card__topline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }"
-        appendLine builder ".ll-entry-card__title { margin: 0; font-size: 0.9375rem; color: #64748b; font-weight: 500; }"
+        appendLine builder ".ll-entry-card__title { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }"
         appendLine builder ".ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }"
-        appendLine builder ".ll-entry-card__detail { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
+        appendLine builder ".ll-entry-card__detail { margin: 0; font-size: 0.8125rem; color: #64748b; font-weight: 500; }"
         appendLine builder ".ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
         appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-two-up { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }"
         appendLine builder "</style>"

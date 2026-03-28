@@ -59,6 +59,7 @@ The goal is to make the right seams obvious before wider extraction into shared 
 
 The current screen proving ground renders:
 
+- `Screen.EntryForm - v7 Primary`
 - `Screen.NewSession - Awaiting Location`
 - `Screen.NewSession - Ready To Set`
 - `Screen.EntryForm - Washer Draft`
@@ -99,7 +100,7 @@ Future refinements should treat the current HTML renderer as successful only ins
 
 That now has a concrete presentation rule:
 
-- the `Screen.EntryForm - Washer Draft` surface is the primary mobile app screen
+- the `Screen.EntryForm - v7 Primary` surface is the primary mobile app screen
 - the other current screens render as supporting state variants beneath it
 - the proving ground should read like `the app first, variant references second`, not like a flat gallery of equal-weight screens
 

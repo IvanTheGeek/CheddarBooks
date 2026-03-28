@@ -36,6 +36,71 @@ module PrimitiveStateExamples =
         FeedbackBannerState.tryCreate (controlId controlIdValue) messageText
         |> expect $"feedback banner '{messageText}'"
 
+    let private locationInput valueText =
+        TextInputState.tryCreate (controlId "location-input") "Tap 📍 or enter location" valueText false
+        |> expect "entry-form location input"
+
+    let private gpsAction () =
+        actionButton "use-gps-location" "Use GPS Location" true Supporting
+
+    let private recentEntry controlIdValue titleText detailText amountText =
+        EntryCardState.tryCreate
+            (controlId controlIdValue)
+            titleText
+            (Some detailText)
+            (Some amountText)
+        |> expect $"recent entry '{controlIdValue}'"
+
+    /// Captures the recovered v7 mobile design surface as the primary LaundryLog screen anchor.
+    let entryFormV7PrimarySurface () : EntryFormPrimitiveState =
+        { Header =
+            HeaderBarState.tryCreate "LaundryLog" None None
+            |> expect "v7 primary header"
+          LocationInput = locationInput None |> Some
+          GpsAction = gpsAction () |> Some
+          StatusChips =
+            [ statusChip "status-location" "📍" "Location" NeedsAttention
+              statusChip "status-type" "🌊" "Type" NeedsAttention
+              statusChip "status-payment" "💳" "Payment" NeedsAttention ]
+          MachineTypeOptions =
+            optionGroup
+                "machine-type"
+                None
+                [ optionChoice "washer" "Washer" false
+                  optionChoice "dryer" "Dryer" false
+                  optionChoice "supplies" "Supplies" false ]
+          QuantityStepper =
+            StepperState.tryCreate (controlId "quantity-stepper") "-" "+" "1" false true
+            |> expect "v7 primary quantity stepper"
+          PriceInput =
+            MoneyInputState.tryCreate
+                (controlId "price-input")
+                "$"
+                (Some "3.00")
+                "0.00"
+                [ "Last used $3.75"; "Historical $4.00"; "Community $3.50" ]
+                [ quarterAdjustButton "price-quarter-down" Decrease "25¢"
+                  quarterAdjustButton "price-quarter-up" Increase "25¢" ]
+            |> expect "v7 primary price input"
+          PaymentOptions =
+            optionGroup
+                "payment-type"
+                None
+                [ optionChoice "cash" "Cash" false
+                  optionChoice "points" "Points" false
+                  optionChoice "card" "Card" false
+                  optionChoice "app" "App" false ]
+          PaymentDetailOptions = None
+          SessionTotal =
+            SummaryBarState.tryCreate (controlId "session-total") "Session Total" "$0.00"
+            |> expect "v7 primary session total"
+          FeedbackBanner = None
+          RecentEntries =
+            [ recentEntry "entry-v7-washer" "2:34 PM" "3 Washers @ $3.75 • Credit Card" "$11.25"
+              recentEntry "entry-v7-dryer" "2:38 PM" "3 Dryers @ $2.00 • Credit Card" "$6.00"
+              recentEntry "entry-v7-supplies" "2:40 PM" "1 Supplies @ $2.50 • Cash" "$2.50" ]
+          SubmitAction = actionButton "log-entry" "Log Entry" false Primary }
+
     /// Captures the current New Session primitive composition before a location value has been entered.
     let newSessionAwaitingLocation () : NewSessionPrimitiveState =
         { Header =
@@ -67,6 +132,8 @@ module PrimitiveStateExamples =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some "Love's #123 - Springfield, OH") None
             |> expect "entry-form header"
+          LocationInput = locationInput (Some "Love's #123 - Springfield, OH") |> Some
+          GpsAction = gpsAction () |> Some
           StatusChips =
             [ statusChip "status-location" "📍" "Location" Ready
               statusChip "status-type" "🌊" "Type" Ready
@@ -118,6 +185,8 @@ module PrimitiveStateExamples =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some "Love's #123 - Springfield, OH") None
             |> expect "entry-form card-detail header"
+          LocationInput = locationInput (Some "Love's #123 - Springfield, OH") |> Some
+          GpsAction = gpsAction () |> Some
           StatusChips =
             [ statusChip "status-location" "📍" "Location" Ready
               statusChip "status-type" "🌊" "Type" Ready
@@ -170,6 +239,8 @@ module PrimitiveStateExamples =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some "Love's #123 - Springfield, OH") None
             |> expect "entry-form logged header"
+          LocationInput = locationInput (Some "Love's #123 - Springfield, OH") |> Some
+          GpsAction = gpsAction () |> Some
           StatusChips =
             [ statusChip "status-location" "📍" "Location" Ready
               statusChip "status-type" "🌊" "Type" NeedsAttention
@@ -208,16 +279,6 @@ module PrimitiveStateExamples =
             |> expect "logged session total"
           FeedbackBanner = feedbackBanner "entry-logged" "✓ Entry logged — $5.00 · CASH" |> Some
           RecentEntries =
-            [ EntryCardState.tryCreate
-                  (controlId "entry-1-washer")
-                  "Washer x1"
-                  (Some "Cash • 2026-03-28 01:10")
-                  (Some "$3.00")
-              |> expect "logged recent washer"
-              EntryCardState.tryCreate
-                  (controlId "entry-2-dryer")
-                  "Dryer x1"
-                  (Some "Cash • 2026-03-28 01:13")
-                  (Some "$2.00")
-              |> expect "logged recent dryer" ]
+            [ recentEntry "entry-1-washer" "2026-03-28 01:10" "1 Washer @ $3.00 • Cash" "$3.00"
+              recentEntry "entry-2-dryer" "2026-03-28 01:13" "1 Dryer @ $2.00 • Cash" "$2.00" ]
           SubmitAction = actionButton "log-expense" "✓ Logged!" true Success }
