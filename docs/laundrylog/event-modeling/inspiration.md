@@ -65,6 +65,20 @@ Useful there:
 - earlier slice HTML experiments
 - TOML-shaped slice specs
 - graph-substrate exploration
+- recovered slice-card styling milestones on `main`
+
+Useful milestone commits:
+
+- `d47c513`
+  base command-slice concept
+- `f229656`
+  GWT row added and layout refined
+- `e6f1b00`
+  view-slice section added
+- `f63e1af`
+  read-model row and calmer badge grouping
+
+Those are currently the strongest surviving recovery path for the EM-1 look-and-feel work.
 
 Not authoritative there:
 
