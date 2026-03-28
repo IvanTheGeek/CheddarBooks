@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="PrimitiveStateShapes.fs" />
     <Compile Include="LaundryLogShell.fs" />
   </ItemGroup>
 </Project>

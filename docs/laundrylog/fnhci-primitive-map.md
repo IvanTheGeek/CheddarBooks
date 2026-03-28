@@ -231,12 +231,14 @@ That is the clearest signal we currently have for what should later live in `FnH
 
 1. refine this map against the real Penpot component structure
 2. connect the mapped primitives to the current token vocabulary
-3. sketch the first F# primitive types in the `FnTools` line
-4. keep testing the map against the actual Event Modeling paths instead of only against the pictures
+3. make the first explicit local primitive state shapes code-facing in `CheddarBooks`
+4. later move the truly reusable parts into the `FnTools` line
+5. keep testing the map against the actual Event Modeling paths instead of only against the pictures
 
 ## Related
 
 - [Concept UI Page](concept-ui-page.md)
+- [FnHCI Primitive State Shapes](fnhci-primitive-state-shapes.md)
 - [Screens](screens.md)
 - [View Contracts](view-contracts.md)
 - [Event Modeling](event-modeling/README.md)

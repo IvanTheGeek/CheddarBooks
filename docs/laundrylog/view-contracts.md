@@ -6,6 +6,8 @@ For the fuller visual and workflow rationale behind these view contracts, see [C
 
 For the first reusable interaction-primitive bridge below the app-view level, see [FnHCI Primitive Map](fnhci-primitive-map.md).
 
+For the first explicit local state-shape direction sitting between the current app and future shared primitives, see [FnHCI Primitive State Shapes](fnhci-primitive-state-shapes.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.
