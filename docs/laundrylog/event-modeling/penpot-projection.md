@@ -249,6 +249,20 @@ The stronger current reading is:
 - we should keep using component instances for normal reuse and state pressure whenever they work
 - detaching should stay a deliberate escape hatch, not the default workflow
 
+The current strongest clue about the suspicious shell came from comparing generated markup:
+
+- the slice shell's generated HTML included both:
+  - live edited HTML text nodes
+  - stale base-value text inside embedded SVG fragments
+- the simpler `Button.Option` and `Input.Text` cases did not show that same mixed pattern
+- the slice shell's generated SVG followed the stale base-value path, which matches the broken export result
+
+So the current practical interpretation is:
+
+- the slice shell is not just a generic component-text case
+- it is likely going through a mixed HTML/SVG projection path
+- the stale SVG side is currently winning when Penpot exports the shell visually
+
 ## Current Token Caution
 
 The same live lab also showed that token work needs its own explicit verification.

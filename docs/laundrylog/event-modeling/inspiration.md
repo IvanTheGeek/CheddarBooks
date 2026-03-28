@@ -80,6 +80,16 @@ Useful milestone commits:
 
 Those are currently the strongest surviving recovery path for the EM-1 look-and-feel work.
 
+Still-live hosted reference:
+
+- [EM-1 Slice working file](https://em1.ivanthegeek.com/wwwroot/Slice.html)
+
+Useful there:
+
+- card feel
+- section rhythm
+- visual density of the slice rows
+
 Not authoritative there:
 
 - Bolero as the long-term target
