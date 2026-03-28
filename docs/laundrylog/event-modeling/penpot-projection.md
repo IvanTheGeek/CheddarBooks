@@ -263,7 +263,21 @@ Current component-instance seam:
 - the Penpot API call that matches dragging from the Assets tab is `LibraryComponent.instance()`
 - the `V3` slice bases on `PATHS` are real connected instances, not just copied boards
 - this should be treated as a higher-on-the-ladder workflow than raw board synthesis when we want reusable `FnHCI`-aligned slice primitives
-- current caveat: in the present lab, text overrides applied to those live instances are reflected in live shape data but not yet reflected in the export render path
+- current caveat: in the present lab, text overrides applied to those live instances are reflected in live shape data but not yet reflected in either the live canvas or the export render path
+
+Current strongest instance-based repro:
+
+- `PATH1.Row.V6.InstanceBased`
+
+This row is composed only from `CommandSlice.Clean.V3` and `ViewSlice.Clean.V3` library instances.
+
+Current observed behavior:
+
+- the stored instance text values contain the intended LaundryLog-specific overrides
+- the live Penpot canvas still paints the master/default text
+- export also paints the master/default text
+
+So the instance path is still the correct architectural seam for reuse, but Penpot currently appears to have a render-sync or override-application bug in this workflow.
 
 Current refinements now locked in:
 
