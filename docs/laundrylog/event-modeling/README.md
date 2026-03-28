@@ -35,6 +35,7 @@ That keeps the first pass grounded in desired behavior rather than prematurely d
 - [`open-questions.md`](open-questions.md)
 - [`penpot-projection.md`](penpot-projection.md)
 - [`penpot-board-seed.md`](penpot-board-seed.md)
+- [`inspiration.md`](inspiration.md)
 - [`../command-view-primitive-seam.md`](../command-view-primitive-seam.md)
 
 ## Working Rule

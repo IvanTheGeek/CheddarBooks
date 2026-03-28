@@ -108,6 +108,8 @@ The best current reading is:
 
 For the current concrete starting point in the existing `LaundryLog.penpot` file, see [Penpot Board Seed](penpot-board-seed.md).
 
+For the current visual and historical inspiration references around this board work, see [Inspiration](inspiration.md).
+
 ## Current Live Workflow
 
 The current practical working loop is:
