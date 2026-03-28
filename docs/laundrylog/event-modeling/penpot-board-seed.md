@@ -48,6 +48,18 @@ It already contains at least:
   - `PATH1: ViewSlice - Ready (V2 Instance)`
 - the first readable row proof:
   - `PATH1.Row.V1`
+- the current clean readable row:
+  - `PATH1.Row.V2.Clean`
+
+The current clean slice rebuild also produced a reusable component family that now belongs in the practical board seed:
+
+- `SliceRow.Screen.Clean.V1`
+- `SliceRow.Command.Clean.V1`
+- `SliceRow.Event.Clean.V1`
+- `SliceRow.View.Clean.V1`
+- `SliceRow.Ref.Clean.V1`
+- `CommandSlice.Clean.V1`
+- `ViewSlice.Clean.V1`
 
 So the current task is not to invent the page from nothing.
 

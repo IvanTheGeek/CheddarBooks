@@ -66,6 +66,7 @@ So these notes should stay precise in Event Modeling terms without pretending th
 - [`open-questions.md`](open-questions.md)
 - [`penpot-projection.md`](penpot-projection.md)
 - [`penpot-board-seed.md`](penpot-board-seed.md)
+- [`penpot-slice-components.md`](penpot-slice-components.md)
 - [`inspiration.md`](inspiration.md)
 - [`../command-view-primitive-seam.md`](../command-view-primitive-seam.md)
 

@@ -205,6 +205,33 @@ The first likely token concerns are:
 
 That means the Event Modeling projection should stay aligned with the broader `FnHCI` / `FnUI` token direction instead of inventing a one-off visual system.
 
+## Current Clean Slice Family
+
+The live `LaundryLog` file now has a clean slice family rebuilt from scratch rather than inheriting from the older recovered shell lineage.
+
+Current components:
+
+- `SliceRow.Screen.Clean.V1`
+- `SliceRow.Command.Clean.V1`
+- `SliceRow.Event.Clean.V1`
+- `SliceRow.View.Clean.V1`
+- `SliceRow.Ref.Clean.V1`
+- `CommandSlice.Clean.V1`
+- `ViewSlice.Clean.V1`
+
+Current readable row:
+
+- `PATH1.Row.V2.Clean`
+
+Current practical interpretation:
+
+- row components are now the first reusable seam
+- shell components are now the second reusable seam
+- path-row instances are now the projection seam
+- this is a better direction for later `FnHCI` / `FnUI` derivation than the earlier detached-shell workaround
+
+For the detailed naming and component conventions, see [Penpot Slice Components](penpot-slice-components.md).
+
 ## Multiple Actor Lanes
 
 The first LaundryLog path is still effectively single-actor.
