@@ -285,3 +285,25 @@ One additional practical finding from the current `PATH1.Row.V1` work is:
 - detached component shells are a good base for readable path cards
 - but directly editing inherited text did not reliably show up in exported visuals
 - the current reliable approach is to hide the inherited text nodes and overlay fresh local text nodes for the card-specific content
+
+That should be treated as a current Penpot workaround, not the final desired component pattern.
+
+Current sharper reading from the text-mutation lab:
+
+- fresh non-component text exports correctly
+- direct edits to inherited text inside the current component-derived slice shells did not export correctly
+- detaching alone did not fix that export problem
+- renaming the inherited text node did not fix it either
+- overlay text did render correctly
+
+So for the longer-term `FnHCI` / `FnUI` direction, the healthier target is still:
+
+- stay on real component instances where possible
+- prefer variants or explicit stateful components over detaching when the change is really a state change
+- use overlay text only where the current Penpot behavior forces it and record that choice explicitly
+
+Current token caveat:
+
+- the current slice-title texts in this experiment had no token bindings
+- so the overlay workaround did not yet prove token-preserving behavior
+- that means token-governed text surfaces should be treated as a separate concern that still needs explicit proof
