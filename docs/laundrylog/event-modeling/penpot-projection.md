@@ -218,7 +218,10 @@ That means the Event Modeling projection should stay aligned with the broader `F
 
 ## Current Clean Slice Family
 
-The live `LaundryLog` file now has a clean slice family rebuilt from scratch rather than inheriting from the older recovered shell lineage.
+The live `LaundryLog` file now has two practical Penpot slice/projection lines:
+
+- a newer clean slice family rebuilt from scratch
+- an older visible `V1` row lineage that currently paints text more reliably on the live `PATHS` canvas
 
 Current components:
 
@@ -229,17 +232,31 @@ Current components:
 - `CommandSlice.Clean.V2`
 - `ViewSlice.Clean.V2`
 
-Current readable row:
+Current readable rows:
 
-- `PATH1.Row.V4.Clean`
+- `PATH1.Row.V1`
+- `PATH1.Row.V5.Visible`
 
 Current practical interpretation:
 
 - row components are now the first reusable seam
 - shell components are now the second reusable seam
 - readable path rows are still the projection seam
-- but the current readable row is best treated as a derived projection rather than as a provenance-preserving component lineage
+- but the live readable `PATHS` row is best treated as a derived projection rather than as a provenance-preserving component lineage
 - this is still a better direction for later `FnHCI` / `FnUI` derivation than letting the path board drift into ad hoc drawing
+
+Current live-canvas caution:
+
+- `PATH1.Row.V2.Clean`
+- `PATH1.Row.V3.Clean`
+- `PATH1.Row.V4.Clean`
+
+all held valid live text data and exported text, but did not paint that text reliably on the live `PATHS` canvas.
+
+So, for now:
+
+- use the visible `V1` lineage as the live `PATHS` working surface
+- use the clean rebuild line as a structural reference and export/data experiment line
 
 Current refinements now locked in:
 

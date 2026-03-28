@@ -48,7 +48,11 @@ It already contains at least:
   - `PATH1: ViewSlice - Ready (V2 Instance)`
 - the first readable row proof:
   - `PATH1.Row.V1`
-- the current clean readable row:
+- the current live readable working row:
+  - `PATH1.Row.V5.Visible`
+- the newer clean rebuild experiments:
+  - `PATH1.Row.V2.Clean`
+  - `PATH1.Row.V3.Clean`
   - `PATH1.Row.V4.Clean`
 
 The current clean slice rebuild also produced a reusable component family that now belongs in the practical board seed:
@@ -82,20 +86,28 @@ It is to normalize and refine what is already there into a clearer row-per-path 
 
 ## Current PATH 1 Row Proof
 
-`PATH1.Row.V4.Clean` is the current live proof that the `PATHS` page can carry a readable path row rather than only loose screens and scratch boards.
+`PATH1.Row.V5.Visible` is the current live proof that the `PATHS` page can carry a readable path row rather than only loose screens and scratch boards.
 
 Current shape:
 
 - path title and short descriptive note
 - one horizontal row of alternating `CommandSlice` and `ViewSlice` cards
-- current screen slots as screenshot-like references
+- current screen slots as screenshot-like references on `CommandSlice`
 - single-actor reading for now
-- bottom-right row badges used as context markers:
-  - `ui lens`
-  - `business`
-  - `classic em`
+- classic `ViewSlice` cards showing the green `View` only
 
-That proof is still early, but it establishes the right kind of projection surface to keep refining.
+Important current caveat:
+
+- `PATH1.Row.V2.Clean`
+- `PATH1.Row.V3.Clean`
+- `PATH1.Row.V4.Clean`
+
+all carried readable text in exported output and live shape data, but did not paint that text reliably on the live `PATHS` page.
+
+So the current board rule is:
+
+- use the visible `V1` lineage as the live `PATHS` working surface
+- keep the cleaner rebuild line available as reference and export/data pressure
 
 ## Current Top-Level Structure
 
