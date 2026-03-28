@@ -127,17 +127,75 @@ type PathSliceCard =
     | CommandSlice of CommandSliceCardState
     | ViewSlice of ViewSliceCardState
 
+/// Distinguishes the first supported scenario stages for GWT-style path bands.
+type GwtStage =
+    | Given
+    | When
+    | Then
+
+[<RequireQualifiedAccess>]
+module GwtStage =
+    /// Returns the stable uppercase stage label for the current scenario cell.
+    let label =
+        function
+        | GwtStage.Given -> "GIVEN"
+        | GwtStage.When -> "WHEN"
+        | GwtStage.Then -> "THEN"
+
+/// Describes one scenario cell aligned beneath a rendered path row.
+type GwtScenarioCell =
+    { Stage: GwtStage
+      Summary: string
+      Detail: string option
+      ColumnSpan: int }
+
+[<RequireQualifiedAccess>]
+module GwtScenarioCell =
+    /// Creates a validated scenario cell for the current path-row band.
+    let tryCreate stage summary detail columnSpan =
+        let detail : string option = detail
+
+        if String.IsNullOrWhiteSpace summary then
+            Error "Scenario cells must provide summary text."
+        elif columnSpan <= 0 then
+            Error "Scenario cell column spans must be positive."
+        else
+            Ok
+                { Stage = stage
+                  Summary = summary.Trim()
+                  Detail = detail |> Option.map (fun value -> value.Trim())
+                  ColumnSpan = columnSpan }
+
+/// Describes one rendered scenario row aligned beneath the path slices.
+type PathScenarioRow =
+    { Title: string
+      Cells: GwtScenarioCell list }
+
+[<RequireQualifiedAccess>]
+module PathScenarioRow =
+    /// Creates a validated scenario row for a path band.
+    let tryCreate title cells =
+        if String.IsNullOrWhiteSpace title then
+            Error "Scenario rows must provide a title."
+        elif List.isEmpty cells then
+            Error "Scenario rows must contain at least one cell."
+        else
+            Ok
+                { Title = title.Trim()
+                  Cells = cells }
+
 /// Describes one rendered PATH row.
 type PathRowState =
     { PathId: string
       Title: string
       Description: string
-      SliceCards: PathSliceCard list }
+      SliceCards: PathSliceCard list
+      ScenarioRows: PathScenarioRow list }
 
 [<RequireQualifiedAccess>]
 module PathRowState =
     /// Creates a validated PATH row state.
-    let tryCreate pathId title description sliceCards =
+    let tryCreate pathId title description sliceCards scenarioRows =
         if String.IsNullOrWhiteSpace pathId then
             Error "Path rows must provide a stable path identifier."
         elif String.IsNullOrWhiteSpace title then
@@ -151,7 +209,8 @@ module PathRowState =
                 { PathId = pathId.Trim()
                   Title = title.Trim()
                   Description = description.Trim()
-                  SliceCards = sliceCards }
+                  SliceCards = sliceCards
+                  ScenarioRows = scenarioRows }
 
 /// Describes the current rendering options for the HTML path projection.
 type SliceRenderOptions =
@@ -193,6 +252,14 @@ module SliceHtmlExamples =
         CommandSliceCardState.tryCreate appName title description screen command event
         |> expect $"command slice '{title}'"
         |> PathSliceCard.CommandSlice
+
+    let private scenarioCell stage summary detail columnSpan =
+        GwtScenarioCell.tryCreate stage summary detail columnSpan
+        |> expect $"scenario cell '{summary}'"
+
+    let private scenarioRow title cells =
+        PathScenarioRow.tryCreate title cells
+        |> expect $"scenario row '{title}'"
 
     let private viewSlice appName title description screen view =
         ViewSliceCardState.tryCreate appName title description screen view
@@ -396,6 +463,23 @@ module SliceHtmlExamples =
                       []
                       (PropertyLines (formatViewState washerDryerView))
                       (Some "classic em")) ]
+            [ scenarioRow
+                  "PATH 1 scenario"
+                  [ scenarioCell
+                        GwtStage.Given
+                        "location is captured and the session is ready for the first expense"
+                        (Some "manual location capture establishes the active location and the empty current session")
+                        2
+                    scenarioCell
+                        GwtStage.When
+                        "a washer expense is logged into the active location"
+                        (Some "the running total becomes $3.00 and the washer entry becomes visible")
+                        2
+                    scenarioCell
+                        GwtStage.Then
+                        "a dryer expense is logged into the same session"
+                        (Some "the running total becomes $5.50 and both washer and dryer entries remain visible")
+                        2 ] ]
         |> expect "path1 row"
 
 /// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
@@ -595,11 +679,35 @@ module SliceHtmlRenderer =
         appendLine builder "});"
         appendLine builder "</script>"
 
+    let private renderScenarioCell (builder: StringBuilder) (cell: GwtScenarioCell) =
+        appendLine
+            builder
+            $"<article class=\"path-document__scenario-card\" style=\"grid-column: span {cell.ColumnSpan};\">"
+        appendLine builder "<div class=\"path-document__scenario-topline\">"
+        renderBadge builder "path-document__scenario-stage" (GwtStage.label cell.Stage)
+        appendLine builder "</div>"
+        appendLine builder $"<p class=\"path-document__scenario-summary\">{htmlEncode cell.Summary}</p>"
+
+        match cell.Detail with
+        | Some detail ->
+            appendLine builder $"<p class=\"path-document__scenario-detail\">{htmlEncode detail}</p>"
+        | None -> ()
+
+        appendLine builder "</article>"
+
+    let private renderScenarioRow (builder: StringBuilder) (row: PathScenarioRow) =
+        appendLine builder "<section class=\"path-document__scenario-row-wrap\">"
+        appendLine builder $"<h2 class=\"path-document__scenario-row-title\">{htmlEncode row.Title}</h2>"
+        appendLine builder "<div class=\"path-document__scenario-row\">"
+        row.Cells |> List.iter (renderScenarioCell builder)
+        appendLine builder "</div>"
+        appendLine builder "</section>"
+
     let private renderStyles (builder: StringBuilder) =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; padding: 8px 10px 10px; }"
+        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; --scenario-row-height: 78px; padding: 8px 10px 10px; }"
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
         appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
@@ -607,6 +715,15 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
         appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".path-document__row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--slice-card-width); grid-template-rows: auto var(--slice-title-height) var(--slice-description-height) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
+        appendLine builder ".path-document__scenarios { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }"
+        appendLine builder ".path-document__scenario-row-wrap { display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__scenario-row-title { margin: 0; font-size: 0.72rem; line-height: 1.1; color: #35506a; }"
+        appendLine builder ".path-document__scenario-row { display: grid; grid-template-columns: repeat(var(--slice-columns), var(--slice-card-width)); column-gap: 10px; align-items: stretch; overflow-x: auto; padding: 1px 2px 2px; }"
+        appendLine builder ".path-document__scenario-card { min-height: var(--scenario-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__scenario-topline { display: flex; justify-content: flex-start; }"
+        appendLine builder ".path-document__scenario-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
+        appendLine builder ".path-document__scenario-summary { margin: 0; font-size: 0.7rem; line-height: 1.24; color: #0f2740; }"
+        appendLine builder ".path-document__scenario-detail { margin: 0; font-size: 0.62rem; line-height: 1.2; color: #55708b; }"
         appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 6; align-content: start; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
         appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
@@ -652,7 +769,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
         appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
-        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"
+        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row, .path-document__scenario-row { column-gap: 8px; } }"
         appendLine builder "</style>"
 
     /// Renders a full self-contained HTML document for the supplied PATH row.
@@ -668,7 +785,7 @@ module SliceHtmlRenderer =
         renderStyles builder
         appendLine builder "</head>"
         appendLine builder "<body>"
-        appendLine builder "<main class=\"path-document\">"
+        appendLine builder $"<main class=\"path-document\" style=\"--slice-columns: {pathRow.SliceCards.Length};\">"
         appendLine builder "<header class=\"path-document__header\">"
         appendLine builder $"<h1 class=\"path-document__title\">{htmlEncode pathRow.Title}</h1>"
         appendLine builder $"<p class=\"path-document__description\">{htmlEncode pathRow.Description}</p>"
@@ -680,6 +797,12 @@ module SliceHtmlRenderer =
         appendLine builder "<section class=\"path-document__row\">"
         pathRow.SliceCards |> List.iter (renderSliceCard builder options)
         appendLine builder "</section>"
+
+        if not (List.isEmpty pathRow.ScenarioRows) then
+            appendLine builder "<section class=\"path-document__scenarios\">"
+            pathRow.ScenarioRows |> List.iter (renderScenarioRow builder)
+            appendLine builder "</section>"
+
         appendLine builder "</main>"
         renderScript builder
         appendLine builder "</body>"

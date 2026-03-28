@@ -229,6 +229,21 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "CurrentLaundrySession" "Expected the current-session view title in the rendered document."
                   Expect.stringContains htmlDocument "classic em" "Expected the current lens footer badge.")
 
+              testCase "Classic path renderer includes an aligned GIVEN WHEN THEN band" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains htmlDocument "PATH 1 scenario" "Expected the first scenario-row title."
+                  Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the scenario band."
+                  Expect.stringContains htmlDocument "WHEN" "Expected the WHEN stage label in the scenario band."
+                  Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the scenario band."
+                  Expect.stringContains htmlDocument "grid-column: span 2;" "Expected scenario cells to align to two slice columns each."
+                  Expect.stringContains htmlDocument "location is captured and the session is ready for the first expense" "Expected the first scenario summary.")
+
               testCase "Classic path renderer hides the view screen blocks" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 

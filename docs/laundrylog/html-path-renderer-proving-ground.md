@@ -55,12 +55,14 @@ It now also uses explicit CSS grid row contracts for the outer path row and shar
 - `CommandSlice` and `ViewSlice` can stay in horizontal rhythm
 - screen, detail, and future supporting bands can share stable heights
 - later `GWT` rows can be added as deliberate bands instead of improvised offsets
+- the first `GIVEN / WHEN / THEN` scenario band can align directly beneath the slice columns
 
 The current first path is:
 
 - manual location capture
 - washer expense
 - dryer expense
+- one aligned `GIVEN / WHEN / THEN` scenario band spanning the six slice columns in pairs
 
 ## Lens Rule
 
@@ -96,6 +98,7 @@ The next likely moves are:
 
 - refine the slice-card visual language
 - keep shared row contracts strong enough for later `GWT` and scenario bands
+- decide which scenario bands are always visible versus lens-controlled
 - keep the projection deterministic and self-contained
 - pressure which slice and badge concepts should later migrate into shared `FnTools`
 - keep the current LaundryLog proving ground honest before extracting a wider reusable engine
