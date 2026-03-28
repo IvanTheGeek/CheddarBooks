@@ -510,46 +510,63 @@ module SliceHtmlRenderer =
 
         appendLine builder "</div>"
 
-    let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
-        appendLine builder "<article class=\"slice-card slice-card--command\">"
+    let private renderSliceCardShell
+        (builder: StringBuilder)
+        options
+        sliceCssClass
+        appName
+        kindLabel
+        title
+        description
+        rows
+        =
+        appendLine builder $"<article class=\"slice-card {sliceCssClass}\">"
+        appendLine builder "<div class=\"slice-card__header\">"
         appendLine builder "<div class=\"slice-card__topline\">"
-        renderBadge builder "slice-card__app-pill" sliceState.AppName
-        appendLine builder "<div class=\"slice-card__kind\">COMMAND SLICE</div>"
+        renderBadge builder "slice-card__app-pill" appName
+        appendLine builder $"<div class=\"slice-card__kind\">{htmlEncode kindLabel}</div>"
         appendLine builder "</div>"
-        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode sliceState.Title}</h2>"
-        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode sliceState.Description}</p>"
+        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode title}</h2>"
+        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode description}</p>"
+        appendLine builder "</div>"
         appendLine builder "<div class=\"slice-card__body\">"
 
-        [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
-          detailRow (SliceCardRowContent.BlockRow sliceState.Command)
-          detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
+        rows
         |> List.iter (renderCardRow builder options)
 
         appendLine builder "</div>"
         appendLine builder "</article>"
+
+    let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--command"
+            sliceState.AppName
+            "COMMAND SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Command)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
 
     let private renderViewSlice (builder: StringBuilder) options (sliceState: ViewSliceCardState) =
-        appendLine builder "<article class=\"slice-card slice-card--view\">"
-        appendLine builder "<div class=\"slice-card__topline\">"
-        renderBadge builder "slice-card__app-pill" sliceState.AppName
-        appendLine builder "<div class=\"slice-card__kind\">VIEW SLICE</div>"
-        appendLine builder "</div>"
-        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode sliceState.Title}</h2>"
-        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode sliceState.Description}</p>"
-        appendLine builder "<div class=\"slice-card__body\">"
-
-        [ if options.ShowViewScreens then
-              match sliceState.Screen with
-              | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
-              | None -> screenRow SliceCardRowContent.EmptyRow
-          else
-              screenRow SliceCardRowContent.EmptyRow
-          detailRow (SliceCardRowContent.BlockRow sliceState.View)
-          detailRow SliceCardRowContent.EmptyRow ]
-        |> List.iter (renderCardRow builder options)
-
-        appendLine builder "</div>"
-        appendLine builder "</article>"
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--view"
+            sliceState.AppName
+            "VIEW SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ if options.ShowViewScreens then
+                  match sliceState.Screen with
+                  | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
+                  | None -> screenRow SliceCardRowContent.EmptyRow
+              else
+                  screenRow SliceCardRowContent.EmptyRow
+              detailRow (SliceCardRowContent.BlockRow sliceState.View)
+              detailRow SliceCardRowContent.EmptyRow ]
 
     let private renderSliceCard (builder: StringBuilder) options =
         function
@@ -582,26 +599,27 @@ module SliceHtmlRenderer =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".path-document { --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; padding: 8px 10px 10px; }"
+        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; padding: 8px 10px 10px; }"
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
         appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
         appendLine builder ".path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }"
         appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
         appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
-        appendLine builder ".path-document__row { display: flex; gap: 10px; overflow-x: auto; align-items: stretch; padding: 2px 2px 6px; }"
-        appendLine builder ".slice-card { flex: 0 0 224px; min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: flex; flex-direction: column; }"
+        appendLine builder ".path-document__row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--slice-card-width); grid-template-rows: auto var(--slice-title-height) var(--slice-description-height) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
+        appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 6; align-content: start; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
         appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
-        appendLine builder ".slice-card__topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }"
+        appendLine builder ".slice-card__header, .slice-card__body { display: contents; }"
+        appendLine builder ".slice-card__topline { grid-row: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }"
         appendLine builder ".slice-card__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }"
         appendLine builder ".slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; }"
-        appendLine builder ".slice-card__title { margin: 7px 0 0; font-size: 0.82rem; line-height: 1.04; min-height: var(--slice-title-height); max-height: var(--slice-title-height); overflow: hidden; }"
-        appendLine builder ".slice-card__description { margin: 3px 0 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; min-height: var(--slice-description-height); max-height: var(--slice-description-height); overflow: hidden; }"
-        appendLine builder ".slice-card__body { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }"
-        appendLine builder ".slice-card__row { display: flex; flex-direction: column; }"
-        appendLine builder ".slice-card__row--screen { min-height: var(--screen-row-height); }"
-        appendLine builder ".slice-card__row--detail { min-height: var(--detail-row-height); }"
+        appendLine builder ".slice-card__title { grid-row: 2; margin: 7px 0 0; font-size: 0.82rem; line-height: 1.04; overflow: hidden; }"
+        appendLine builder ".slice-card__description { grid-row: 3; margin: 3px 0 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; overflow: hidden; }"
+        appendLine builder ".slice-card__row { display: flex; flex-direction: column; min-height: 0; }"
+        appendLine builder ".slice-card__row--screen { grid-row: 4; }"
+        appendLine builder ".slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }"
+        appendLine builder ".slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }"
         appendLine builder ".slice-card__row > .slice-block { flex: 1; }"
         appendLine builder ".slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }"
         appendLine builder ".slice-card__slot--row-fill { flex: 1; }"
@@ -633,8 +651,8 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }"
         appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
-        appendLine builder "@media (max-width: 1200px) { .slice-card { flex-basis: 216px; } .path-document { padding-left: 8px; padding-right: 8px; } }"
-        appendLine builder "@media (max-width: 900px) { .path-document__row { gap: 8px; } .slice-card { flex-basis: 208px; } }"
+        appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
+        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"
         appendLine builder "</style>"
 
     /// Renders a full self-contained HTML document for the supplied PATH row.

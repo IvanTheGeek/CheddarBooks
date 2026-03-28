@@ -50,6 +50,12 @@ The first local renderer introduces explicit path-renderer state for:
 - `PathRow`
 - rendering options for different lenses
 
+It now also uses explicit CSS grid row contracts for the outer path row and shared slice shells, so:
+
+- `CommandSlice` and `ViewSlice` can stay in horizontal rhythm
+- screen, detail, and future supporting bands can share stable heights
+- later `GWT` rows can be added as deliberate bands instead of improvised offsets
+
 The current first path is:
 
 - manual location capture
@@ -89,6 +95,7 @@ So the current order is:
 The next likely moves are:
 
 - refine the slice-card visual language
+- keep shared row contracts strong enough for later `GWT` and scenario bands
 - keep the projection deterministic and self-contained
 - pressure which slice and badge concepts should later migrate into shared `FnTools`
 - keep the current LaundryLog proving ground honest before extracting a wider reusable engine
