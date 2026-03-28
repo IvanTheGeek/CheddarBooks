@@ -348,7 +348,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the entry-form screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Card Details Expanded" "Expected the card-details-expanded screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success screen surface."
-                  Expect.stringContains htmlDocument "Use GPS Location" "Expected the GPS supporting action."
+                  Expect.stringContains htmlDocument "ll-gps-button" "Expected the GPS location control."
                   Expect.stringContains htmlDocument "Set Location" "Expected the set-location command action."
                   Expect.stringContains htmlDocument "Log Expense" "Expected the primary entry-form action."
                   Expect.stringContains htmlDocument "Session Total" "Expected the summary bar label."
@@ -371,6 +371,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "ll-money-input" "Expected the money-input block."
                   Expect.stringContains htmlDocument "ll-quarter-button" "Expected the quarter-style price-adjust buttons."
                   Expect.stringContains htmlDocument "Choose Card" "Expected the progressive payment-detail section."
-                  Expect.stringContains htmlDocument "Historical $3.00" "Expected the historical helper label."
+                  Expect.stringContains htmlDocument "<span class=\"ll-chip__amount\">$3.00</span>" "Expected the historical helper amount."
+                  Expect.stringContains htmlDocument "<span class=\"ll-chip__subtext\">Historical</span>" "Expected the historical helper label."
                   Expect.stringContains htmlDocument "ll-feedback-banner" "Expected the visible success toast block."
                   Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block.") ]

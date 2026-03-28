@@ -23,6 +23,7 @@ The current first screen renderer is grounded in:
 - [`screens.md`](screens.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
 - [`claude-design-nuances.md`](claude-design-nuances.md)
+- local reference artifact: [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
@@ -31,6 +32,7 @@ That means the current screen renderer is:
 
 - Penpot-informed
 - historical-chat-informed
+- anchored to the recovered `laundrylog-v7.html` mobile visual direction
 - primitive-state-driven
 - reviewable
 - deterministic
@@ -86,6 +88,14 @@ The current screen renderer now restores a first pass of several LaundryLog nuan
 - visible logged-state feedback through toast plus `✓ Logged!`
 
 These are still proving-ground implementations, but they are now structural rather than one-off styling.
+
+## Current Visual Anchor
+
+For the mobile LaundryLog screen renderer, the current visual source of truth is:
+
+- [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
+
+Future refinements should treat the current HTML renderer as successful only insofar as it converges toward that `v7` look-and-feel while still staying typed, deterministic, and built from reusable seams.
 
 ## Still Not Fully Restored
 

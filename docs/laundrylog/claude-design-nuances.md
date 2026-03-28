@@ -36,6 +36,10 @@ The strongest current source threads are:
 - [`019d174e-e9e1-70b8-86e8-817618ced4a2.toml`](../../../NEXUS-EMERGING/NEXUS-EventStore/projections/conversations/019d174e-e9e1-70b8-86e8-817618ced4a2.toml)
   the thread that produced the original `design-v7-spec.md` / `design-evolution.md` artifacts
 
+The strongest surviving visual artifact from that line is:
+
+- [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
+
 ## Stable Nuances To Preserve
 
 ### Batch Entry Is The Main Flow

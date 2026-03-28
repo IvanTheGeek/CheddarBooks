@@ -1,6 +1,7 @@
 namespace CheddarBooks.LaundryLog.UI
 
 open System
+open System.Globalization
 open System.Net
 open System.Text
 
@@ -57,6 +58,58 @@ module ScreenHtmlRenderer =
     let private appendLine (builder: StringBuilder) (value: string) =
         builder.AppendLine(value) |> ignore
 
+    let private tryParseDecimal (value: string) =
+        match Decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture) with
+        | true, parsedValue -> Some parsedValue
+        | false, _ -> None
+
+    let private formatCurrency (amount: decimal) =
+        amount.ToString("0.00", CultureInfo.InvariantCulture)
+
+    let private optionIcon labelText =
+        match labelText with
+        | "Washer" -> Some "🌊"
+        | "Dryer" -> Some "🔥"
+        | "Supplies" -> Some "🧴"
+        | "Cash" -> Some "💵"
+        | "Points" -> Some "⭐"
+        | "Card" -> Some "💳"
+        | "App" -> Some "📱"
+        | _ -> None
+
+    let private splitQuickFillLabel (quickFillLabel: string) =
+        let knownPrefixes =
+            [ "Historical"
+              "Last used"
+              "Community" ]
+
+        knownPrefixes
+        |> List.tryPick (fun prefix ->
+            let prefixWithSpace = prefix + " "
+
+            if quickFillLabel.StartsWith(prefixWithSpace, StringComparison.Ordinal) then
+                let amountText = quickFillLabel.Substring(prefixWithSpace.Length).Trim()
+                Some(amountText, prefix)
+            else
+                None)
+        |> Option.defaultValue (quickFillLabel, "")
+
+    let private entryTotalText (screenState: EntryFormPrimitiveState) =
+        let quantity =
+            match Int32.TryParse(screenState.QuantityStepper.ValueText) with
+            | true, parsedValue when parsedValue > 0 -> parsedValue
+            | _ -> 1
+
+        let unitPriceText =
+            screenState.PriceInput.ValueText
+            |> Option.defaultValue screenState.PriceInput.PlaceholderText
+
+        let unitPriceAmount =
+            tryParseDecimal unitPriceText
+            |> Option.defaultValue 0.00m
+
+        $"${formatCurrency (decimal quantity * unitPriceAmount)}"
+
     let private renderActionButton (builder: StringBuilder) (buttonState: ActionButtonState) =
         let emphasisCssClass =
             match buttonState.Emphasis with
@@ -72,22 +125,11 @@ module ScreenHtmlRenderer =
 
     let private renderHeaderBar (builder: StringBuilder) (headerState: HeaderBarState) =
         appendLine builder "<header class=\"ll-header\">"
-        appendLine builder "<div class=\"ll-header__topline\">"
-        appendLine builder "<span class=\"ll-header__brand\">LaundryLog</span>"
-
-        match headerState.BadgeText with
-        | Some badgeText ->
-            appendLine builder $"<span class=\"ll-header__badge\">{htmlEncode badgeText}</span>"
-        | None -> ()
-
+        appendLine builder "<div class=\"ll-header__text\">"
+        appendLine builder $"<h2 class=\"ll-header__title\">🧺 {htmlEncode headerState.Title}</h2>"
+        appendLine builder "<p class=\"ll-header__subtitle\">by CheddarBooks</p>"
         appendLine builder "</div>"
-        appendLine builder $"<h2 class=\"ll-header__title\">{htmlEncode headerState.Title}</h2>"
-
-        match headerState.Subtitle with
-        | Some subtitle ->
-            appendLine builder $"<p class=\"ll-header__subtitle\">{htmlEncode subtitle}</p>"
-        | None -> ()
-
+        appendLine builder "<div class=\"ll-header__badge\">🧀</div>"
         appendLine builder "</header>"
 
     let private renderStatusChip (builder: StringBuilder) (chipState: StatusChipState) =
@@ -132,6 +174,13 @@ module ScreenHtmlRenderer =
         appendLine builder "</div>"
 
     let private renderOptionGroup (builder: StringBuilder) label (optionGroup: OptionGroupState) =
+        let groupId = PrimitiveControlId.value optionGroup.ControlId
+        let groupCssClass, buttonCssClass =
+            match groupId with
+            | "machine-type" -> " ll-option-group--machine", " ll-chip--tile"
+            | "payment-type" -> " ll-option-group--payment", " ll-chip--tile"
+            | _ -> " ll-option-group--detail", " ll-chip--detail"
+
         appendLine builder "<div class=\"ll-field\">"
 
         match label, optionGroup.Label with
@@ -141,16 +190,25 @@ module ScreenHtmlRenderer =
             appendLine builder $"<div class=\"ll-field__label\">{htmlEncode groupLabel}</div>"
         | None, None -> ()
 
-        appendLine builder "<div class=\"ll-option-group\">"
+        appendLine builder $"<div class=\"ll-option-group{groupCssClass}\">"
 
         optionGroup.Choices
         |> List.iter (fun choice ->
             let selectedCssClass = if choice.IsSelected then " ll-chip--selected" else ""
             let disabledAttribute = if choice.IsEnabled then "" else " disabled"
 
+            let bodyHtml =
+                match groupId with
+                | "machine-type"
+                | "payment-type" ->
+                    let iconText = optionIcon choice.Label |> Option.defaultValue ""
+                    $"<span class=\"ll-chip__icon\">{htmlEncode iconText}</span><span class=\"ll-chip__label\">{htmlEncode choice.Label}</span>"
+                | _ ->
+                    htmlEncode choice.Label
+
             appendLine
                 builder
-                $"<button type=\"button\" class=\"ll-chip{selectedCssClass}\" data-choice-id=\"{PrimitiveControlId.value choice.ChoiceId}\"{disabledAttribute}>{htmlEncode choice.Label}</button>")
+                $"<button type=\"button\" class=\"ll-chip{buttonCssClass}{selectedCssClass}\" data-choice-id=\"{PrimitiveControlId.value choice.ChoiceId}\"{disabledAttribute}>{bodyHtml}</button>")
 
         appendLine builder "</div>"
         appendLine builder "</div>"
@@ -212,7 +270,15 @@ module ScreenHtmlRenderer =
 
             moneyInputState.QuickFillLabels
             |> List.iter (fun quickFillLabel ->
-                appendLine builder $"<button type=\"button\" class=\"ll-chip ll-chip--quick-fill\">{htmlEncode quickFillLabel}</button>")
+                let amountText, labelText = splitQuickFillLabel quickFillLabel
+
+                appendLine builder "<button type=\"button\" class=\"ll-chip ll-chip--quick-fill\">"
+                appendLine builder $"<span class=\"ll-chip__amount\">{htmlEncode amountText}</span>"
+
+                if not (String.IsNullOrWhiteSpace labelText) then
+                    appendLine builder $"<span class=\"ll-chip__subtext\">{htmlEncode labelText}</span>"
+
+                appendLine builder "</button>")
 
             appendLine builder "</div>"
 
@@ -228,6 +294,23 @@ module ScreenHtmlRenderer =
         appendLine
             builder
             $"<div class=\"ll-feedback-banner\" data-control-id=\"{PrimitiveControlId.value feedbackBannerState.ControlId}\">{htmlEncode feedbackBannerState.MessageText}</div>"
+
+    let private renderValidationAction (builder: StringBuilder) (statusChips: StatusChipState list) (buttonState: ActionButtonState) =
+        let emphasisCssClass =
+            match buttonState.Emphasis with
+            | Success -> " ll-button--success"
+            | _ when buttonState.IsEnabled -> " ll-button--primary"
+            | _ -> " ll-button--disabled"
+
+        let disabledAttribute = if buttonState.IsEnabled then "" else " disabled"
+        appendLine builder $"<button type=\"button\" class=\"ll-button ll-button--submit{emphasisCssClass}\" data-control-id=\"{PrimitiveControlId.value buttonState.ControlId}\"{disabledAttribute}>"
+
+        if buttonState.IsEnabled || List.isEmpty statusChips then
+            appendLine builder (htmlEncode buttonState.Label)
+        else
+            statusChips |> renderStatusChipRow builder
+
+        appendLine builder "</button>"
 
     let private renderEntryCard (builder: StringBuilder) (entryCardState: EntryCardState) =
         appendLine builder "<article class=\"ll-entry-card\">"
@@ -256,13 +339,21 @@ module ScreenHtmlRenderer =
 
         appendLine builder "<section class=\"ll-phone-screen\">"
         renderHeaderBar builder screenState.Header
-        renderPanelStart builder "Location"
+        appendLine builder "<div class=\"ll-screen-body\">"
+        appendLine builder "<section class=\"ll-panel ll-panel--location\">"
+        appendLine builder "<h3 class=\"ll-panel__title\">📍 Location</h3>"
+        appendLine builder "<div class=\"ll-location-section\">"
+        appendLine builder "<div class=\"ll-location-input\">"
         renderTextInput builder "Location" screenState.LocationInput
-        appendLine builder "<div class=\"ll-action-stack\">"
-        renderActionButton builder screenState.GpsAction
+        appendLine builder "<div class=\"ll-location-info\">GPS will check personal &amp; community data</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<button type=\"button\" class=\"ll-gps-button\" data-control-id=\"{PrimitiveControlId.value screenState.GpsAction.ControlId}\">📍</button>"
+        appendLine builder "</div>"
+        appendLine builder "</section>"
+        appendLine builder "<div class=\"ll-primary-action-row\">"
         renderActionButton builder screenState.SetLocationAction
         appendLine builder "</div>"
-        renderPanelEnd builder
+        appendLine builder "</div>"
         appendLine builder "</section>"
         appendLine builder "</article>"
 
@@ -276,11 +367,16 @@ module ScreenHtmlRenderer =
 
         appendLine builder "<section class=\"ll-phone-screen ll-phone-screen--tall\">"
         renderHeaderBar builder screenState.Header
-        renderStatusChipRow builder screenState.StatusChips
+        appendLine builder "<div class=\"ll-screen-body\">"
 
-        renderPanelStart builder "Machine Type"
+        match screenState.Header.Subtitle with
+        | Some subtitle ->
+            appendLine builder $"<div class=\"ll-location-context\">📍 {htmlEncode subtitle}</div>"
+        | None -> ()
+
+        appendLine builder "<section class=\"ll-panel ll-panel--compact\">"
         renderOptionGroup builder None screenState.MachineTypeOptions
-        renderPanelEnd builder
+        appendLine builder "</section>"
 
         appendLine builder "<div class=\"ll-two-up\">"
         renderPanelStart builder "Quantity"
@@ -289,10 +385,14 @@ module ScreenHtmlRenderer =
 
         renderPanelStart builder "Unit Price"
         renderMoneyInput builder "Unit Price" screenState.PriceInput
+        appendLine builder "<div class=\"ll-entry-total\">"
+        appendLine builder "<span class=\"ll-entry-total__label\">Entry Total</span>"
+        appendLine builder $"<span class=\"ll-entry-total__amount\">{htmlEncode (entryTotalText screenState)}</span>"
+        appendLine builder "</div>"
         renderPanelEnd builder
         appendLine builder "</div>"
 
-        renderPanelStart builder "Payment"
+        appendLine builder "<section class=\"ll-panel ll-panel--compact\">"
         renderOptionGroup builder None screenState.PaymentOptions
 
         match screenState.PaymentDetailOptions with
@@ -300,18 +400,19 @@ module ScreenHtmlRenderer =
             renderOptionGroup builder None paymentDetailOptions
         | None -> ()
 
-        renderPanelEnd builder
+        appendLine builder "</section>"
 
         match screenState.FeedbackBanner with
         | Some feedbackBanner -> renderFeedbackBanner builder feedbackBanner
         | None -> ()
 
         appendLine builder "<div class=\"ll-primary-action-row\">"
-        renderActionButton builder screenState.SubmitAction
+        renderValidationAction builder screenState.StatusChips screenState.SubmitAction
         appendLine builder "</div>"
         renderSummaryBar builder screenState.SessionTotal
 
-        renderPanelStart builder "Recent Entries"
+        appendLine builder "<section class=\"ll-recent-entries\">"
+        appendLine builder "<h3 class=\"ll-recent-entries__title\">Today's Entries</h3>"
 
         if List.isEmpty screenState.RecentEntries then
             appendLine builder "<p class=\"ll-empty-state\">No entries yet in this session.</p>"
@@ -320,7 +421,8 @@ module ScreenHtmlRenderer =
             screenState.RecentEntries |> List.iter (renderEntryCard builder)
             appendLine builder "</div>"
 
-        renderPanelEnd builder
+        appendLine builder "</section>"
+        appendLine builder "</div>"
         appendLine builder "</section>"
         appendLine builder "</article>"
 
@@ -334,70 +436,96 @@ module ScreenHtmlRenderer =
     let private renderStyles (builder: StringBuilder) =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
-        appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
+        appendLine builder "body { margin: 0; background: #f8f9fa; color: #2d3748; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }"
         appendLine builder ".ll-document { padding: 14px 16px 22px; }"
         appendLine builder ".ll-document__header { margin-bottom: 14px; }"
-        appendLine builder ".ll-document__title { margin: 0; font-size: 1.15rem; line-height: 1.06; }"
-        appendLine builder ".ll-document__description { margin: 4px 0 0; color: #48627f; font-size: 0.82rem; line-height: 1.3; }"
+        appendLine builder ".ll-document__title { margin: 0; font-size: 1.05rem; line-height: 1.06; }"
+        appendLine builder ".ll-document__description { margin: 4px 0 0; color: #64748b; font-size: 0.76rem; line-height: 1.3; }"
         appendLine builder ".ll-screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 360px)); gap: 18px; align-items: start; }"
         appendLine builder ".ll-screen-surface { display: flex; flex-direction: column; gap: 8px; }"
-        appendLine builder ".ll-screen-surface__name { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }"
-        appendLine builder ".ll-screen-surface__note { margin: 0; color: #58718b; font-size: 0.72rem; line-height: 1.25; }"
-        appendLine builder ".ll-phone-screen { width: 100%; max-width: 375px; min-height: 667px; box-sizing: border-box; border-radius: 28px; border: 4px solid #15263d; background: linear-gradient(180deg, #fcfdff 0%, #f6f9fd 100%); box-shadow: 0 16px 32px rgba(10, 27, 49, 0.12); padding: 14px; display: flex; flex-direction: column; gap: 12px; }"
-        appendLine builder ".ll-phone-screen--tall { min-height: 1020px; }"
-        appendLine builder ".ll-header { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".ll-header__topline { display: flex; justify-content: space-between; align-items: center; gap: 8px; }"
-        appendLine builder ".ll-header__brand { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.66rem; font-weight: 700; line-height: 1; }"
-        appendLine builder ".ll-header__badge { display: inline-flex; align-items: center; justify-content: center; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,0.92); border: 1px solid #c6d4e2; color: #566d86; font-size: 0.62rem; font-weight: 700; }"
-        appendLine builder ".ll-header__title { margin: 0; font-size: 1.18rem; line-height: 1.08; }"
-        appendLine builder ".ll-header__subtitle { margin: 0; color: #47617c; font-size: 0.82rem; line-height: 1.25; }"
-        appendLine builder ".ll-status-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }"
-        appendLine builder ".ll-status-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 10px; border-radius: 999px; background: #718096; color: rgba(255,255,255,0.96); font-size: 0.72rem; font-weight: 700; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }"
-        appendLine builder ".ll-status-chip__label { color: rgba(255,255,255,0.96); }"
-        appendLine builder ".ll-status-chip__mark { font-weight: 800; }"
-        appendLine builder ".ll-status-chip--ready .ll-status-chip__mark { color: #dcfce7; }"
-        appendLine builder ".ll-status-chip--needs-attention .ll-status-chip__mark { color: #fecaca; }"
-        appendLine builder ".ll-panel { display: flex; flex-direction: column; gap: 9px; background: rgba(255,255,255,0.78); border: 1px solid #d7e3f0; border-radius: 18px; padding: 12px; }"
-        appendLine builder ".ll-panel__title { margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #27435c; }"
-        appendLine builder ".ll-field { display: flex; flex-direction: column; gap: 6px; }"
-        appendLine builder ".ll-field__label { color: #47617c; font-size: 0.72rem; font-weight: 700; }"
-        appendLine builder ".ll-text-input, .ll-money-input__field { width: 100%; box-sizing: border-box; border: 1px solid #c6d7ea; border-radius: 14px; padding: 12px 13px; background: #f7fbff; color: #16304a; font-size: 0.94rem; line-height: 1.2; }"
-        appendLine builder ".ll-text-input::placeholder, .ll-money-input__field::placeholder { color: #8aa0b7; }"
-        appendLine builder ".ll-action-stack, .ll-primary-action-row { display: flex; flex-direction: column; gap: 8px; }"
-        appendLine builder ".ll-button { width: 100%; border-radius: 16px; border: 1px solid transparent; padding: 12px 14px; font-size: 0.9rem; font-weight: 700; line-height: 1.15; cursor: pointer; }"
-        appendLine builder ".ll-button:disabled { cursor: not-allowed; opacity: 0.58; }"
-        appendLine builder ".ll-button--primary { background: #0ea5e9; border-color: #0284c7; color: white; }"
-        appendLine builder ".ll-button--secondary { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }"
-        appendLine builder ".ll-button--supporting { background: rgba(255,255,255,0.92); border-color: #c6d4e2; color: #27435c; }"
-        appendLine builder ".ll-button--success { background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%); border-color: #15803d; color: white; box-shadow: 0 10px 18px rgba(22, 163, 74, 0.22); }"
-        appendLine builder ".ll-option-group { display: flex; flex-wrap: wrap; gap: 8px; }"
-        appendLine builder ".ll-chip { border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255,255,255,0.94); color: #27435c; padding: 7px 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }"
-        appendLine builder ".ll-chip--selected { background: #0ea5e9; border-color: #0284c7; color: white; }"
-        appendLine builder ".ll-chip--quick-fill { background: #fff7ed; border-color: #fdba74; color: #9a3412; }"
+        appendLine builder ".ll-screen-surface__name { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }"
+        appendLine builder ".ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }"
+        appendLine builder ".ll-phone-screen { width: 100%; max-width: 360px; min-height: 667px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; gap: 0; }"
+        appendLine builder ".ll-phone-screen--tall { min-height: 920px; }"
+        appendLine builder ".ll-screen-body { padding: 1rem; }"
+        appendLine builder ".ll-location-context { margin: 0 0 1rem; color: #64748b; font-size: 0.82rem; font-weight: 600; }"
+        appendLine builder ".ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }"
+        appendLine builder ".ll-header__text { display: flex; flex-direction: column; gap: 0.125rem; }"
+        appendLine builder ".ll-header__title { margin: 0; font-size: 1.5rem; font-weight: 700; line-height: 1.05; }"
+        appendLine builder ".ll-header__subtitle { margin: 0; font-size: 0.75rem; opacity: 0.95; font-weight: 500; color: rgba(255,255,255,0.95); }"
+        appendLine builder ".ll-header__badge { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3); }"
+        appendLine builder ".ll-panel { background: white; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.75rem; }"
+        appendLine builder ".ll-panel--compact { padding-top: 1rem; padding-bottom: 1rem; }"
+        appendLine builder ".ll-panel--location { gap: 0.75rem; }"
+        appendLine builder ".ll-panel__title { margin: 0; font-size: 0.875rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }"
+        appendLine builder ".ll-field { display: flex; flex-direction: column; gap: 0.5rem; }"
+        appendLine builder ".ll-field__label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; }"
+        appendLine builder ".ll-location-section { display: flex; gap: 0.75rem; align-items: stretch; }"
+        appendLine builder ".ll-location-input { flex: 1; display: flex; flex-direction: column; }"
+        appendLine builder ".ll-location-info { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; font-weight: 500; }"
+        appendLine builder ".ll-text-input { width: 100%; padding: 1rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1rem; color: #2d3748; transition: border-color 0.2s; font-weight: 500; }"
+        appendLine builder ".ll-text-input:focus { outline: none; border-color: #ffcc80; }"
+        appendLine builder ".ll-text-input::placeholder { color: #8aa0b7; }"
+        appendLine builder ".ll-gps-button { width: 64px; min-height: 56px; border: 3px solid #e2e8f0; background: white; border-radius: 0.75rem; font-size: 1.75rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }"
+        appendLine builder ".ll-gps-button:active { transform: scale(0.97); background: #fff8e1; border-color: #ffcc80; }"
+        appendLine builder ".ll-primary-action-row { display: flex; flex-direction: column; gap: 0.75rem; }"
+        appendLine builder ".ll-button { width: 100%; border: none; border-radius: 0.75rem; min-height: 64px; padding: 1rem; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }"
+        appendLine builder ".ll-button:disabled { cursor: not-allowed; }"
+        appendLine builder ".ll-button--primary { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; box-shadow: 0 4px 12px rgba(255, 204, 128, 0.4); }"
+        appendLine builder ".ll-button--supporting { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }"
+        appendLine builder ".ll-button--secondary { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }"
+        appendLine builder ".ll-button--disabled { background: #cbd5e1; color: #475569; box-shadow: none; }"
+        appendLine builder ".ll-button--success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }"
+        appendLine builder ".ll-option-group { display: grid; gap: 0.75rem; }"
+        appendLine builder ".ll-option-group--machine { grid-template-columns: repeat(3, 1fr); }"
+        appendLine builder ".ll-option-group--payment { grid-template-columns: repeat(2, 1fr); }"
+        appendLine builder ".ll-option-group--detail { grid-template-columns: repeat(2, 1fr); margin-top: 0.25rem; }"
+        appendLine builder ".ll-chip { border: 3px solid #e2e8f0; background: white; border-radius: 0.75rem; color: #475569; cursor: pointer; transition: all 0.2s; }"
+        appendLine builder ".ll-chip--tile { min-height: 64px; padding: 0.875rem 0.5rem; font-size: 0.9375rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }"
+        appendLine builder ".ll-chip--detail { min-height: 48px; padding: 0.75rem 0.6rem; font-size: 0.82rem; font-weight: 600; }"
+        appendLine builder ".ll-chip--selected { background: #fff8e1; border-color: #ffcc80; color: #f57c00; }"
+        appendLine builder ".ll-chip__icon { font-size: 1rem; line-height: 1; }"
+        appendLine builder ".ll-chip__label { line-height: 1.1; }"
         appendLine builder ".ll-two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }"
-        appendLine builder ".ll-stepper { display: grid; grid-template-columns: 56px 1fr 56px; gap: 10px; align-items: center; }"
-        appendLine builder ".ll-stepper__button { border-radius: 16px; border: 1px solid #c6d4e2; background: rgba(255,255,255,0.94); color: #27435c; min-height: 52px; font-size: 1.18rem; font-weight: 700; cursor: pointer; }"
-        appendLine builder ".ll-stepper__value { border-radius: 16px; border: 1px solid #c6d7ea; background: #f7fbff; padding: 14px 12px; font-size: 1rem; font-weight: 700; text-align: center; }"
-        appendLine builder ".ll-money-input { display: grid; grid-template-columns: auto 1fr; align-items: center; border: 1px solid #c6d7ea; border-radius: 14px; background: #f7fbff; overflow: hidden; }"
-        appendLine builder ".ll-money-input__currency { padding: 0 0 0 12px; color: #47617c; font-size: 0.88rem; font-weight: 700; }"
-        appendLine builder ".ll-money-input__field { border: 0; background: transparent; padding-left: 6px; }"
-        appendLine builder ".ll-quarter-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }"
-        appendLine builder ".ll-quarter-button { position: relative; display: inline-grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; border: 1px solid #94a3b8; background: radial-gradient(circle at 30% 28%, #ffffff 0%, #f8fafc 28%, #d9e2ec 56%, #b8c5d1 74%, #eef2f7 100%); color: #1f3349; box-shadow: inset 0 2px 2px rgba(255,255,255,0.7), inset 0 -2px 2px rgba(71,85,105,0.18), 0 4px 8px rgba(15, 23, 42, 0.12); cursor: pointer; }"
-        appendLine builder ".ll-quarter-button__sign { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1.02rem; font-weight: 800; }"
-        appendLine builder ".ll-quarter-button__coin { font-size: 0.84rem; font-weight: 800; letter-spacing: 0.01em; }"
-        appendLine builder ".ll-quarter-button:disabled { cursor: not-allowed; opacity: 0.52; }"
-        appendLine builder ".ll-quick-fill-row { display: flex; flex-wrap: wrap; gap: 8px; }"
-        appendLine builder ".ll-summary-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-radius: 18px; background: linear-gradient(90deg, #fff5eb 0%, #ffe5c5 100%); border: 1px solid #fdba74; padding: 11px 12px; }"
-        appendLine builder ".ll-summary-bar__label { color: #9a3412; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }"
-        appendLine builder ".ll-summary-bar__value { color: #7c2d12; font-size: 1rem; font-weight: 800; }"
-        appendLine builder ".ll-feedback-banner { border-radius: 16px; background: linear-gradient(90deg, #ecfdf5 0%, #dcfce7 100%); border: 1px solid #86efac; color: #166534; padding: 11px 12px; font-size: 0.82rem; font-weight: 700; }"
-        appendLine builder ".ll-entry-list { display: flex; flex-direction: column; gap: 8px; }"
-        appendLine builder ".ll-entry-card { border-radius: 14px; border: 1px solid #d7e3f0; background: rgba(255,255,255,0.92); padding: 10px 11px; display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".ll-entry-card__topline { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }"
-        appendLine builder ".ll-entry-card__title { margin: 0; font-size: 0.83rem; line-height: 1.15; }"
-        appendLine builder ".ll-entry-card__amount { color: #0e5883; font-size: 0.82rem; font-weight: 800; white-space: nowrap; }"
-        appendLine builder ".ll-entry-card__detail { margin: 0; color: #4d6781; font-size: 0.72rem; line-height: 1.25; }"
-        appendLine builder ".ll-empty-state { margin: 0; color: #6b7f95; font-size: 0.76rem; line-height: 1.25; }"
+        appendLine builder ".ll-stepper { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }"
+        appendLine builder ".ll-stepper__button { width: 72px; height: 72px; border: none; background: #ffcc80; color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3); }"
+        appendLine builder ".ll-stepper__button:active { transform: scale(0.95); background: #ffb74d; }"
+        appendLine builder ".ll-stepper__value { font-size: 3rem; font-weight: 700; color: #2d3748; min-width: 80px; width: 80px; text-align: center; padding: 0.5rem; border: 3px solid transparent; border-radius: 0.5rem; background: transparent; }"
+        appendLine builder ".ll-money-input { display: flex; align-items: center; justify-content: center; gap: 0.25rem; border: 0; background: transparent; overflow: visible; }"
+        appendLine builder ".ll-money-input__currency { font-size: 1.5rem; font-weight: 700; color: #64748b; padding: 0; }"
+        appendLine builder ".ll-money-input__field { width: 100%; max-width: 140px; padding: 0.875rem 0.5rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #2d3748; text-align: center; background: white; }"
+        appendLine builder ".ll-quarter-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; }"
+        appendLine builder ".ll-quarter-button { width: 72px; height: 72px; border: none; background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%); color: #4a4a4a; border-radius: 50%; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; border: 3px solid #a8a8a8; position: relative; font-family: 'Courier New', monospace; }"
+        appendLine builder ".ll-quarter-button::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; border: 1px dashed rgba(128, 128, 128, 0.3); }"
+        appendLine builder ".ll-quarter-button__sign { font-size: 1.25rem; font-weight: 900; margin-right: -0.125rem; z-index: 1; }"
+        appendLine builder ".ll-quarter-button__coin { font-size: 1.125rem; font-weight: 700; z-index: 1; }"
+        appendLine builder ".ll-quarter-button:active { transform: scale(0.95); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); }"
+        appendLine builder ".ll-quick-fill-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }"
+        appendLine builder ".ll-chip--quick-fill { padding: 0.875rem 0.5rem; border: 2px solid #ffcc80; background: #fff8e1; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 600; color: #f57c00; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }"
+        appendLine builder ".ll-chip__amount { font-size: 0.9375rem; font-weight: 600; }"
+        appendLine builder ".ll-chip__subtext { font-size: 0.625rem; opacity: 0.8; display: block; margin-top: 0.25rem; }"
+        appendLine builder ".ll-entry-total { background: #f1f5f9; padding: 1rem; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; }"
+        appendLine builder ".ll-entry-total__label { font-size: 0.875rem; font-weight: 600; color: #64748b; }"
+        appendLine builder ".ll-entry-total__amount { font-size: 1.75rem; font-weight: 700; color: #2d3748; }"
+        appendLine builder ".ll-status-chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; width: 100%; }"
+        appendLine builder ".ll-status-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.375rem 0.75rem; background: rgba(255, 255, 255, 0.9); border-radius: 1rem; font-size: 0.875rem; font-weight: 600; color: #475569; box-shadow: none; }"
+        appendLine builder ".ll-status-chip__label { color: inherit; }"
+        appendLine builder ".ll-status-chip__mark { font-weight: 800; }"
+        appendLine builder ".ll-status-chip--ready .ll-status-chip__mark { color: #16a34a; }"
+        appendLine builder ".ll-status-chip--needs-attention .ll-status-chip__mark { color: #dc2626; }"
+        appendLine builder ".ll-summary-bar { background: #fff8e1; padding: 0.875rem 1rem; border-bottom: 2px solid #ffcc80; border-top: 2px solid #ffcc80; display: flex; justify-content: space-between; align-items: center; margin: 1rem 0.25rem 1.5rem 0.25rem; border-radius: 0.5rem; }"
+        appendLine builder ".ll-summary-bar__label { font-size: 0.875rem; font-weight: 600; color: #f57c00; text-transform: uppercase; letter-spacing: 0.05em; }"
+        appendLine builder ".ll-summary-bar__value { font-size: 1.5rem; font-weight: 700; color: #f57c00; }"
+        appendLine builder ".ll-feedback-banner { border-radius: 0.75rem; background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 700; }"
+        appendLine builder ".ll-recent-entries { margin-top: 0; }"
+        appendLine builder ".ll-recent-entries__title { font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }"
+        appendLine builder ".ll-entry-list { display: flex; flex-direction: column; gap: 0.75rem; }"
+        appendLine builder ".ll-entry-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #cbd5e1; }"
+        appendLine builder ".ll-entry-card__topline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }"
+        appendLine builder ".ll-entry-card__title { margin: 0; font-size: 0.9375rem; color: #64748b; font-weight: 500; }"
+        appendLine builder ".ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }"
+        appendLine builder ".ll-entry-card__detail { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
+        appendLine builder ".ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
         appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-two-up { grid-template-columns: 1fr; } }"
         appendLine builder "</style>"
 
