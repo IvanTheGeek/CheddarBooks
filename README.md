@@ -22,3 +22,10 @@ Start here:
 - [`docs/foundation.md`](docs/foundation.md)
 - [`docs/laundrylog/introduction.md`](docs/laundrylog/introduction.md)
 - [`docs/laundrylog/requirements.md`](docs/laundrylog/requirements.md)
+
+## Agent And Repo Memory Surfaces
+
+- [`docs/agent-readme.md`](docs/agent-readme.md)
+- [`docs/current-focus.md`](docs/current-focus.md)
+- [`docs/context-packs/laundrylog-context-pack.md`](docs/context-packs/laundrylog-context-pack.md)
+- [`docs/session-handoffs/README.md`](docs/session-handoffs/README.md)
