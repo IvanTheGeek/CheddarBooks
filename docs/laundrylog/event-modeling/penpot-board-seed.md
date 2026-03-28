@@ -49,7 +49,7 @@ It already contains at least:
 - the first readable row proof:
   - `PATH1.Row.V1`
 - the current clean readable row:
-  - `PATH1.Row.V3.Clean`
+  - `PATH1.Row.V4.Clean`
 
 The current clean slice rebuild also produced a reusable component family that now belongs in the practical board seed:
 
@@ -70,9 +70,11 @@ Current `ViewSlice` correction:
 Current shell-shape correction:
 
 - `CommandSlice` and `ViewSlice` now target the same outer visual height
-- the header wording should use title case:
-  - `CommandSlice`
-  - `ViewSlice`
+- the shell header wording should use:
+  - `COMMAND SLICE`
+  - `VIEW SLICE`
+- the top-left pill should carry the app name
+- the bottom-right row badge should carry context or lens, not a file-ish label
 
 So the current task is not to invent the page from nothing.
 
@@ -80,7 +82,7 @@ It is to normalize and refine what is already there into a clearer row-per-path 
 
 ## Current PATH 1 Row Proof
 
-`PATH1.Row.V1` is the first live proof that the `PATHS` page can carry a readable path row rather than only loose screens and scratch boards.
+`PATH1.Row.V4.Clean` is the current live proof that the `PATHS` page can carry a readable path row rather than only loose screens and scratch boards.
 
 Current shape:
 
@@ -88,6 +90,10 @@ Current shape:
 - one horizontal row of alternating `CommandSlice` and `ViewSlice` cards
 - current screen slots as screenshot-like references
 - single-actor reading for now
+- bottom-right row badges used as context markers:
+  - `ui lens`
+  - `business`
+  - `classic em`
 
 That proof is still early, but it establishes the right kind of projection surface to keep refining.
 

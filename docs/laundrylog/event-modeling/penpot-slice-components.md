@@ -33,6 +33,7 @@ Current shell components:
 Current first clean path-row projection:
 
 - `PATH1.Row.V3.Clean`
+- `PATH1.Row.V4.Clean`
 
 ## Current Visual Direction
 
@@ -73,19 +74,19 @@ That means the current shell composition is:
 
 If a different lens wants to show a screen or actor surface above the `View`, that should be treated as a lens-specific projection rather than the default `ViewSlice` shape.
 
-## Current Casing Rule
+## Current Header Rule
 
-Current preferred casing in the Penpot slice language is:
+Current preferred shell header wording in the Penpot slice language is:
 
-- `CommandSlice`
-- `ViewSlice`
+- `COMMAND SLICE`
+- `VIEW SLICE`
 
 Do not use:
 
 - `COMMANDSLICE`
 - `VIEWSLICE`
 
-The smaller type marker in the header should still be right-aligned, but the wording should stay in normal title case.
+The smaller type marker in the header should stay right-aligned with a little breathing room on the right edge.
 
 ## Current Height Rule
 
@@ -99,7 +100,37 @@ Why:
 
 Current clean shell target:
 
-- `420` high outer card
+- `452` high outer card
+
+## Current Badge Rule
+
+The current clean slice family now distinguishes three different badge jobs.
+
+- top-left pill on the slice shell
+  app name
+- top-right badge in the row
+  block type such as `SCREEN`, `COMMAND`, `EVENT`, or `VIEW`
+- bottom-right badge in the row
+  context, lens, or audience marker
+
+That bottom badge is not a file label.
+
+It should answer a question more like:
+
+- who is this block for?
+- which lens is currently making this block visible?
+- what context is this block meant to be read in?
+
+Current first practical values in `PATH1.Row.V4.Clean` are:
+
+- screen rows
+  `ui lens`
+- command rows
+  `business`
+- event rows
+  `business`
+- view rows
+  `classic em`
 
 ## Current Token Direction
 
@@ -168,6 +199,21 @@ The next screen-oriented upgrade should prefer:
 
 without changing the underlying slice meaning.
 
+## Current Projection Rule
+
+The current clean readable path row is a derived projection, not a reusable component base.
+
+Why:
+
+- the reusable component ladder is still the preferred direction
+- but the current live clone or detach seam is not trustworthy enough to treat the readable row itself as a provenance-preserving instance chain
+
+So the practical rule is:
+
+- keep reusable slice building blocks on `Components`
+- keep readable path rows on `PATHS`
+- document when a readable path row is built as a local projection rather than as a traceable instance lineage
+
 ## Current Event Ref Rule
 
 `Event Ref` is not part of the current default LaundryLog `ViewSlice` language.
@@ -184,7 +230,7 @@ Current naming should stay explicit and layered:
 
 - row components: `SliceRow.<Role>.Clean.V1`
 - shell components: `<SliceType>.Clean.V1`
-- path-row board: `PATH1.Row.V2.Clean`
+- path-row board: `PATH1.Row.V4.Clean`
 - path-row instances: `PATH1.<kind>.<step>`
 
 This keeps the Penpot file inspectable for both humans and future automation.

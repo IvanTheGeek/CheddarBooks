@@ -143,6 +143,17 @@ For the `PATHS` page specifically, the first board should aim for:
 - nearby notes or path descriptions where that improves comprehension
 - an approach that can later expand to multiple actor lanes when needed
 
+Current local reading rule for the inner row badges:
+
+- the top-right badge inside a row is the block type
+- the bottom-right badge inside a row is context, lens, or audience
+
+That means the bottom-right badge should answer a question more like:
+
+- who is this block for?
+- which lens is currently making this block visible?
+- what context is this block meant to be read in?
+
 ## Current Practical Rule
 
 If the Penpot board and the durable Event Modeling notes disagree:
@@ -220,20 +231,27 @@ Current components:
 
 Current readable row:
 
-- `PATH1.Row.V3.Clean`
+- `PATH1.Row.V4.Clean`
 
 Current practical interpretation:
 
 - row components are now the first reusable seam
 - shell components are now the second reusable seam
-- path-row instances are now the projection seam
-- this is a better direction for later `FnHCI` / `FnUI` derivation than the earlier detached-shell workaround
+- readable path rows are still the projection seam
+- but the current readable row is best treated as a derived projection rather than as a provenance-preserving component lineage
+- this is still a better direction for later `FnHCI` / `FnUI` derivation than letting the path board drift into ad hoc drawing
 
 Current refinements now locked in:
 
-- `CommandSlice` / `ViewSlice` title-case header wording
+- shell headers now use:
+  - `COMMAND SLICE`
+  - `VIEW SLICE`
 - equal outer height between `CommandSlice` and `ViewSlice`
 - classic `ViewSlice` shows the green `View` only by default
+- bottom-right row badges carry context or lens markers such as:
+  - `ui lens`
+  - `business`
+  - `classic em`
 
 ## Current ViewSlice Rule
 
@@ -276,6 +294,11 @@ For slice work, prefer this Penpot editing pattern:
 4. adjust instance text or state where needed
 
 That keeps the board component-driven instead of turning it into ad hoc one-off drawing.
+
+Current practical caveat:
+
+- when the live clone or detach seam is not trustworthy enough, a readable path row may need to be rebuilt as a direct projection instead of as a traceable instance chain
+- if that happens, record it explicitly so the board is not mistaken for a fully provenance-preserving component surface
 
 ## Current Component-State Lab
 
