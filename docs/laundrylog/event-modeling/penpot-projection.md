@@ -258,6 +258,13 @@ So, for now:
 - use the visible `V1` lineage as the live `PATHS` working surface
 - use the clean rebuild line as a structural reference and export/data experiment line
 
+Current component-instance seam:
+
+- the Penpot API call that matches dragging from the Assets tab is `LibraryComponent.instance()`
+- the `V3` slice bases on `PATHS` are real connected instances, not just copied boards
+- this should be treated as a higher-on-the-ladder workflow than raw board synthesis when we want reusable `FnHCI`-aligned slice primitives
+- current caveat: in the present lab, text overrides applied to those live instances are reflected in live shape data but not yet reflected in the export render path
+
 Current refinements now locked in:
 
 - shell headers now use:
