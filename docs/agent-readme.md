@@ -82,6 +82,17 @@ When local app understanding changes:
 
 When work is docs-only or tests are not applicable, say so explicitly.
 
+## Verification Discipline
+
+When verifying .NET work in this repo:
+
+- do not run `dotnet build` and `dotnet run` for the test project in parallel against the same output tree
+- prefer one of:
+  - `dotnet build`, then `dotnet run --no-build --project ...`
+  - or just `dotnet run --project ...` by itself
+
+This avoids transient output-copy races in `bin/Debug/net10.0/` that can look like repo problems when they are really verification-command overlap.
+
 ## Scratch Versus Durable Docs
 
 ### Scratch
