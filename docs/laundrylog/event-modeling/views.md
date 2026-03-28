@@ -46,6 +46,36 @@ Notes:
 - the View localizes time for display
 - the View is derived from the durable event line, not stored as the source of truth
 
+## First Visible Entry View Examples
+
+The current `visible_entries` idea can be read as the green-box `View` data that later supports the business-visible screen.
+
+Current first-pass visible-entry examples:
+
+```toml
+[[visible_entries]]
+expense_kind = "washer"
+payment_method = "card"
+quantity = 1
+line_total = "3.00"
+```
+
+```toml
+[[visible_entries]]
+expense_kind = "dryer"
+payment_method = "cash"
+quantity = 1
+line_total = "2.50"
+```
+
+These examples are the current repo-memory counterpart to the local code shape:
+
+- `VisibleLaundryExpenseViewLine`
+
+And later screen-side projection pressure:
+
+- `EntryCardState`
+
 ## PATH 1 Business Screenshots
 
 ### Screenshot 1: After `LaundryLocationCaptured`
@@ -76,6 +106,10 @@ Expected visible state:
 - active location: `Love's #123 - Springfield, OH`
 - visible entries:
   - washer entry
+    `expense_kind = "washer"`
+    `payment_method = "card"`
+    `quantity = 1`
+    `line_total = "3.00"`
 - running total: washer line total
 - next obvious action: log dryer expense or another washer expense
 
@@ -92,7 +126,15 @@ Expected visible state:
 - active location: `Love's #123 - Springfield, OH`
 - visible entries:
   - washer entry
+    `expense_kind = "washer"`
+    `payment_method = "card"`
+    `quantity = 1`
+    `line_total = "3.00"`
   - dryer entry
+    `expense_kind = "dryer"`
+    `payment_method = "cash"`
+    `quantity = 1`
+    `line_total = "2.50"`
 - running total: washer + dryer
 - next obvious action: log another expense or leave the session as-is
 

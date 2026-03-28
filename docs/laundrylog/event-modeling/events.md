@@ -100,6 +100,68 @@ Why it likely matters:
 - washer and dryer expenses can both be represented by repeated instances of this event
 - views can still present local time without losing a stable UTC basis in storage
 
+Current first-pass properties:
+
+- `location_name`
+  the active laundry location context for the logged expense
+- `expense_kind`
+  the kind of laundry expense that was logged
+- `quantity`
+  how many units were logged
+- `unit_price`
+  the logged unit price
+- `line_total`
+  the durable resulting amount for the entry
+- `payment_method`
+  how the expense was paid
+- `occurred_at_utc`
+  when the expense happened, stored in UTC
+- `recorded_at_utc`
+  when the expense was recorded into the journal, stored in UTC
+
+Current optional properties:
+
+- `notes`
+  only if we later decide expense notes belong in the first durable line
+- `matched_statement_line_id`
+  only when later statement matching exists
+
+First concrete example: washer expense
+
+```toml
+event_name = "LaundryExpenseLogged"
+location_name = "Love's #123 - Springfield, OH"
+expense_kind = "washer"
+quantity = 1
+unit_price = "3.00"
+line_total = "3.00"
+payment_method = "card"
+occurred_at_utc = "2026-03-27T13:47:00Z"
+recorded_at_utc = "2026-03-27T13:47:10Z"
+```
+
+Second concrete example: dryer expense
+
+```toml
+event_name = "LaundryExpenseLogged"
+location_name = "Love's #123 - Springfield, OH"
+expense_kind = "dryer"
+quantity = 1
+unit_price = "2.50"
+line_total = "2.50"
+payment_method = "cash"
+occurred_at_utc = "2026-03-27T13:58:00Z"
+recorded_at_utc = "2026-03-27T13:58:08Z"
+```
+
+What these examples pressure:
+
+- `location_name` needs to stay available to derived views even if the location event remains its own separate durable fact
+- payment method is part of the first useful durable line
+- washer and dryer stay as values of `expense_kind`, not separate event kinds
+- `line_total` should be durable so later reporting and audit review do not depend on recalculating from possibly changed rules
+- `occurred_at_utc` and `recorded_at_utc` may differ, and that distinction is worth keeping from the start
+
 ## Strong Candidates For Soon-After
 
 These are plausible but can wait until the first path is stable:

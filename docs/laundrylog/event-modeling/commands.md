@@ -98,6 +98,79 @@ What this actor screen shows:
 - quantity and amount controls for one laundry expense
 - the action surface that expresses the `LogLaundryExpense` intent
 
+Current first-pass properties:
+
+- `expense_kind`
+  the kind of laundry expense being logged
+- `quantity`
+  how many machine runs or supply units are being logged
+- `unit_price`
+  the user-entered price per unit
+- `payment_method`
+  how this expense was paid
+
+Current optional properties:
+
+- `notes`
+  only if we later decide freeform notes belong on the expense command
+- `device_observed_at_local`
+  only if we later want to carry a local-device observation hint before durable UTC event time is assigned
+
+First concrete example: washer expense
+
+```toml
+command_name = "LogLaundryExpense"
+expense_kind = "washer"
+quantity = 1
+unit_price = "3.00"
+payment_method = "card"
+```
+
+Expected resulting event:
+
+```toml
+event_name = "LaundryExpenseLogged"
+location_name = "Love's #123 - Springfield, OH"
+expense_kind = "washer"
+quantity = 1
+unit_price = "3.00"
+line_total = "3.00"
+payment_method = "card"
+occurred_at_utc = "2026-03-27T13:47:00Z"
+recorded_at_utc = "2026-03-27T13:47:10Z"
+```
+
+Second concrete example: dryer expense
+
+```toml
+command_name = "LogLaundryExpense"
+expense_kind = "dryer"
+quantity = 1
+unit_price = "2.50"
+payment_method = "cash"
+```
+
+Expected resulting event:
+
+```toml
+event_name = "LaundryExpenseLogged"
+location_name = "Love's #123 - Springfield, OH"
+expense_kind = "dryer"
+quantity = 1
+unit_price = "2.50"
+line_total = "2.50"
+payment_method = "cash"
+occurred_at_utc = "2026-03-27T13:58:00Z"
+recorded_at_utc = "2026-03-27T13:58:08Z"
+```
+
+What these command examples pressure:
+
+- washer and dryer can share one command shape
+- the user-facing path should not need different commands for washer versus dryer
+- line total can still be a durable event fact even if the command only carries quantity and unit price
+- payment method belongs in the first path because it is part of the audit-defense journal value
+
 Current next step:
 
-- define first-pass properties and examples for washer and dryer cases
+- compare these examples directly against the visible-entry View examples

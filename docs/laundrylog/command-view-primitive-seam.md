@@ -166,6 +166,11 @@ This seam gives us:
 - a way to compare the model against Penpot and the running UI later
 - a smaller and safer path toward future shared `FnHCI` primitives
 
+The concrete washer and dryer examples in the Event Modeling docs should now be treated as the semantic reference points for:
+
+- `VisibleLaundryExpenseViewLine`
+- `EntryCardState`
+
 ## Related
 
 - [Event Modeling](event-modeling/README.md)
