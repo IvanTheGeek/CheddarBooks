@@ -8,7 +8,12 @@ If someone comes in using Event Modeling search terms, this is roughly the place
 
 In the preferred Event Modeling language here, this is the `ViewSlice` side.
 
-This note is about:
+The current working clarification is:
+
+- a `ViewSlice` can be just the green-box `View`
+- with the right lens on, it can also include the resultant business-visible screen that the `View` supports
+
+This note is therefore about:
 
 - what the user can see
 - what the business state appears to be
@@ -104,3 +109,4 @@ See also:
 
 - [`../screens.md`](../screens.md)
 - [`../view-contracts.md`](../view-contracts.md)
+- [`../command-view-primitive-seam.md`](../command-view-primitive-seam.md)

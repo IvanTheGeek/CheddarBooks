@@ -10,6 +10,8 @@ For the first explicit local state-shape direction sitting between the current a
 
 For the current Penpot-backed screen evidence behind these view contracts, see [Penpot Screen Evidence](penpot-screen-evidence.md).
 
+For the current seam between Event Modeling state and local primitive composition, see [Command/View To Primitive Seam](command-view-primitive-seam.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.

@@ -19,6 +19,10 @@ module LaundryLogTests =
                   Expect.equal (ExpenseKind.slug ExpenseKind.Washer) "washer" "Expected the washer expense slug."
                   Expect.equal (ExpenseKind.displayName ExpenseKind.Supplies) "Supplies" "Expected the supplies display name.")
 
+              testCase "Payment methods map to stable slugs" (fun () ->
+                  Expect.equal (PaymentMethod.slug PaymentMethod.Card) "card" "Expected the card payment slug."
+                  Expect.equal (PaymentMethod.displayName PaymentMethod.Points) "Points" "Expected the points payment label.")
+
               testCase "Location names reject characters outside the explicit allowlist" (fun () ->
                   match LocationName.tryCreate "Main Street Laundry!" with
                   | Ok _ -> failtest "Expected disallowed punctuation to be rejected."
@@ -124,4 +128,66 @@ module LaundryLogTests =
 
                   Expect.sequenceEqual selectedMachineLabels [ "Washer" ] "Expected washer to be the selected machine type."
                   Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected card to be the selected payment type."
-                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values.") ]
+                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values.")
+
+              testCase "New-session primitive mapping follows location command-slice state" (fun () ->
+                  let noLocationState =
+                      CaptureLaundryLocationCommandSliceState.create None true
+                      |> PrimitiveStateMappings.newSessionFromCommandSlice
+
+                  let enteredLocation =
+                      LocationName.tryCreate "Love's #123 - Springfield, OH"
+                      |> unwrap "location name"
+
+                  let withLocationState =
+                      CaptureLaundryLocationCommandSliceState.create (Some enteredLocation) true
+                      |> PrimitiveStateMappings.newSessionFromCommandSlice
+
+                  Expect.equal noLocationState.SetLocationAction.IsEnabled false "Expected Set Location to remain disabled before a draft location exists."
+
+                  Expect.equal
+                      withLocationState.LocationInput.ValueText
+                      (Some "Love's #123 - Springfield, OH")
+                      "Expected the command-slice draft location to appear in the mapped input."
+
+                  Expect.equal withLocationState.SetLocationAction.IsEnabled true "Expected Set Location to become enabled when location text exists.")
+
+              testCase "Entry-form primitive mapping combines command-slice and view-slice state" (fun () ->
+                  let location =
+                      LocationName.tryCreate "Love's #123 - Springfield, OH"
+                      |> unwrap "location name"
+
+                  let washerEntry =
+                      VisibleLaundryExpenseViewLine.tryCreate ExpenseKind.Washer PaymentMethod.Card 1 "$3.00"
+                      |> unwrap "visible washer expense line"
+
+                  let sessionView =
+                      CurrentLaundrySessionViewState.tryCreate location [ washerEntry ] "$3.00" (Some "2026-03-28 01:10")
+                      |> unwrap "current session view"
+
+                  let expenseCommand =
+                      LogLaundryExpenseCommandSliceState.tryCreate
+                          ExpenseKind.Dryer
+                          1
+                          (Some "2.50")
+                          PaymentMethod.Card
+                          [ "$2.50"; "$3.00" ]
+                          true
+                      |> unwrap "expense command slice"
+
+                  let mappedState = PrimitiveStateMappings.entryFormFromSlices sessionView expenseCommand
+
+                  let selectedMachineLabels =
+                      mappedState.MachineTypeOptions.Choices
+                      |> List.filter (fun choice -> choice.IsSelected)
+                      |> List.map (fun choice -> choice.Label)
+
+                  let selectedPaymentLabels =
+                      mappedState.PaymentOptions.Choices
+                      |> List.filter (fun choice -> choice.IsSelected)
+                      |> List.map (fun choice -> choice.Label)
+
+                  Expect.equal mappedState.Header.Subtitle (Some "Love's #123 - Springfield, OH") "Expected the active location from the ViewSlice to appear in the header."
+                  Expect.sequenceEqual selectedMachineLabels [ "Dryer" ] "Expected the selected expense kind from the CommandSlice to drive machine selection."
+                  Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected the selected payment method from the CommandSlice to drive payment selection."
+                  Expect.equal mappedState.SessionTotal.ValueText "$3.00" "Expected the running total from the ViewSlice to drive the summary bar.") ]

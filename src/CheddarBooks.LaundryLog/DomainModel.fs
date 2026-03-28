@@ -24,6 +24,31 @@ module ExpenseKind =
         | ExpenseKind.Dryer -> "Dryer"
         | ExpenseKind.Supplies -> "Supplies"
 
+/// Enumerates the first supported payment methods for LaundryLog expense logging.
+type PaymentMethod =
+    | Cash
+    | Card
+    | App
+    | Points
+
+[<RequireQualifiedAccess>]
+module PaymentMethod =
+    /// Returns the stable slug used in view state, mapping rules, and later persistence boundaries.
+    let slug =
+        function
+        | PaymentMethod.Cash -> "cash"
+        | PaymentMethod.Card -> "card"
+        | PaymentMethod.App -> "app"
+        | PaymentMethod.Points -> "points"
+
+    /// Returns the user-facing label for the payment method.
+    let displayName =
+        function
+        | PaymentMethod.Cash -> "Cash"
+        | PaymentMethod.Card -> "Card"
+        | PaymentMethod.App -> "App"
+        | PaymentMethod.Points -> "Points"
+
 /// Enumerates the first known CheddarBooks LaundryLog workflow stages.
 type SessionFlowStage =
     | NewSession
@@ -59,13 +84,14 @@ module LocationName =
         || character = '.'
         || character = ','
         || character = '&'
+        || character = '#'
 
     /// Creates a validated location label using an explicit ASCII allowlist.
     let tryCreate (value: string) =
         if String.IsNullOrWhiteSpace value then
             Error "Location names must not be blank."
         elif value |> Seq.exists (isAllowedCharacter >> not) then
-            Error "Location names may contain only ASCII letters, digits, space, hyphen, apostrophe, dot, comma, and ampersand."
+            Error "Location names may contain only ASCII letters, digits, space, hyphen, apostrophe, dot, comma, ampersand, and hash."
         else
             Ok(LocationName(value.Trim()))
 

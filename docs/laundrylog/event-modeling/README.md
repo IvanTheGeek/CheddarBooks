@@ -33,6 +33,7 @@ That keeps the first pass grounded in desired behavior rather than prematurely d
 - [`path-1-first-entry.md`](path-1-first-entry.md)
 - [`views.md`](views.md)
 - [`open-questions.md`](open-questions.md)
+- [`../command-view-primitive-seam.md`](../command-view-primitive-seam.md)
 
 ## Working Rule
 
