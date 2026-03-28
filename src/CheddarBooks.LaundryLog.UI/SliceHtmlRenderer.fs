@@ -142,47 +142,74 @@ module GwtStage =
         | GwtStage.When -> "WHEN"
         | GwtStage.Then -> "THEN"
 
-/// Describes one scenario cell aligned beneath a rendered path row.
-type GwtScenarioCell =
+/// Describes one stage clause inside a per-slice GWT card.
+type GwtClause =
     { Stage: GwtStage
-      Summary: string
-      Detail: string option
-      ColumnSpan: int }
+      Text: string }
 
 [<RequireQualifiedAccess>]
-module GwtScenarioCell =
-    /// Creates a validated scenario cell for the current path-row band.
-    let tryCreate stage summary detail columnSpan =
-        let detail : string option = detail
-
-        if String.IsNullOrWhiteSpace summary then
-            Error "Scenario cells must provide summary text."
-        elif columnSpan <= 0 then
-            Error "Scenario cell column spans must be positive."
+module GwtClause =
+    /// Creates a validated GWT clause for a single slice card.
+    let tryCreate stage text =
+        if String.IsNullOrWhiteSpace text then
+            Error "GWT clauses must provide text."
         else
             Ok
                 { Stage = stage
-                  Summary = summary.Trim()
-                  Detail = detail |> Option.map (fun value -> value.Trim())
-                  ColumnSpan = columnSpan }
+                  Text = text.Trim() }
 
-/// Describes one rendered scenario row aligned beneath the path slices.
-type PathScenarioRow =
-    { Title: string
-      Cells: GwtScenarioCell list }
+/// Distinguishes the two current per-slice GWT purposes.
+type SliceGwtKind =
+    | CommandRules
+    | ViewProjection
 
 [<RequireQualifiedAccess>]
-module PathScenarioRow =
-    /// Creates a validated scenario row for a path band.
-    let tryCreate title cells =
+module SliceGwtKind =
+    /// Returns the stable badge label for the current GWT card kind.
+    let label =
+        function
+        | SliceGwtKind.CommandRules -> "command gwt"
+        | SliceGwtKind.ViewProjection -> "view gwt"
+
+    /// Returns the stable CSS class suffix for the current GWT card kind.
+    let cssClass =
+        function
+        | SliceGwtKind.CommandRules -> "command"
+        | SliceGwtKind.ViewProjection -> "view"
+
+/// Describes one per-slice GWT card aligned beneath a rendered path row.
+type SliceGwtCard =
+    { Kind: SliceGwtKind
+      Clauses: GwtClause list }
+
+[<RequireQualifiedAccess>]
+module SliceGwtCard =
+    /// Creates a validated per-slice GWT card.
+    let tryCreate kind clauses =
+        if List.isEmpty clauses then
+            Error "GWT cards must contain at least one clause."
+        else
+            Ok
+                { Kind = kind
+                  Clauses = clauses }
+
+/// Describes one rendered GWT row aligned beneath the path slices.
+type PathGwtRow =
+    { Title: string
+      Cards: SliceGwtCard list }
+
+[<RequireQualifiedAccess>]
+module PathGwtRow =
+    /// Creates a validated GWT row for a path band.
+    let tryCreate title cards =
         if String.IsNullOrWhiteSpace title then
-            Error "Scenario rows must provide a title."
-        elif List.isEmpty cells then
-            Error "Scenario rows must contain at least one cell."
+            Error "GWT rows must provide a title."
+        elif List.isEmpty cards then
+            Error "GWT rows must contain at least one card."
         else
             Ok
                 { Title = title.Trim()
-                  Cells = cells }
+                  Cards = cards }
 
 /// Describes one rendered PATH row.
 type PathRowState =
@@ -190,12 +217,12 @@ type PathRowState =
       Title: string
       Description: string
       SliceCards: PathSliceCard list
-      ScenarioRows: PathScenarioRow list }
+      GwtRows: PathGwtRow list }
 
 [<RequireQualifiedAccess>]
 module PathRowState =
     /// Creates a validated PATH row state.
-    let tryCreate pathId title description sliceCards scenarioRows =
+    let tryCreate pathId title description sliceCards gwtRows =
         if String.IsNullOrWhiteSpace pathId then
             Error "Path rows must provide a stable path identifier."
         elif String.IsNullOrWhiteSpace title then
@@ -210,7 +237,7 @@ module PathRowState =
                   Title = title.Trim()
                   Description = description.Trim()
                   SliceCards = sliceCards
-                  ScenarioRows = scenarioRows }
+                  GwtRows = gwtRows }
 
 /// Describes the current rendering options for the HTML path projection.
 type SliceRenderOptions =
@@ -253,13 +280,17 @@ module SliceHtmlExamples =
         |> expect $"command slice '{title}'"
         |> PathSliceCard.CommandSlice
 
-    let private scenarioCell stage summary detail columnSpan =
-        GwtScenarioCell.tryCreate stage summary detail columnSpan
-        |> expect $"scenario cell '{summary}'"
+    let private gwtClause stage text =
+        GwtClause.tryCreate stage text
+        |> expect $"gwt clause '{text}'"
 
-    let private scenarioRow title cells =
-        PathScenarioRow.tryCreate title cells
-        |> expect $"scenario row '{title}'"
+    let private gwtCard kind clauses =
+        SliceGwtCard.tryCreate kind clauses
+        |> expect "gwt card"
+
+    let private gwtRow title cards =
+        PathGwtRow.tryCreate title cards
+        |> expect $"gwt row '{title}'"
 
     let private viewSlice appName title description screen view =
         ViewSliceCardState.tryCreate appName title description screen view
@@ -463,23 +494,38 @@ module SliceHtmlExamples =
                       []
                       (PropertyLines (formatViewState washerDryerView))
                       (Some "classic em")) ]
-            [ scenarioRow
-                  "PATH 1 scenario"
-                  [ scenarioCell
-                        GwtStage.Given
-                        "location is captured and the session is ready for the first expense"
-                        (Some "manual location capture establishes the active location and the empty current session")
-                        2
-                    scenarioCell
-                        GwtStage.When
-                        "a washer expense is logged into the active location"
-                        (Some "the running total becomes $3.00 and the washer entry becomes visible")
-                        2
-                    scenarioCell
-                        GwtStage.Then
-                        "a dryer expense is logged into the same session"
-                        (Some "the running total becomes $5.50 and both washer and dryer entries remain visible")
-                        2 ] ]
+            [ gwtRow
+                  "PATH 1 GWT"
+                  [ gwtCard
+                        SliceGwtKind.CommandRules
+                        [ gwtClause GwtStage.Given "no active laundry location has been captured yet"
+                          gwtClause GwtStage.When "CaptureLaundryLocation is issued with manual text"
+                          gwtClause GwtStage.Then "LaundryLocationCaptured becomes true" ]
+                    gwtCard
+                        SliceGwtKind.ViewProjection
+                        [ gwtClause GwtStage.Given "LaundryLocationCaptured exists as the current location fact"
+                          gwtClause GwtStage.When "the current laundry session is projected for that active location"
+                          gwtClause GwtStage.Then "CurrentLaundrySession is ready with empty visible entries" ]
+                    gwtCard
+                        SliceGwtKind.CommandRules
+                        [ gwtClause GwtStage.Given "an active location is already captured for the session"
+                          gwtClause GwtStage.When "LogLaundryExpense is issued for one washer load"
+                          gwtClause GwtStage.Then "LaundryExpenseLogged records the washer expense" ]
+                    gwtCard
+                        SliceGwtKind.ViewProjection
+                        [ gwtClause GwtStage.Given "LaundryExpenseLogged includes a washer expense in the active location"
+                          gwtClause GwtStage.When "the current laundry session is projected over visible entries"
+                          gwtClause GwtStage.Then "CurrentLaundrySession shows the washer entry and $3.00 total" ]
+                    gwtCard
+                        SliceGwtKind.CommandRules
+                        [ gwtClause GwtStage.Given "the current session already contains the washer expense"
+                          gwtClause GwtStage.When "LogLaundryExpense is issued for one dryer load"
+                          gwtClause GwtStage.Then "LaundryExpenseLogged records the dryer expense" ]
+                    gwtCard
+                        SliceGwtKind.ViewProjection
+                        [ gwtClause GwtStage.Given "washer and dryer expenses exist in the active location window"
+                          gwtClause GwtStage.When "the current laundry session is projected over visible entries"
+                          gwtClause GwtStage.Then "CurrentLaundrySession shows washer and dryer with $5.50 total" ] ] ]
         |> expect "path1 row"
 
 /// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
@@ -679,27 +725,29 @@ module SliceHtmlRenderer =
         appendLine builder "});"
         appendLine builder "</script>"
 
-    let private renderScenarioCell (builder: StringBuilder) (cell: GwtScenarioCell) =
-        appendLine
-            builder
-            $"<article class=\"path-document__scenario-card\" style=\"grid-column: span {cell.ColumnSpan};\">"
-        appendLine builder "<div class=\"path-document__scenario-topline\">"
-        renderBadge builder "path-document__scenario-stage" (GwtStage.label cell.Stage)
+    let private renderGwtClause (builder: StringBuilder) (clause: GwtClause) =
+        appendLine builder "<div class=\"path-document__gwt-clause\">"
+        renderBadge builder "path-document__gwt-stage" (GwtStage.label clause.Stage)
+        appendLine builder $"<div class=\"path-document__gwt-text\">{htmlEncode clause.Text}</div>"
         appendLine builder "</div>"
-        appendLine builder $"<p class=\"path-document__scenario-summary\">{htmlEncode cell.Summary}</p>"
 
-        match cell.Detail with
-        | Some detail ->
-            appendLine builder $"<p class=\"path-document__scenario-detail\">{htmlEncode detail}</p>"
-        | None -> ()
+    let private renderGwtCard (builder: StringBuilder) (card: SliceGwtCard) =
+        let kindCssClass = SliceGwtKind.cssClass card.Kind
 
+        appendLine builder $"<article class=\"path-document__gwt-card path-document__gwt-card--{kindCssClass}\">"
+        appendLine builder "<div class=\"path-document__gwt-topline\">"
+        renderBadge builder "path-document__gwt-kind" (SliceGwtKind.label card.Kind)
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"path-document__gwt-clauses\">"
+        card.Clauses |> List.iter (renderGwtClause builder)
+        appendLine builder "</div>"
         appendLine builder "</article>"
 
-    let private renderScenarioRow (builder: StringBuilder) (row: PathScenarioRow) =
-        appendLine builder "<section class=\"path-document__scenario-row-wrap\">"
-        appendLine builder $"<h2 class=\"path-document__scenario-row-title\">{htmlEncode row.Title}</h2>"
-        appendLine builder "<div class=\"path-document__scenario-row\">"
-        row.Cells |> List.iter (renderScenarioCell builder)
+    let private renderGwtRow (builder: StringBuilder) (row: PathGwtRow) =
+        appendLine builder "<section class=\"path-document__gwt-row-wrap\">"
+        appendLine builder $"<h2 class=\"path-document__gwt-row-title\">{htmlEncode row.Title}</h2>"
+        appendLine builder "<div class=\"path-document__gwt-row\">"
+        row.Cards |> List.iter (renderGwtCard builder)
         appendLine builder "</div>"
         appendLine builder "</section>"
 
@@ -707,7 +755,7 @@ module SliceHtmlRenderer =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; --scenario-row-height: 78px; padding: 8px 10px 10px; }"
+        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.78rem; --slice-description-height: 1.58rem; --property-value-indent: 1.2rem; --gwt-row-height: 108px; padding: 8px 10px 10px; }"
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
         appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
@@ -715,15 +763,19 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
         appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".path-document__row { display: grid; grid-auto-flow: column; grid-auto-columns: var(--slice-card-width); grid-template-rows: auto var(--slice-title-height) var(--slice-description-height) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
-        appendLine builder ".path-document__scenarios { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }"
-        appendLine builder ".path-document__scenario-row-wrap { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".path-document__scenario-row-title { margin: 0; font-size: 0.72rem; line-height: 1.1; color: #35506a; }"
-        appendLine builder ".path-document__scenario-row { display: grid; grid-template-columns: repeat(var(--slice-columns), var(--slice-card-width)); column-gap: 10px; align-items: stretch; overflow-x: auto; padding: 1px 2px 2px; }"
-        appendLine builder ".path-document__scenario-card { min-height: var(--scenario-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".path-document__scenario-topline { display: flex; justify-content: flex-start; }"
-        appendLine builder ".path-document__scenario-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
-        appendLine builder ".path-document__scenario-summary { margin: 0; font-size: 0.7rem; line-height: 1.24; color: #0f2740; }"
-        appendLine builder ".path-document__scenario-detail { margin: 0; font-size: 0.62rem; line-height: 1.2; color: #55708b; }"
+        appendLine builder ".path-document__gwt-bands { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }"
+        appendLine builder ".path-document__gwt-row-wrap { display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__gwt-row-title { margin: 0; font-size: 0.72rem; line-height: 1.1; color: #35506a; }"
+        appendLine builder ".path-document__gwt-row { display: grid; grid-template-columns: repeat(var(--slice-columns), var(--slice-card-width)); column-gap: 10px; align-items: stretch; overflow-x: auto; padding: 1px 2px 2px; }"
+        appendLine builder ".path-document__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }"
+        appendLine builder ".path-document__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }"
+        appendLine builder ".path-document__gwt-topline { display: flex; justify-content: flex-start; }"
+        appendLine builder ".path-document__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; text-transform: lowercase; }"
+        appendLine builder ".path-document__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
+        appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
+        appendLine builder ".path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }"
         appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 6; align-content: start; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
         appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
@@ -769,7 +821,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
         appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
-        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row, .path-document__scenario-row { column-gap: 8px; } }"
+        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row, .path-document__gwt-row { column-gap: 8px; } }"
         appendLine builder "</style>"
 
     /// Renders a full self-contained HTML document for the supplied PATH row.
@@ -798,9 +850,9 @@ module SliceHtmlRenderer =
         pathRow.SliceCards |> List.iter (renderSliceCard builder options)
         appendLine builder "</section>"
 
-        if not (List.isEmpty pathRow.ScenarioRows) then
-            appendLine builder "<section class=\"path-document__scenarios\">"
-            pathRow.ScenarioRows |> List.iter (renderScenarioRow builder)
+        if not (List.isEmpty pathRow.GwtRows) then
+            appendLine builder "<section class=\"path-document__gwt-bands\">"
+            pathRow.GwtRows |> List.iter (renderGwtRow builder)
             appendLine builder "</section>"
 
         appendLine builder "</main>"

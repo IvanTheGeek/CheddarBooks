@@ -229,7 +229,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "CurrentLaundrySession" "Expected the current-session view title in the rendered document."
                   Expect.stringContains htmlDocument "classic em" "Expected the current lens footer badge.")
 
-              testCase "Classic path renderer includes an aligned GIVEN WHEN THEN band" (fun () ->
+              testCase "Classic path renderer includes a per-slice GWT band" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 
                   let htmlDocument =
@@ -237,12 +237,14 @@ module LaundryLogTests =
                           (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
                           pathRow
 
-                  Expect.stringContains htmlDocument "PATH 1 scenario" "Expected the first scenario-row title."
-                  Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the scenario band."
-                  Expect.stringContains htmlDocument "WHEN" "Expected the WHEN stage label in the scenario band."
-                  Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the scenario band."
-                  Expect.stringContains htmlDocument "grid-column: span 2;" "Expected scenario cells to align to two slice columns each."
-                  Expect.stringContains htmlDocument "location is captured and the session is ready for the first expense" "Expected the first scenario summary.")
+                  Expect.stringContains htmlDocument "PATH 1 GWT" "Expected the first GWT-row title."
+                  Expect.stringContains htmlDocument "command gwt" "Expected command-slice GWT cards."
+                  Expect.stringContains htmlDocument "view gwt" "Expected view-slice GWT cards."
+                  Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the GWT band."
+                  Expect.stringContains htmlDocument "WHEN" "Expected the WHEN stage label in the GWT band."
+                  Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the GWT band."
+                  Expect.stringContains htmlDocument "CaptureLaundryLocation is issued with manual text" "Expected the first command-slice WHEN clause."
+                  Expect.stringContains htmlDocument "the current laundry session is projected for that active location" "Expected the first view-slice WHEN clause.")
 
               testCase "Classic path renderer hides the view screen blocks" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
