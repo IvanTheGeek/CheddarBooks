@@ -494,6 +494,19 @@ module SliceHtmlRenderer =
         | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
         | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
 
+    let private renderScript (builder: StringBuilder) =
+        appendLine builder "<script>"
+        appendLine builder "document.addEventListener('DOMContentLoaded', function () {"
+        appendLine builder "  const expandButton = document.querySelector('[data-action=\"expand-properties\"]');"
+        appendLine builder "  if (!expandButton) return;"
+        appendLine builder "  expandButton.addEventListener('click', function () {"
+        appendLine builder "    document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "      panel.open = true;"
+        appendLine builder "    });"
+        appendLine builder "  });"
+        appendLine builder "});"
+        appendLine builder "</script>"
+
     let private renderStyles (builder: StringBuilder) =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
@@ -502,6 +515,9 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
         appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
+        appendLine builder ".path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }"
+        appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
+        appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".path-document__row { display: flex; gap: 10px; overflow-x: auto; align-items: stretch; padding: 2px 2px 6px; }"
         appendLine builder ".slice-card { flex: 0 0 224px; min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: flex; flex-direction: column; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
@@ -521,8 +537,8 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block--view { background: rgba(103, 229, 130, 0.18); border-color: #78e39d; }"
         appendLine builder ".slice-block__topline { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto; row-gap: 5px; min-height: 0; }"
         appendLine builder ".slice-block__badges { display: flex; flex-direction: row; justify-content: flex-end; gap: 4px; grid-row: 1; }"
-        appendLine builder ".slice-block__title { margin: 0; font-size: 0.62rem; line-height: 1.14; font-weight: 700; overflow-wrap: normal; word-break: normal; hyphens: none; grid-row: 2; }"
-        appendLine builder ".slice-block--screen .slice-block__title { font-weight: 400; font-size: 0.6rem; white-space: nowrap; }"
+        appendLine builder ".slice-block__title { margin: 0; font-size: 0.66rem; line-height: 1.14; font-weight: 700; overflow-wrap: normal; word-break: normal; hyphens: none; grid-row: 2; }"
+        appendLine builder ".slice-block--screen .slice-block__title { font-weight: 400; font-size: 0.64rem; white-space: nowrap; }"
         appendLine builder ".slice-block__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4a647f; white-space: nowrap; }"
         appendLine builder ".slice-block__badge--kind { color: #203954; }"
         appendLine builder ".slice-block__snapshot { min-height: var(--screen-snapshot-height); border-radius: 10px; border: 1px dashed #c7d7ea; background: linear-gradient(180deg, #eef4fb 0%, #e7eef7 100%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; color: #7087a0; font-size: 0.7rem; font-weight: 600; }"
@@ -558,11 +574,15 @@ module SliceHtmlRenderer =
         appendLine builder "<header class=\"path-document__header\">"
         appendLine builder $"<h1 class=\"path-document__title\">{htmlEncode pathRow.Title}</h1>"
         appendLine builder $"<p class=\"path-document__description\">{htmlEncode pathRow.Description}</p>"
+        appendLine builder "<div class=\"path-document__header-actions\">"
+        appendLine builder "<button type=\"button\" class=\"path-document__action\" data-action=\"expand-properties\">Expand Properties</button>"
+        appendLine builder "</div>"
         appendLine builder "</header>"
         appendLine builder "<section class=\"path-document__row\">"
         pathRow.SliceCards |> List.iter (renderSliceCard builder options)
         appendLine builder "</section>"
         appendLine builder "</main>"
+        renderScript builder
         appendLine builder "</body>"
         appendLine builder "</html>"
 
