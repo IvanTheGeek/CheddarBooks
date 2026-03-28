@@ -401,6 +401,18 @@ module SliceHtmlExamples =
 /// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
 [<RequireQualifiedAccess>]
 module SliceHtmlRenderer =
+    type private SliceCardRowHeight =
+        | ScreenRow
+        | DetailRow
+
+    type private SliceCardRowContent =
+        | BlockRow of SliceBlockState
+        | EmptyRow
+
+    type private SliceCardRow =
+        { Height: SliceCardRowHeight
+          Content: SliceCardRowContent }
+
     let private htmlEncode (value: string) = WebUtility.HtmlEncode value
 
     let private appendLine (builder: StringBuilder) (value: string) =
@@ -430,6 +442,14 @@ module SliceHtmlRenderer =
                 appendLine builder $"<span class=\"slice-block__property-key\">{htmlEncode key} =</span>"
                 appendLine builder $"<span class=\"slice-block__property-value\">{htmlEncode value}</span>"
                 appendLine builder "</div>"
+
+    let private screenRow content =
+        { Height = SliceCardRowHeight.ScreenRow
+          Content = content }
+
+    let private detailRow content =
+        { Height = SliceCardRowHeight.DetailRow
+          Content = content }
 
     let private renderBlockContent (builder: StringBuilder) showProperties content =
         match content with
@@ -475,6 +495,21 @@ module SliceHtmlRenderer =
 
         appendLine builder "</section>"
 
+    let private renderCardRow (builder: StringBuilder) options (row: SliceCardRow) =
+        let rowCssClass =
+            match row.Height with
+            | SliceCardRowHeight.ScreenRow -> "screen"
+            | SliceCardRowHeight.DetailRow -> "detail"
+
+        appendLine builder $"<div class=\"slice-card__row slice-card__row--{rowCssClass}\">"
+
+        match row.Content with
+        | SliceCardRowContent.BlockRow blockState -> renderBlock builder options.ShowProperties blockState
+        | SliceCardRowContent.EmptyRow ->
+            appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
+
+        appendLine builder "</div>"
+
     let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
         appendLine builder "<article class=\"slice-card slice-card--command\">"
         appendLine builder "<div class=\"slice-card__topline\">"
@@ -484,9 +519,12 @@ module SliceHtmlRenderer =
         appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode sliceState.Title}</h2>"
         appendLine builder $"<p class=\"slice-card__description\">{htmlEncode sliceState.Description}</p>"
         appendLine builder "<div class=\"slice-card__body\">"
-        renderBlock builder options.ShowProperties sliceState.Screen
-        renderBlock builder options.ShowProperties sliceState.Command
-        renderBlock builder options.ShowProperties sliceState.Event
+
+        [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
+          detailRow (SliceCardRowContent.BlockRow sliceState.Command)
+          detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
+        |> List.iter (renderCardRow builder options)
+
         appendLine builder "</div>"
         appendLine builder "</article>"
 
@@ -498,15 +536,18 @@ module SliceHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode sliceState.Title}</h2>"
         appendLine builder $"<p class=\"slice-card__description\">{htmlEncode sliceState.Description}</p>"
-        appendLine builder "<div class=\"slice-card__body slice-card__body--view\">"
+        appendLine builder "<div class=\"slice-card__body\">"
 
-        if options.ShowViewScreens then
-            sliceState.Screen |> Option.iter (renderBlock builder options.ShowProperties)
-        else
-            appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--screen-gap\" aria-hidden=\"true\"></div>"
+        [ if options.ShowViewScreens then
+              match sliceState.Screen with
+              | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
+              | None -> screenRow SliceCardRowContent.EmptyRow
+          else
+              screenRow SliceCardRowContent.EmptyRow
+          detailRow (SliceCardRowContent.BlockRow sliceState.View)
+          detailRow SliceCardRowContent.EmptyRow ]
+        |> List.iter (renderCardRow builder options)
 
-        renderBlock builder options.ShowProperties sliceState.View
-        appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty\" aria-hidden=\"true\"></div>"
         appendLine builder "</div>"
         appendLine builder "</article>"
 
@@ -557,9 +598,13 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; }"
         appendLine builder ".slice-card__title { margin: 7px 0 0; font-size: 0.82rem; line-height: 1.04; min-height: var(--slice-title-height); max-height: var(--slice-title-height); overflow: hidden; }"
         appendLine builder ".slice-card__description { margin: 3px 0 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; min-height: var(--slice-description-height); max-height: var(--slice-description-height); overflow: hidden; }"
-        appendLine builder ".slice-card__body { display: grid; grid-template-rows: minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content); gap: 6px; margin-top: 8px; align-content: start; }"
-        appendLine builder ".slice-card__slot--empty { min-height: var(--detail-row-height); border-radius: 16px; background: transparent; }"
-        appendLine builder ".slice-card__slot--screen-gap { min-height: var(--screen-row-height); }"
+        appendLine builder ".slice-card__body { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }"
+        appendLine builder ".slice-card__row { display: flex; flex-direction: column; }"
+        appendLine builder ".slice-card__row--screen { min-height: var(--screen-row-height); }"
+        appendLine builder ".slice-card__row--detail { min-height: var(--detail-row-height); }"
+        appendLine builder ".slice-card__row > .slice-block { flex: 1; }"
+        appendLine builder ".slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }"
+        appendLine builder ".slice-card__slot--row-fill { flex: 1; }"
         appendLine builder ".slice-block { display: flex; flex-direction: column; gap: 3px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; }"
         appendLine builder ".slice-block--screen { min-height: var(--screen-row-height); box-sizing: border-box; background: rgba(255, 255, 255, 0.78); border-color: #c8dcff; }"
         appendLine builder ".slice-block--command { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(74, 150, 255, 0.18); border-color: #8bc3ff; }"
