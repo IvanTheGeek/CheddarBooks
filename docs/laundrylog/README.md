@@ -8,6 +8,7 @@ Start here:
 - [`../foundation.md`](../foundation.md)
 - [`introduction.md`](introduction.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
+- [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
 - [`event-modeling/README.md`](event-modeling/README.md)
@@ -34,6 +35,8 @@ Current focus:
 If you want the user-facing explanation first, start with [`introduction.md`](introduction.md).
 
 If you want the richer UI-design origin and concept-page rationale, go to [`concept-ui-page.md`](concept-ui-page.md).
+
+If you want the concrete screen evidence coming from the current `LaundryLog.penpot` file, go to [`penpot-screen-evidence.md`](penpot-screen-evidence.md).
 
 If you want the first bridge from the current screens into reusable interaction primitives, go to [`fnhci-primitive-map.md`](fnhci-primitive-map.md).
 

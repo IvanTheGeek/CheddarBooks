@@ -8,6 +8,8 @@ For the first reusable interaction-primitive bridge below the app-view level, se
 
 For the first explicit local state-shape direction sitting between the current app and future shared primitives, see [FnHCI Primitive State Shapes](fnhci-primitive-state-shapes.md).
 
+For the current Penpot-backed screen evidence behind these view contracts, see [Penpot Screen Evidence](penpot-screen-evidence.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.

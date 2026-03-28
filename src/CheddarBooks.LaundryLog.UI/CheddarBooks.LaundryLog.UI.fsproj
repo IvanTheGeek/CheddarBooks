@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Compile Include="PrimitiveStateShapes.fs" />
+    <Compile Include="PrimitiveStateExamples.fs" />
     <Compile Include="LaundryLogShell.fs" />
   </ItemGroup>
 </Project>

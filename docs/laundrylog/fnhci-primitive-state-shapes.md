@@ -36,6 +36,8 @@ That means:
 - keep them close to the current screens and paths
 - avoid inventing a giant generic UI framework too early
 
+The current examples are also now being pressured by the real `LaundryLog.penpot` file, not only by static screenshots.
+
 ## First Primitive State Shapes
 
 ### `HeaderBarState`
@@ -268,6 +270,7 @@ These shapes give us:
 ## Related
 
 - [FnHCI Primitive Map](fnhci-primitive-map.md)
+- [Penpot Screen Evidence](penpot-screen-evidence.md)
 - [View Contracts](view-contracts.md)
 - [Screens](screens.md)
 - [Event Modeling](event-modeling/README.md)

@@ -229,15 +229,16 @@ That is the clearest signal we currently have for what should later live in `FnH
 
 ## Next Likely Steps
 
-1. refine this map against the real Penpot component structure
-2. connect the mapped primitives to the current token vocabulary
-3. make the first explicit local primitive state shapes code-facing in `CheddarBooks`
+1. keep refining this map against the real Penpot component structure
+2. use Penpot-backed example states to pressure the local app model
+3. connect the mapped primitives to the current token vocabulary
 4. later move the truly reusable parts into the `FnTools` line
 5. keep testing the map against the actual Event Modeling paths instead of only against the pictures
 
 ## Related
 
 - [Concept UI Page](concept-ui-page.md)
+- [Penpot Screen Evidence](penpot-screen-evidence.md)
 - [FnHCI Primitive State Shapes](fnhci-primitive-state-shapes.md)
 - [Screens](screens.md)
 - [View Contracts](view-contracts.md)

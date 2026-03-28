@@ -89,4 +89,39 @@ module LaundryLogTests =
                   | Error message -> failtest $"Expected a valid money-input state. {message}"
                   | Ok moneyInput ->
                       Expect.equal moneyInput.PlaceholderText "0.00" "Expected the price placeholder text."
-                      Expect.sequenceEqual moneyInput.QuickFillLabels [ "$2.50"; "$3.00" ] "Expected the quick-fill labels to stay stable.") ]
+                      Expect.sequenceEqual moneyInput.QuickFillLabels [ "$2.50"; "$3.00" ] "Expected the quick-fill labels to stay stable.")
+
+              testCase "Penpot-backed new-session example starts with location unset" (fun () ->
+                  let state = PrimitiveStateExamples.newSessionAwaitingLocation ()
+
+                  Expect.equal state.Header.Title "LaundryLog" "Expected the Penpot-backed screen title."
+                  Expect.equal state.LocationInput.ValueText None "Expected the first new-session example to begin without a location value."
+                  Expect.equal state.GpsAction.Label "Use GPS Location" "Expected the GPS action label from the Penpot screen."
+                  Expect.equal state.SetLocationAction.IsEnabled false "Expected Set Location to remain disabled before location entry.")
+
+              testCase "Penpot-backed location-entered example enables set-location" (fun () ->
+                  let state = PrimitiveStateExamples.newSessionLocationEntered ()
+
+                  Expect.equal
+                      state.LocationInput.ValueText
+                      (Some "Love's #123 - Springfield, OH")
+                      "Expected the entered location value to stay stable."
+
+                  Expect.equal state.SetLocationAction.IsEnabled true "Expected Set Location to become enabled after location entry.")
+
+              testCase "Penpot-backed entry-form example keeps washer and card selected" (fun () ->
+                  let state = PrimitiveStateExamples.entryFormWasherCardDraft ()
+
+                  let selectedMachineLabels =
+                      state.MachineTypeOptions.Choices
+                      |> List.filter (fun choice -> choice.IsSelected)
+                      |> List.map (fun choice -> choice.Label)
+
+                  let selectedPaymentLabels =
+                      state.PaymentOptions.Choices
+                      |> List.filter (fun choice -> choice.IsSelected)
+                      |> List.map (fun choice -> choice.Label)
+
+                  Expect.sequenceEqual selectedMachineLabels [ "Washer" ] "Expected washer to be the selected machine type."
+                  Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected card to be the selected payment type."
+                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values.") ]
