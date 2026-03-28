@@ -22,6 +22,7 @@ The current first screen renderer is grounded in:
 
 - [`screens.md`](screens.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
+- [`claude-design-nuances.md`](claude-design-nuances.md)
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
@@ -29,6 +30,7 @@ The current first screen renderer is grounded in:
 That means the current screen renderer is:
 
 - Penpot-informed
+- historical-chat-informed
 - primitive-state-driven
 - reviewable
 - deterministic

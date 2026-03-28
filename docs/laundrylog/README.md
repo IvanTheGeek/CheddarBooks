@@ -8,6 +8,7 @@ Start here:
 - [`../foundation.md`](../foundation.md)
 - [`introduction.md`](introduction.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
+- [`claude-design-nuances.md`](claude-design-nuances.md)
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md)
 - [`html-screen-renderer-proving-ground.md`](html-screen-renderer-proving-ground.md)
@@ -38,6 +39,8 @@ Current focus:
 If you want the user-facing explanation first, start with [`introduction.md`](introduction.md).
 
 If you want the richer UI-design origin and concept-page rationale, go to [`concept-ui-page.md`](concept-ui-page.md).
+
+If you want the more specific Claude-era visual and interaction nuances that the current renderer should still honor, go to [`claude-design-nuances.md`](claude-design-nuances.md).
 
 If you want the concrete screen evidence coming from the current `LaundryLog.penpot` file, go to [`penpot-screen-evidence.md`](penpot-screen-evidence.md).
 
