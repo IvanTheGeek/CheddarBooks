@@ -103,3 +103,5 @@ The best current reading is:
 
 - markdown and code-facing notes carry the deeper meaning
 - Penpot carries a chosen visual projection of that meaning
+
+For the current concrete starting point in the existing `LaundryLog.penpot` file, see [Penpot Board Seed](penpot-board-seed.md).
