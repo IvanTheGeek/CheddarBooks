@@ -228,6 +228,42 @@ For slice work, prefer this Penpot editing pattern:
 
 That keeps the board component-driven instead of turning it into ad hoc one-off drawing.
 
+## Current Component-State Lab
+
+The live `LaundryLog` file now also includes `ComponentStateTokenLab.V1` as a focused lab for reusable component behavior.
+
+Current verified findings from that lab:
+
+- `Button.Option` instance text edits exported correctly
+- `Button.Option` detached-instance text edits also exported correctly
+- `Input.Text` instance text edits exported correctly
+- `Input.Text` detached-instance text edits also exported correctly
+- a fresh overlay label exported correctly once it was given an explicit visible size
+
+That means the current export problem is narrower than \"all component-derived text is unreliable\".
+
+The stronger current reading is:
+
+- the recovered slice-card shells are the suspicious case
+- ordinary reusable controls like buttons and inputs currently behave much better
+- we should keep using component instances for normal reuse and state pressure whenever they work
+- detaching should stay a deliberate escape hatch, not the default workflow
+
+## Current Token Caution
+
+The same live lab also showed that token work needs its own explicit verification.
+
+Current verified caution:
+
+- `shape.applyToken(...)` currently threw a Penpot-side `check error` in the live plugin path
+- a first `token.applyToShapes(...)` probe did not yet give us a clean, inspectable token-binding result
+
+So the current practical rule is:
+
+- do not assume that dropping in a fresh local text box and reapplying tokens is already a solved workflow
+- treat token-governed replacement text as an explicit lab concern
+- re-verify token binding before we depend on it for component-state generation or later `FnHCI` / `FnUI` bridging
+
 ## Current Recovered Slice Language
 
 The current visual direction is being pulled most strongly from the recovered EM-1 `Slice.html` lineage, especially `f63e1af`.
