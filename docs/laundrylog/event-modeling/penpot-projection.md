@@ -263,6 +263,23 @@ So the current practical interpretation is:
 - it is likely going through a mixed HTML/SVG projection path
 - the stale SVG side is currently winning when Penpot exports the shell visually
 
+## Current Mini-Shell Direction
+
+The follow-up `MiniShellStructureLab.V1` showed that from-scratch shell-like components behave better than the recovered `CommandSlice.Base.V2` lineage.
+
+Current verified findings:
+
+- a flat from-scratch shell exported edited instance text correctly
+- a one-row shell with nested board content also exported edited instance text correctly
+- a three-row shell with nested board content also exported edited instance text correctly
+- even after adding heavier stroke, rounded corners, drop shadow, and rounded nested rows, the from-scratch shell still did not reproduce the stale-base-text failure
+
+So the current practical conclusion is:
+
+- the `CommandSlice.Base.V2` issue appears to belong to that recovered component line, not to the general slice-shell idea
+- rebuilding a clean slice-shell family from scratch is now a credible next move if we want a trustworthy Penpot component base
+- that rebuild should stay component-driven and reuse-oriented rather than collapsing back into ad hoc local drawing
+
 ## Current Token Caution
 
 The same live lab also showed that token work needs its own explicit verification.
