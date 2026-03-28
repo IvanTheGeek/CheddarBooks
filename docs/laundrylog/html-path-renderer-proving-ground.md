@@ -72,6 +72,7 @@ The current rule is:
 - command-side `GWT` should prefer mini representations of the participating command and event surfaces when that improves readability
 - view-side `GWT` can mix fact/view representations with short projection text
 - the slice frame itself should include that slice's `GWT`, not push it into a separate board-wide band
+- path-level controls can widen the slice grid by one extra track per slice when properties and `GWT` data need more horizontal room
 
 ## Lens Rule
 

@@ -250,6 +250,18 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument ">CaptureLaundryLocation</div>" "Expected the first command-slice WHEN clause to use the command block title."
                   Expect.stringContains htmlDocument "project the current laundry session for the active location" "Expected the first view-slice WHEN clause.")
 
+              testCase "Classic path renderer includes a property-width toggle mode" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains htmlDocument "Expand Property Width" "Expected a path-level property-width toggle."
+                  Expect.stringContains htmlDocument "path-document--properties-wide" "Expected the renderer to emit the widened path mode class."
+                  Expect.stringContains htmlDocument "--slice-wide-columns" "Expected the widened track count to be present in the document.")
+
               testCase "Classic path renderer hides the view screen blocks" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 
