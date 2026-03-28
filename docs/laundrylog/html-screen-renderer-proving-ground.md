@@ -60,6 +60,8 @@ The current screen proving ground renders:
 - `Screen.NewSession - Awaiting Location`
 - `Screen.NewSession - Ready To Set`
 - `Screen.EntryForm - Washer Draft`
+- `Screen.EntryForm - Card Details Expanded`
+- `Screen.EntryForm - Logged Success`
 
 This is intentionally small.
 
@@ -70,6 +72,31 @@ It is enough to pressure:
 - mobile-first component sizing
 - summary visibility
 - repeated-entry screen composition
+- payment progressive disclosure
+- post-submit feedback state
+
+## Restored Claude-Era Nuances
+
+The current screen renderer now restores a first pass of several LaundryLog nuances that were previously flattened:
+
+- top readiness chips for `Location`, `Type`, and `Payment`
+- lighter session-total bar placed near the primary action area
+- quarter-style `±25¢` price-adjust buttons
+- payment progressive disclosure when card details are needed
+- visible logged-state feedback through toast plus `✓ Logged!`
+
+These are still proving-ground implementations, but they are now structural rather than one-off styling.
+
+## Still Not Fully Restored
+
+The current screen renderer still does not fully recover everything from the older LaundryLog design work.
+
+The main remaining gaps are:
+
+- the exact spacing and tonal nuance of the status row
+- richer meaning in the price helper chips
+- the final placement and behavior of session total versus recent entries on shorter screens
+- the fuller repeated-entry feel after logging multiple items in one session
 
 ## Relationship To The Path Renderer
 

@@ -208,12 +208,20 @@ The entry cards should feel:
 
 Compared to the Claude-era design work, the current screen renderer still flattens or omits several important nuances:
 
-- the session total bar is not yet in the preferred near-action position
-- the top validation/status chip row is missing
-- success-state toast and `Logged!` button state are not yet represented
-- the machine/quantity/unit price label treatment is still more generic than the refined historical direction
-- payment progressive disclosure is not yet present
+- the exact machine/quantity/unit price label treatment is still more generic than the refined historical direction
 - helper-chip semantics for price are not yet carrying the historical nuance strongly enough
+- the exact session-total placement and lower-screen relationship to recent entries still need refinement
+- the logged-state feel is present, but not yet fully tuned
+
+## First Restorations Now Present
+
+The current HTML screen renderer has now restored a first pass of these previously missing nuances:
+
+- top validation/status chips for `Location`, `Type`, and `Payment`
+- visible session-total bar near the primary command area
+- quarter-style `±25¢` price-adjust buttons
+- payment progressive disclosure for card details
+- success-state toast plus `✓ Logged!` button surface
 
 ## Working Rule
 

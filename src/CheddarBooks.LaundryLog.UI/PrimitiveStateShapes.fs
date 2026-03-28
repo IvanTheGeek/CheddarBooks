@@ -29,6 +29,7 @@ type ActionButtonEmphasis =
     | Primary
     | Secondary
     | Supporting
+    | Success
 
 /// Describes the current header-bar pressure from LaundryLog screens.
 type HeaderBarState =
@@ -47,6 +48,33 @@ module HeaderBarState =
                 { Title = title.Trim()
                   Subtitle = subtitle |> Option.map (fun (value: string) -> value.Trim())
                   BadgeText = badgeText |> Option.map (fun (value: string) -> value.Trim()) }
+
+/// Distinguishes the current readiness tone for one status chip.
+type StatusChipTone =
+    | Ready
+    | NeedsAttention
+
+/// Describes one compact status chip near the current command area.
+type StatusChipState =
+    { ControlId: PrimitiveControlId
+      IconText: string
+      LabelText: string
+      Tone: StatusChipTone }
+
+[<RequireQualifiedAccess>]
+module StatusChipState =
+    /// Creates a validated status-chip state.
+    let tryCreate controlId iconText labelText tone =
+        if String.IsNullOrWhiteSpace iconText then
+            Error "Status chips must provide an icon text."
+        elif String.IsNullOrWhiteSpace labelText then
+            Error "Status chips must provide a label text."
+        else
+            Ok
+                { ControlId = controlId
+                  IconText = iconText.Trim()
+                  LabelText = labelText.Trim()
+                  Tone = tone }
 
 /// Describes one text-input primitive state.
 type TextInputState =
@@ -161,17 +189,43 @@ module StepperState =
                   CanIncrement = canIncrement }
 
 /// Describes one money-input primitive with optional quick-fill labels.
+type QuarterAdjustDirection =
+    | Decrease
+    | Increase
+
+/// Describes one quarter-style price adjust button.
+type QuarterAdjustButtonState =
+    { ControlId: PrimitiveControlId
+      Direction: QuarterAdjustDirection
+      AmountText: string
+      IsEnabled: bool }
+
+[<RequireQualifiedAccess>]
+module QuarterAdjustButtonState =
+    /// Creates a validated quarter-adjust button state.
+    let tryCreate controlId direction amountText isEnabled =
+        if String.IsNullOrWhiteSpace amountText then
+            Error "Quarter-adjust buttons must provide an amount text."
+        else
+            Ok
+                { ControlId = controlId
+                  Direction = direction
+                  AmountText = amountText.Trim()
+                  IsEnabled = isEnabled }
+
+/// Describes one money-input primitive with optional quick-fill labels.
 type MoneyInputState =
     { ControlId: PrimitiveControlId
       CurrencySymbol: string
       ValueText: string option
       PlaceholderText: string
-      QuickFillLabels: string list }
+      QuickFillLabels: string list
+      QuarterAdjustButtons: QuarterAdjustButtonState list }
 
 [<RequireQualifiedAccess>]
 module MoneyInputState =
     /// Creates a validated money-input state.
-    let tryCreate controlId currencySymbol valueText placeholderText quickFillLabels =
+    let tryCreate controlId currencySymbol valueText placeholderText quickFillLabels quarterAdjustButtons =
         if String.IsNullOrWhiteSpace currencySymbol then
             Error "Money inputs must provide a currency symbol."
         elif String.IsNullOrWhiteSpace placeholderText then
@@ -184,7 +238,8 @@ module MoneyInputState =
                   CurrencySymbol = currencySymbol.Trim()
                   ValueText = valueText |> Option.map (fun (value: string) -> value.Trim())
                   PlaceholderText = placeholderText.Trim()
-                  QuickFillLabels = quickFillLabels |> List.map (fun (value: string) -> value.Trim()) }
+                  QuickFillLabels = quickFillLabels |> List.map (fun (value: string) -> value.Trim())
+                  QuarterAdjustButtons = quarterAdjustButtons }
 
 /// Describes one summary or status bar near the current command area.
 type SummaryBarState =
@@ -205,6 +260,22 @@ module SummaryBarState =
                 { ControlId = controlId
                   Label = label.Trim()
                   ValueText = valueText.Trim() }
+
+/// Describes one visible toast or feedback banner after a completed action.
+type FeedbackBannerState =
+    { ControlId: PrimitiveControlId
+      MessageText: string }
+
+[<RequireQualifiedAccess>]
+module FeedbackBannerState =
+    /// Creates a validated feedback-banner state.
+    let tryCreate controlId messageText =
+        if String.IsNullOrWhiteSpace messageText then
+            Error "Feedback banners must provide a visible message."
+        else
+            Ok
+                { ControlId = controlId
+                  MessageText = messageText.Trim() }
 
 /// Describes one compact visible entry card in the current session list.
 type EntryCardState =
@@ -236,10 +307,13 @@ type NewSessionPrimitiveState =
 /// Describes the first local primitive composition for the Entry Form view.
 type EntryFormPrimitiveState =
     { Header: HeaderBarState
+      StatusChips: StatusChipState list
       MachineTypeOptions: OptionGroupState
       QuantityStepper: StepperState
       PriceInput: MoneyInputState
       PaymentOptions: OptionGroupState
+      PaymentDetailOptions: OptionGroupState option
       SessionTotal: SummaryBarState
+      FeedbackBanner: FeedbackBannerState option
       RecentEntries: EntryCardState list
       SubmitAction: ActionButtonState }

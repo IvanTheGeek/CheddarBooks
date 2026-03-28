@@ -89,7 +89,7 @@ module LaundryLogTests =
                       PrimitiveControlId.tryCreate "price-input"
                       |> unwrap "price input control id"
 
-                  match MoneyInputState.tryCreate controlId "$" None "0.00" [ "$2.50"; "$3.00" ] with
+                  match MoneyInputState.tryCreate controlId "$" None "0.00" [ "$2.50"; "$3.00" ] [] with
                   | Error message -> failtest $"Expected a valid money-input state. {message}"
                   | Ok moneyInput ->
                       Expect.equal moneyInput.PlaceholderText "0.00" "Expected the price placeholder text."
@@ -140,7 +140,14 @@ module LaundryLogTests =
 
                   Expect.sequenceEqual selectedMachineLabels [ "Washer" ] "Expected washer to be the selected machine type."
                   Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected card to be the selected payment type."
-                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values."
+                  Expect.equal
+                      state.PriceInput.QuickFillLabels
+                      [ "Historical $3.00"; "Last used $2.75"; "Community $3.50" ]
+                      "Expected the historical Penpot-backed helper values."
+
+                  Expect.equal state.PriceInput.QuarterAdjustButtons.Length 2 "Expected the quarter adjust pair for price nudging."
+                  Expect.isSome state.PaymentDetailOptions "Expected the card payment example to include progressive-disclosure details."
+                  Expect.equal state.StatusChips.Length 3 "Expected the command-readiness chip row."
                   Expect.isEmpty state.RecentEntries "Expected the draft Penpot example to begin without visible entry cards.")
 
               testCase "New-session primitive mapping follows location command-slice state" (fun () ->
@@ -339,10 +346,15 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the awaiting-location screen surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Ready To Set" "Expected the ready-to-set screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the entry-form screen surface."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Card Details Expanded" "Expected the card-details-expanded screen surface."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success screen surface."
                   Expect.stringContains htmlDocument "Use GPS Location" "Expected the GPS supporting action."
                   Expect.stringContains htmlDocument "Set Location" "Expected the set-location command action."
                   Expect.stringContains htmlDocument "Log Expense" "Expected the primary entry-form action."
-                  Expect.stringContains htmlDocument "Session Total" "Expected the summary bar label.")
+                  Expect.stringContains htmlDocument "Session Total" "Expected the summary bar label."
+                  Expect.stringContains htmlDocument "✓ Logged!" "Expected the success button state."
+                  Expect.stringContains htmlDocument "✓ Entry logged — $5.00" "Expected the logged toast copy prefix."
+                  Expect.stringContains htmlDocument "CASH" "Expected the logged toast payment text.")
 
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
@@ -353,7 +365,12 @@ module LaundryLogTests =
 
                   Expect.stringContains htmlDocument "ll-header" "Expected the screen header block."
                   Expect.stringContains htmlDocument "ll-panel" "Expected the reusable screen panel block."
+                  Expect.stringContains htmlDocument "ll-status-chip-row" "Expected the command-readiness chip row."
                   Expect.stringContains htmlDocument "ll-option-group" "Expected the option-group block."
                   Expect.stringContains htmlDocument "ll-stepper" "Expected the stepper block."
                   Expect.stringContains htmlDocument "ll-money-input" "Expected the money-input block."
+                  Expect.stringContains htmlDocument "ll-quarter-button" "Expected the quarter-style price-adjust buttons."
+                  Expect.stringContains htmlDocument "Choose Card" "Expected the progressive payment-detail section."
+                  Expect.stringContains htmlDocument "Historical $3.00" "Expected the historical helper label."
+                  Expect.stringContains htmlDocument "ll-feedback-banner" "Expected the visible success toast block."
                   Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block.") ]

@@ -99,9 +99,18 @@ module PrimitiveStateMappings =
         ActionButtonState.tryCreate (controlId controlIdValue) label isEnabled emphasis
         |> expect $"action button '{label}'"
 
+    let private statusChip controlIdValue iconText labelText tone =
+        StatusChipState.tryCreate (controlId controlIdValue) iconText labelText tone
+        |> expect $"status chip '{labelText}'"
+
     let private optionChoice controlIdValue label isSelected =
         OptionChoiceState.tryCreate (controlId controlIdValue) label isSelected true
         |> expect $"option choice '{label}'"
+
+    let private quarterAdjustButtons =
+        [ QuarterAdjustButtonState.tryCreate (controlId "price-quarter-down") Decrease "25¢" true
+          QuarterAdjustButtonState.tryCreate (controlId "price-quarter-up") Increase "25¢" true ]
+        |> List.map (expect "quarter adjust button")
 
     let private machineTypeOptions selectedExpenseKind =
         [ ExpenseKind.Washer; ExpenseKind.Dryer; ExpenseKind.Supplies ]
@@ -159,6 +168,10 @@ module PrimitiveStateMappings =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some(LocationName.value viewState.ActiveLocationName)) None
             |> expect "entry-form header"
+          StatusChips =
+            [ statusChip "status-location" "📍" "Location" Ready
+              statusChip "status-type" "🌊" "Type" Ready
+              statusChip "status-payment" "💳" "Payment" Ready ]
           MachineTypeOptions = machineTypeOptions commandSlice.SelectedExpenseKind
           QuantityStepper =
             StepperState.tryCreate
@@ -176,10 +189,13 @@ module PrimitiveStateMappings =
                 commandSlice.UnitPriceText
                 "0.00"
                 commandSlice.QuickFillLabels
+                quarterAdjustButtons
             |> expect "price input"
           PaymentOptions = paymentOptions commandSlice.SelectedPaymentMethod
+          PaymentDetailOptions = None
           SessionTotal =
             SummaryBarState.tryCreate (controlId "session-total") "Session Total" viewState.RunningTotalText
             |> expect "session total"
+          FeedbackBanner = None
           RecentEntries = recentEntryCards viewState.VisibleEntries
           SubmitAction = actionButton "log-expense" "Log Expense" commandSlice.CanSubmit Primary }
