@@ -247,6 +247,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the GWT band."
                   Expect.stringContains htmlDocument "path-document__gwt-ref--command" "Expected command-side GWT references to render as command mini-blocks."
                   Expect.stringContains htmlDocument "path-document__gwt-ref--event" "Expected event references to render as event mini-blocks."
+                  Expect.stringContains htmlDocument "toggle-gwt-properties" "Expected GWT mini-block property toggles."
                   Expect.stringContains htmlDocument ">CaptureLaundryLocation</div>" "Expected the first command-slice WHEN clause to use the command block title."
                   Expect.stringContains htmlDocument "project the current laundry session for the active location" "Expected the first view-slice WHEN clause.")
 

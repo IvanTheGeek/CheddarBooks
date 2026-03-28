@@ -635,6 +635,17 @@ module SliceHtmlRenderer =
         | PropertyLines _ ->
             appendLine builder "<div class=\"slice-block__properties slice-block__properties--hidden\"></div>"
 
+    let private renderGwtReferenceProperties (builder: StringBuilder) showProperties propertyLines =
+        if showProperties then
+            appendLine builder "<details class=\"path-document__gwt-ref-properties-panel\">"
+            appendLine builder "<summary class=\"path-document__gwt-ref-properties-summary\">properties</summary>"
+            appendLine builder "<div class=\"path-document__gwt-ref-properties\">"
+            propertyLines |> List.iter (renderPropertyLine builder)
+            appendLine builder "</div>"
+            appendLine builder "</details>"
+        else
+            appendLine builder "<div class=\"path-document__gwt-ref-properties path-document__gwt-ref-properties--hidden\"></div>"
+
     let private renderSliceWidthAction (builder: StringBuilder) =
         appendLine
             builder
@@ -706,6 +717,15 @@ module SliceHtmlRenderer =
 
     let private renderGwtBlockReference (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
         let blockCssClass = SliceBlockKind.cssClass blockState.Kind
+        let showsPropertiesToggle =
+            match blockState.Content with
+            | PropertyLines _ when showProperties -> true
+            | _ -> false
+
+        let showsWidthAction =
+            match blockState.Content with
+            | PropertyLines _ -> true
+            | ScreenshotPlaceholder _ -> false
 
         appendLine builder $"<div class=\"path-document__gwt-ref path-document__gwt-ref--{blockCssClass}\">"
         appendLine builder "<div class=\"path-document__gwt-ref-topline\">"
@@ -715,11 +735,18 @@ module SliceHtmlRenderer =
 
         match blockState.Content with
         | PropertyLines propertyLines when showProperties ->
-            appendLine builder "<div class=\"path-document__gwt-ref-properties\">"
-            propertyLines |> List.iter (renderPropertyLine builder)
-            appendLine builder "</div>"
+            renderGwtReferenceProperties builder showProperties propertyLines
             appendLine builder "<div class=\"path-document__gwt-ref-footer\">"
-            renderSliceWidthAction builder
+            appendLine builder "<div class=\"path-document__gwt-ref-footer-left\">"
+            if showsPropertiesToggle then
+                appendLine
+                    builder
+                    "<button type=\"button\" class=\"path-document__gwt-ref-toggle\" data-action=\"toggle-gwt-properties\" aria-expanded=\"false\">Properties</button>"
+            appendLine builder "</div>"
+            appendLine builder "<div class=\"path-document__gwt-ref-footer-right\">"
+            if showsWidthAction then
+                renderSliceWidthAction builder
+            appendLine builder "</div>"
             appendLine builder "</div>"
         | ScreenshotPlaceholder label ->
             appendLine builder $"<div class=\"path-document__gwt-ref-text\">{htmlEncode label}</div>"
@@ -845,6 +872,12 @@ module SliceHtmlRenderer =
         appendLine builder "      const expanded = !!panel && panel.open;"
         appendLine builder "      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');"
         appendLine builder "    });"
+        appendLine builder "    document.querySelectorAll('[data-action=\"toggle-gwt-properties\"]').forEach(function (button) {"
+        appendLine builder "      const ref = button.closest('.path-document__gwt-ref');"
+        appendLine builder "      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;"
+        appendLine builder "      const expanded = !!panel && panel.open;"
+        appendLine builder "      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');"
+        appendLine builder "    });"
         appendLine builder "  };"
         appendLine builder "  const updateRowWidthState = function (rowElement) {"
         appendLine builder "    const baseColumns = Number(rowElement.getAttribute('data-base-columns') || '0');"
@@ -864,12 +897,18 @@ module SliceHtmlRenderer =
         appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
         appendLine builder "        panel.open = true;"
         appendLine builder "      });"
+        appendLine builder "      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = true;"
+        appendLine builder "      });"
         appendLine builder "      updatePropertyToggles();"
         appendLine builder "    });"
         appendLine builder "  }"
         appendLine builder "  if (collapseButton) {"
         appendLine builder "    collapseButton.addEventListener('click', function () {"
         appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = false;"
+        appendLine builder "      });"
+        appendLine builder "      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {"
         appendLine builder "        panel.open = false;"
         appendLine builder "      });"
         appendLine builder "      updatePropertyToggles();"
@@ -904,6 +943,15 @@ module SliceHtmlRenderer =
         appendLine builder "      updatePropertyToggles();"
         appendLine builder "    });"
         appendLine builder "  });"
+        appendLine builder "  document.querySelectorAll('[data-action=\"toggle-gwt-properties\"]').forEach(function (button) {"
+        appendLine builder "    button.addEventListener('click', function () {"
+        appendLine builder "      const ref = button.closest('.path-document__gwt-ref');"
+        appendLine builder "      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;"
+        appendLine builder "      if (!panel) { return; }"
+        appendLine builder "      panel.open = !panel.open;"
+        appendLine builder "      updatePropertyToggles();"
+        appendLine builder "    });"
+        appendLine builder "  });"
         appendLine builder "  rowElements.forEach(function (rowElement) {"
         appendLine builder "    updateRowWidthState(rowElement);"
         appendLine builder "    rowElement.querySelectorAll('[data-action=\"toggle-slice-width\"]').forEach(function (button) {"
@@ -932,7 +980,7 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
         appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
-        appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.5rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; }"
+        appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }"
         appendLine builder ".path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }"
         appendLine builder ".path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }"
         appendLine builder ".path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }"
@@ -945,10 +993,21 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__gwt-ref-title { border-radius: 2px 2px 0 0; padding: 3px 5px; font-size: 0.56rem; font-weight: 600; line-height: 1.15; color: #ffffff; background: #0ea5e9; }"
         appendLine builder ".path-document__gwt-ref--event .path-document__gwt-ref-title { background: #f97316; }"
         appendLine builder ".path-document__gwt-ref--view .path-document__gwt-ref-title { background: #22c55e; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel[open] { gap: 2px; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel > summary { display: none; list-style: none; cursor: pointer; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel > summary::-webkit-details-marker { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties-summary { display: none; }"
         appendLine builder ".path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel:not([open]) .path-document__gwt-ref-properties { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties--hidden { display: none; }"
         appendLine builder ".path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }"
         appendLine builder ".path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }"
-        appendLine builder ".path-document__gwt-ref-footer { display: flex; justify-content: flex-end; align-items: flex-end; margin-top: auto; }"
+        appendLine builder ".path-document__gwt-ref-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }"
+        appendLine builder ".path-document__gwt-ref-footer-left { display: flex; align-items: flex-end; }"
+        appendLine builder ".path-document__gwt-ref-footer-right { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }"
+        appendLine builder ".path-document__gwt-ref-toggle { border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; border-radius: 999px; padding: 1px 6px; font-size: 0.48rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
+        appendLine builder ".path-document__gwt-ref-toggle:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; grid-column: span 1; }"
         appendLine builder ".slice-card--wide { grid-column: span 2; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
@@ -965,7 +1024,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-card__row--screen { grid-row: 4; }"
         appendLine builder ".slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }"
         appendLine builder ".slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }"
-        appendLine builder ".slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; }"
+        appendLine builder ".slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 6px; margin-top: 2px; }"
         appendLine builder ".slice-card__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }"
         appendLine builder ".slice-card__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }"
         appendLine builder ".slice-card__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }"
@@ -1001,7 +1060,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__property-key { white-space: nowrap; }"
         appendLine builder ".slice-block__property-value { overflow-wrap: break-word; word-break: normal; }"
         appendLine builder ".slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }"
-        appendLine builder ".slice-card--wide .slice-block__property-line--stacked { display: flex; flex-wrap: wrap; gap: 0.3rem; }"
+        appendLine builder ".slice-card--wide .slice-block__property-line--stacked { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 0.3rem; }"
         appendLine builder ".slice-card--wide .slice-block__property-line--stacked .slice-block__property-value { padding-left: 0; }"
         appendLine builder ".slice-block__footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }"
         appendLine builder ".slice-block__footer-left { display: flex; align-items: flex-end; }"

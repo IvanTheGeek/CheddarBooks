@@ -72,13 +72,16 @@ The current rule is:
 - command-side `GWT` should prefer mini representations of the participating command and event surfaces when that improves readability
 - view-side `GWT` can mix fact/view representations with short projection text
 - the slice frame itself should include that slice's `GWT`, not push it into a separate board-wide band
+- there should be a visible separator between the last event/detail row and the embedded `GWT` section so the `GWT` reads as a distinct slice concern
 - per-slice controls can widen an individual slice by one extra track when properties and `GWT` data need more horizontal room
 - path-level controls can also widen or collapse all slices together when a wider review lens is useful
 - those per-slice width controls can live on the lower-right corner of data-bearing blocks so the interaction stays near the pressured content
+- `GWT` mini-blocks should support their own property show/hide toggle, not force the inner data to stay always open
 - block footers should follow a stable grammar:
   - left = reveal/control such as `Properties`
   - right = lens/context badge plus any width/expansion affordance
 - block kind badges such as `SCREEN`, `VIEW`, `COMMAND`, `EVENT`, and `GWT` should use the squarer grey uppercase treatment from the older EM-1 slice surface rather than the softer rounded-pill look
+- `GIVEN`, `WHEN`, and `THEN` badges should use that same squarer grey uppercase family so the stage markers feel part of the same visual language
 
 ## Lens Rule
 
