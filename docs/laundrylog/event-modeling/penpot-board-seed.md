@@ -15,9 +15,41 @@ Current observed Penpot pages:
 - `Event Model`
 - `PATHS`
 
-For the Event Modeling work, the important page is:
+For the current Event Modeling work, the important Penpot pages are:
 
+- `PATHS`
 - `Event Model`
+
+## Current Page Roles
+
+The current working split should be:
+
+- `PATHS`
+  each `PATH` should read as its own horizontal row
+- `Event Model`
+  slice primitives, slice experiments, lens experiments, and visual grammar work
+- `Screens`
+  app-page surfaces and screenshot-oriented screen references
+- `Components`
+  component bases, tokens, and reusable visual building blocks
+
+That lets the visual work stay organized instead of forcing one page to do everything.
+
+## Current PATHS Page State
+
+The `PATHS` page is not blank.
+
+It already contains at least:
+
+- large screen-oriented boards such as `Path1.3-EntryForm` and `Initial Screen`
+- earlier rough `PATH1` slice boards
+- the newer V2 slice instances:
+  - `PATH1: CommandSlice - Set Location (V2 Instance)`
+  - `PATH1: ViewSlice - Ready (V2 Instance)`
+
+So the current task is not to invent the page from nothing.
+
+It is to normalize and refine what is already there into a clearer row-per-path projection.
 
 ## Current Top-Level Structure
 
@@ -80,15 +112,51 @@ It should not be treated as already-settled doctrine.
 
 ## Recommended Next Shape
 
-The next iteration should likely refine this existing page instead of replacing it.
+The next iteration should likely refine the existing pages instead of replacing them.
 
 The first good move is:
 
-1. keep the `Event Model` page
+1. keep the `Event Model` page as the slice/lens workshop
 2. keep the current primitive area as the seed palette
 3. rename and normalize the primitives where needed
-4. replace `Slice1` and `Slice2` with explicit slice frames for PATH 1
-5. add a real `View` primitive in the preferred language if `PROJECTION` is meant to become `View`
+4. lay out `PATH 1` on the `PATHS` page as one readable horizontal row
+5. use screenshots or strong screen references in the screen position of that row
+6. add a real `View` primitive in the preferred language if `PROJECTION` is meant to become `View`
+
+That also implies some cleanup pressure on the current `PATHS` page so it does not accumulate rough boards, finished boards, and screen references with no clear reading order.
+
+## PATHS Page Working Rule
+
+The current intended PATH projection is:
+
+- one `PATH` per row on the `PATHS` page
+- left-to-right reading for the primary happy-path flow
+- nearby notes or descriptions allowed when they improve readability
+- screen locations should prefer actual app-page screenshots or strong screen cards over vague placeholders
+
+That makes the `PATHS` page a clearer overview surface than the more experimental `Event Model` page.
+
+## Screen Placement Rule
+
+For the current visual language:
+
+- the screen position in a path row should show the app surface that the actor would actually see
+- when possible, that should become a screenshot or screenshot-like projection of the app page
+- the screen should help the reader understand the path, but should not overpower the business cards
+
+## Multi-Actor Lane Pressure
+
+The current first LaundryLog path is effectively a single-actor path.
+
+That means one clean row can work well for now.
+
+If later paths introduce multiple actor roles, the board will likely need:
+
+- multiple actor lanes within the path row
+- a clearer handoff rule between lanes
+- possibly a wider tablet/desktop-first layout instead of a narrow stacked view
+
+So the current row model is a good starting point, but it should not be treated as the final lane model for all paths.
 
 ## Naming Pressure
 
@@ -113,5 +181,6 @@ That should be decided explicitly rather than allowed to drift.
 For now, we should start from the existing `Event Model` page and treat it as:
 
 - the first Penpot projection seed for our own Event Modeling surface
+- the place where slice components and lenses are refined before they are used on the `PATHS` page
 
 That is better than forcing an external tool to become the source of truth for layout and lenses.

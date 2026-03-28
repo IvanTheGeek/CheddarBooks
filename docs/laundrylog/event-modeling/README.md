@@ -13,6 +13,19 @@ These docs are the repo memory that records:
 - the first business-lens ViewSlices or "screenshots" we think we need
 - the open questions that should not stay trapped in chat or on a temporary board
 
+## Current Penpot Page Split
+
+The current intended Penpot split is:
+
+- `PATHS`
+  each `PATH` as its own readable row
+- `Event Model`
+  slice primitives and lens experimentation
+- `Screens`
+  app-page surfaces and screenshot-oriented references
+- `Components`
+  reusable visual bases and token-oriented building blocks
+
 ## Current Modeling Approach
 
 For the next step, we are intentionally starting small:

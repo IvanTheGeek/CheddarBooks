@@ -53,6 +53,21 @@ This makes Penpot a good home for:
 - UI path mockups
 - visual comparison between business flow and screen flow
 
+## Current Page Split
+
+For LaundryLog, the current Penpot page split should be:
+
+- `PATHS`
+  primary readable projection, with each `PATH` laid out as its own row
+- `Event Model`
+  slice-card grammar, primitive refinement, and lens experimentation
+- `Screens`
+  app-page references and screenshot-oriented screen surfaces
+- `Components`
+  reusable component bases and token-governed design pieces
+
+That keeps the overview board, the slice workshop, and the app screens from collapsing into one overloaded page.
+
 ## Working Interpretation
 
 For this LaundryLog work, the likely pattern is:
@@ -83,6 +98,15 @@ Examples of different projections we may want:
 - screen/path lens
 - component/design-system lens
 
+## Screen Rule
+
+Within a `PATH` row, the screen position should prefer:
+
+- an actual app-page screenshot
+- or a strong screenshot-like screen projection
+
+That helps the reader connect the business path to the visible app surface without forcing the screen to become the source of truth.
+
 ## Early Penpot Board Guidance
 
 The first Penpot Event Modeling board should probably aim for:
@@ -93,6 +117,13 @@ The first Penpot Event Modeling board should probably aim for:
 - green `View` cards as business-state anchors
 - blue/orange command/event pairs for action history
 - light screen cards to show the visible interaction surface without letting the UI dominate the board
+
+For the `PATHS` page specifically, the first board should aim for:
+
+- one horizontal row per `PATH`
+- enough width for desktop and tablet reading
+- nearby notes or path descriptions where that improves comprehension
+- an approach that can later expand to multiple actor lanes when needed
 
 ## Current Practical Rule
 
@@ -125,6 +156,48 @@ So the exported file should be read as:
 - useful
 
 but still as a snapshot rather than the always-current live board.
+
+## Responsive Viewing Direction
+
+For the Event Modeling projection itself, current pressure points are:
+
+- phone is not the primary target
+- tablet and desktop are the primary targets
+- a normal laptop width should read comfortably without feeling cramped
+- a wide desktop view should be able to show a fuller path without artificial narrowness
+
+So the Event Modeling board should be treated as:
+
+- responsive enough to remain usable on smaller devices
+- but intentionally optimized for tablet, desktop, and wide-screen reading
+
+## Token Pressure
+
+This board work should eventually be token-governed rather than hand-tuned card by card.
+
+The first likely token concerns are:
+
+- page gutter and row spacing
+- slice card width
+- lane gap
+- title and body typography
+- surface and border colors by slice type
+- note-card and screenshot-card treatment
+- breakpoint behavior for normal desktop versus extended-width views
+
+That means the Event Modeling projection should stay aligned with the broader `FnHCI` / `FnUI` token direction instead of inventing a one-off visual system.
+
+## Multiple Actor Lanes
+
+The first LaundryLog path is still effectively single-actor.
+
+If later paths introduce multiple actor roles, we should expect the projection rules to evolve toward:
+
+- explicit actor lanes within a path row
+- clearer cross-lane handoff cues
+- more width pressure on the desktop view
+
+So the current row-per-path rule is a strong starting point, not the final lane policy for every path.
 
 ## Current Component Pattern
 
