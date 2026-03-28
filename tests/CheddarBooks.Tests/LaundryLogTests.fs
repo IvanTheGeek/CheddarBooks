@@ -263,6 +263,19 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "slice-card--wide" "Expected the widened slice class to be present in the renderer styles."
                   Expect.stringContains htmlDocument "--current-slice-columns" "Expected the row to track live expanded-column count.")
 
+              testCase "Classic path renderer includes path-level property-width controls" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains htmlDocument "Expand All Width" "Expected a path-level width expand control."
+                  Expect.stringContains htmlDocument "Collapse All Width" "Expected a path-level width collapse control."
+                  Expect.stringContains htmlDocument "data-action=\"expand-width\"" "Expected the width expand action hook."
+                  Expect.stringContains htmlDocument "data-action=\"collapse-width\"" "Expected the width collapse action hook.")
+
               testCase "Classic path renderer hides the view screen blocks" (fun () ->
                   let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 
