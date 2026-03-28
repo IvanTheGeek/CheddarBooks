@@ -97,6 +97,12 @@ For the mobile LaundryLog screen renderer, the current visual source of truth is
 
 Future refinements should treat the current HTML renderer as successful only insofar as it converges toward that `v7` look-and-feel while still staying typed, deterministic, and built from reusable seams.
 
+That now has a concrete presentation rule:
+
+- the `Screen.EntryForm - Washer Draft` surface is the primary mobile app screen
+- the other current screens render as supporting state variants beneath it
+- the proving ground should read like `the app first, variant references second`, not like a flat gallery of equal-weight screens
+
 ## Still Not Fully Restored
 
 The current screen renderer still does not fully recover everything from the older LaundryLog design work.

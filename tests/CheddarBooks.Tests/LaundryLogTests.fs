@@ -356,6 +356,23 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "✓ Entry logged — $5.00" "Expected the logged toast copy prefix."
                   Expect.stringContains htmlDocument "CASH" "Expected the logged toast payment text.")
 
+              testCase "Screen renderer presents the washer draft as the primary v7-aligned surface" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains htmlDocument "ll-primary-surface" "Expected the primary screen wrapper."
+                  Expect.stringContains htmlDocument "Supporting State Variants" "Expected the supporting-variants section."
+
+                  let primaryIndex = htmlDocument.IndexOf("ll-primary-surface")
+                  let washerDraftIndex = htmlDocument.IndexOf("Screen.EntryForm - Washer Draft")
+                  let awaitingIndex = htmlDocument.IndexOf("Screen.NewSession - Awaiting Location")
+
+                  Expect.isGreaterThan washerDraftIndex primaryIndex "Expected the washer draft name inside the primary surface."
+                  Expect.isGreaterThan awaitingIndex washerDraftIndex "Expected the awaiting-location variant to appear after the primary washer draft surface.")
+
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
                       ScreenHtmlRenderer.renderDocument

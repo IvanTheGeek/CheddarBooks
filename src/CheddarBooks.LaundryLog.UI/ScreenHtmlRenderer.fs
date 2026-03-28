@@ -433,15 +433,41 @@ module ScreenHtmlRenderer =
         | EntryFormScreen (surfaceName, note, screenState) ->
             renderEntryFormScreen builder surfaceName note screenState
 
+    let private splitPrimarySurface (screenSurfaces: ScreenSurfaceState list) =
+        let isPrimaryEntryForm =
+            function
+            | EntryFormScreen (surfaceName, _, _) when surfaceName = "Screen.EntryForm - Washer Draft" -> true
+            | _ -> false
+
+        match screenSurfaces |> List.tryFind isPrimaryEntryForm with
+        | Some primarySurface ->
+            let supportingSurfaces =
+                screenSurfaces
+                |> List.filter (fun surface -> surface <> primarySurface)
+
+            primarySurface, supportingSurfaces
+        | None ->
+            match screenSurfaces with
+            | primarySurface :: supportingSurfaces -> primarySurface, supportingSurfaces
+            | [] -> failwith "Expected at least one LaundryLog screen surface."
+
     let private renderStyles (builder: StringBuilder) =
         appendLine builder "<style>"
         appendLine builder ":root { color-scheme: light; }"
         appendLine builder "body { margin: 0; background: #f8f9fa; color: #2d3748; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }"
-        appendLine builder ".ll-document { padding: 14px 16px 22px; }"
-        appendLine builder ".ll-document__header { margin-bottom: 14px; }"
-        appendLine builder ".ll-document__title { margin: 0; font-size: 1.05rem; line-height: 1.06; }"
-        appendLine builder ".ll-document__description { margin: 4px 0 0; color: #64748b; font-size: 0.76rem; line-height: 1.3; }"
-        appendLine builder ".ll-screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 360px)); gap: 18px; align-items: start; }"
+        appendLine builder ".ll-document { padding: 14px 16px 28px; max-width: 1040px; margin: 0 auto; }"
+        appendLine builder ".ll-document__header { margin-bottom: 14px; display: flex; flex-direction: column; gap: 3px; }"
+        appendLine builder ".ll-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }"
+        appendLine builder ".ll-document__title { margin: 0; font-size: 0.96rem; line-height: 1.06; font-weight: 700; }"
+        appendLine builder ".ll-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; }"
+        appendLine builder ".ll-primary-surface { display: flex; justify-content: center; margin-bottom: 22px; }"
+        appendLine builder ".ll-primary-surface .ll-screen-surface { width: 100%; max-width: 600px; }"
+        appendLine builder ".ll-primary-surface .ll-phone-screen { max-width: 600px; }"
+        appendLine builder ".ll-primary-surface .ll-screen-surface__name { font-size: 0.68rem; }"
+        appendLine builder ".ll-primary-surface .ll-screen-surface__note { font-size: 0.74rem; }"
+        appendLine builder ".ll-supporting-surfaces { display: flex; flex-direction: column; gap: 10px; }"
+        appendLine builder ".ll-supporting-surfaces__title { margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }"
+        appendLine builder ".ll-screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 320px)); gap: 18px; align-items: start; }"
         appendLine builder ".ll-screen-surface { display: flex; flex-direction: column; gap: 8px; }"
         appendLine builder ".ll-screen-surface__name { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }"
         appendLine builder ".ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }"
@@ -526,11 +552,12 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }"
         appendLine builder ".ll-entry-card__detail { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
         appendLine builder ".ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
-        appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-two-up { grid-template-columns: 1fr; } }"
+        appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-two-up { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }"
         appendLine builder "</style>"
 
     /// Renders a self-contained HTML document for the current LaundryLog screen proving ground.
     let renderDocument documentTitle description (screenSurfaces: ScreenSurfaceState list) =
+        let primarySurface, supportingSurfaces = splitPrimarySurface screenSurfaces
         let builder = StringBuilder()
 
         appendLine builder "<!DOCTYPE html>"
@@ -544,12 +571,22 @@ module ScreenHtmlRenderer =
         appendLine builder "<body>"
         appendLine builder "<main class=\"ll-document\">"
         appendLine builder "<header class=\"ll-document__header\">"
+        appendLine builder "<div class=\"ll-document__eyebrow\">Mobile Source Of Truth</div>"
         appendLine builder $"<h1 class=\"ll-document__title\">{htmlEncode documentTitle}</h1>"
         appendLine builder $"<p class=\"ll-document__description\">{htmlEncode description}</p>"
         appendLine builder "</header>"
-        appendLine builder "<section class=\"ll-screen-grid\">"
-        screenSurfaces |> List.iter (renderScreenSurface builder)
+        appendLine builder "<section class=\"ll-primary-surface\">"
+        renderScreenSurface builder primarySurface
         appendLine builder "</section>"
+
+        if not (List.isEmpty supportingSurfaces) then
+            appendLine builder "<section class=\"ll-supporting-surfaces\">"
+            appendLine builder "<h2 class=\"ll-supporting-surfaces__title\">Supporting State Variants</h2>"
+            appendLine builder "<div class=\"ll-screen-grid\">"
+            supportingSurfaces |> List.iter (renderScreenSurface builder)
+            appendLine builder "</div>"
+            appendLine builder "</section>"
+
         appendLine builder "</main>"
         appendLine builder "</body>"
         appendLine builder "</html>"
