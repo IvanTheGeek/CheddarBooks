@@ -125,3 +125,50 @@ So the exported file should be read as:
 - useful
 
 but still as a snapshot rather than the always-current live board.
+
+## Current Component Pattern
+
+For slice work, prefer this Penpot editing pattern:
+
+1. duplicate a component base
+2. evolve the duplicate into the new visual base
+3. instantiate that evolved base back into the active board
+4. adjust instance text or state where needed
+
+That keeps the board component-driven instead of turning it into ad hoc one-off drawing.
+
+## Current Recovered Slice Language
+
+The current visual direction is being pulled most strongly from the recovered EM-1 `Slice.html` lineage, especially `f63e1af`.
+
+The language there is:
+
+- a slice reads as a card, not as a tangled diagram
+- the card has a strong header band
+- the card carries a small type marker and system marker
+- the semantic rows stay calm and readable
+- the stronger title bar sits above a lighter structured data panel
+- the overall page reads more like a designed product surface than a raw modeling tool
+
+## Current V2 Penpot Bases
+
+The live `LaundryLog` Penpot file now contains first-pass Event Modeling slice bases built from that recovered language:
+
+- `CommandSlice.Base.V2`
+- `ViewSlice.Base.V2`
+
+And the first visible PATH 1 instances derived from them:
+
+- `PATH1: CommandSlice - Set Location (V2 Instance)`
+- `PATH1: ViewSlice - Ready (V2 Instance)`
+
+The rough earlier first two PATH 1 cards were hidden rather than silently deleted so the transition stays traceable.
+
+## Current Surface Rule
+
+For this component-driven slice work:
+
+- plugin/MCP is currently the stronger live editing surface
+- backend API is currently the stronger inspection/export surface
+
+The API mutation seam still matters, but it is currently lower-level and more schema-sensitive than the plugin path for this kind of board evolution.
