@@ -258,7 +258,7 @@ module LaundryLogTests =
                           (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
                           pathRow
 
-                  Expect.stringContains htmlDocument "Expand Width" "Expected a per-slice width toggle."
+                  Expect.stringContains htmlDocument "Expand slice width" "Expected a per-slice width toggle label."
                   Expect.stringContains htmlDocument "toggle-slice-width" "Expected a per-slice width action hook."
                   Expect.stringContains htmlDocument "slice-card--wide" "Expected the widened slice class to be present in the renderer styles."
                   Expect.stringContains htmlDocument "--current-slice-columns" "Expected the row to track live expanded-column count.")
