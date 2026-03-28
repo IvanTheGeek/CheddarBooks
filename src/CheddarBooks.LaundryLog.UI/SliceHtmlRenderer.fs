@@ -500,7 +500,7 @@ module SliceHtmlRenderer =
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
         appendLine builder ".path-document { --screen-row-min-height: 72px; --detail-row-min-height: 58px; --screen-snapshot-height: 22px; padding: 8px 10px 10px; }"
         appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
-        appendLine builder ".path-document__title { margin: 0; font-size: 1.14rem; line-height: 1.03; }"
+        appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
         appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
         appendLine builder ".path-document__row { display: flex; gap: 10px; overflow-x: auto; align-items: stretch; padding: 2px 2px 6px; }"
         appendLine builder ".slice-card { flex: 0 0 224px; min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: flex; flex-direction: column; }"
