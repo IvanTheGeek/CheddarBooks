@@ -49,7 +49,7 @@ It already contains at least:
 - the first readable row proof:
   - `PATH1.Row.V1`
 - the current clean readable row:
-  - `PATH1.Row.V2.Clean`
+  - `PATH1.Row.V3.Clean`
 
 The current clean slice rebuild also produced a reusable component family that now belongs in the practical board seed:
 
@@ -57,8 +57,8 @@ The current clean slice rebuild also produced a reusable component family that n
 - `SliceRow.Command.Clean.V1`
 - `SliceRow.Event.Clean.V1`
 - `SliceRow.View.Clean.V1`
-- `CommandSlice.Clean.V1`
-- `ViewSlice.Clean.V1`
+- `CommandSlice.Clean.V2`
+- `ViewSlice.Clean.V2`
 
 Current `ViewSlice` correction:
 
@@ -66,6 +66,13 @@ Current `ViewSlice` correction:
 - that means the green `View` is the default visible content
 - event reference content is not part of the default `ViewSlice`
 - screen/actor context is a lens-specific add-on rather than the default classic shape
+
+Current shell-shape correction:
+
+- `CommandSlice` and `ViewSlice` now target the same outer visual height
+- the header wording should use title case:
+  - `CommandSlice`
+  - `ViewSlice`
 
 So the current task is not to invent the page from nothing.
 

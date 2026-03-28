@@ -27,12 +27,12 @@ Current row components:
 
 Current shell components:
 
-- `CommandSlice.Clean.V1`
-- `ViewSlice.Clean.V1`
+- `CommandSlice.Clean.V2`
+- `ViewSlice.Clean.V2`
 
 Current first clean path-row projection:
 
-- `PATH1.Row.V2.Clean`
+- `PATH1.Row.V3.Clean`
 
 ## Current Visual Direction
 
@@ -72,6 +72,34 @@ That means the current shell composition is:
   classic Event Modeling default: `View`
 
 If a different lens wants to show a screen or actor surface above the `View`, that should be treated as a lens-specific projection rather than the default `ViewSlice` shape.
+
+## Current Casing Rule
+
+Current preferred casing in the Penpot slice language is:
+
+- `CommandSlice`
+- `ViewSlice`
+
+Do not use:
+
+- `COMMANDSLICE`
+- `VIEWSLICE`
+
+The smaller type marker in the header should still be right-aligned, but the wording should stay in normal title case.
+
+## Current Height Rule
+
+`CommandSlice` and `ViewSlice` should keep the same outer visual height within a given path row.
+
+Why:
+
+- the path should read as one calm rhythm
+- the slice box should not change height just because one slice has more visible internal rows than another
+- lens-specific additions should usually change internal content, not the outer card height
+
+Current clean shell target:
+
+- `420` high outer card
 
 ## Current Token Direction
 

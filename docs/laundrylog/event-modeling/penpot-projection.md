@@ -215,13 +215,12 @@ Current components:
 - `SliceRow.Command.Clean.V1`
 - `SliceRow.Event.Clean.V1`
 - `SliceRow.View.Clean.V1`
-- `SliceRow.Ref.Clean.V1`
-- `CommandSlice.Clean.V1`
-- `ViewSlice.Clean.V1`
+- `CommandSlice.Clean.V2`
+- `ViewSlice.Clean.V2`
 
 Current readable row:
 
-- `PATH1.Row.V2.Clean`
+- `PATH1.Row.V3.Clean`
 
 Current practical interpretation:
 
@@ -229,6 +228,12 @@ Current practical interpretation:
 - shell components are now the second reusable seam
 - path-row instances are now the projection seam
 - this is a better direction for later `FnHCI` / `FnUI` derivation than the earlier detached-shell workaround
+
+Current refinements now locked in:
+
+- `CommandSlice` / `ViewSlice` title-case header wording
+- equal outer height between `CommandSlice` and `ViewSlice`
+- classic `ViewSlice` shows the green `View` only by default
 
 ## Current ViewSlice Rule
 
