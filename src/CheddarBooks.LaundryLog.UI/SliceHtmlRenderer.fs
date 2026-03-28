@@ -635,8 +635,17 @@ module SliceHtmlRenderer =
         | PropertyLines _ ->
             appendLine builder "<div class=\"slice-block__properties slice-block__properties--hidden\"></div>"
 
+    let private renderSliceWidthAction (builder: StringBuilder) =
+        appendLine
+            builder
+            "<button type=\"button\" class=\"slice-card__width-action\" data-action=\"toggle-slice-width\" aria-pressed=\"false\" aria-label=\"Expand slice width\" title=\"Expand slice width\">→</button>"
+
     let private renderBlock (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
         let blockCssClass = SliceBlockKind.cssClass blockState.Kind
+        let showsWidthAction =
+            match blockState.Content with
+            | PropertyLines _ -> true
+            | ScreenshotPlaceholder _ -> false
 
         appendLine builder $"<section class=\"slice-block slice-block--{blockCssClass}\">"
         appendLine builder "<div class=\"slice-block__topline\">"
@@ -651,12 +660,17 @@ module SliceHtmlRenderer =
         appendLine builder "</div>"
         renderBlockContent builder showProperties blockState.Content
 
-        match blockState.FooterBadgeText with
-        | Some footerBadgeText ->
+        if blockState.FooterBadgeText.IsSome || showsWidthAction then
             appendLine builder "<div class=\"slice-block__footer\">"
-            renderBadge builder "slice-block__footer-badge" footerBadgeText
+
+            match blockState.FooterBadgeText with
+            | Some footerBadgeText -> renderBadge builder "slice-block__footer-badge" footerBadgeText
+            | None -> ()
+
+            if showsWidthAction then
+                renderSliceWidthAction builder
+
             appendLine builder "</div>"
-        | None -> ()
 
         appendLine builder "</section>"
 
@@ -688,6 +702,9 @@ module SliceHtmlRenderer =
         | PropertyLines propertyLines when showProperties ->
             appendLine builder "<div class=\"path-document__gwt-ref-properties\">"
             propertyLines |> List.iter (renderPropertyLine builder)
+            appendLine builder "</div>"
+            appendLine builder "<div class=\"path-document__gwt-ref-footer\">"
+            renderSliceWidthAction builder
             appendLine builder "</div>"
         | ScreenshotPlaceholder label ->
             appendLine builder $"<div class=\"path-document__gwt-ref-text\">{htmlEncode label}</div>"
@@ -721,9 +738,6 @@ module SliceHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "<div class=\"slice-card__gwt-clauses\">"
         card.Clauses |> List.iter (renderGwtClause builder)
-        appendLine builder "</div>"
-        appendLine builder "<div class=\"slice-card__gwt-footer\">"
-        appendLine builder "<button type=\"button\" class=\"slice-card__width-action\" data-action=\"toggle-slice-width\" aria-pressed=\"false\" aria-label=\"Expand slice width\" title=\"Expand slice width\">→</button>"
         appendLine builder "</div>"
         appendLine builder "</section>"
 
@@ -877,6 +891,7 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }"
         appendLine builder ".path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }"
         appendLine builder ".path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }"
+        appendLine builder ".path-document__gwt-ref-footer { display: flex; justify-content: flex-end; align-items: flex-end; margin-top: auto; }"
         appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; grid-column: span 1; }"
         appendLine builder ".slice-card--wide { grid-column: span 2; }"
         appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
@@ -884,7 +899,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-card__header, .slice-card__body { display: contents; }"
         appendLine builder ".slice-card__topline { grid-row: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }"
         appendLine builder ".slice-card__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }"
-        appendLine builder ".slice-card__width-action { width: 22px; height: 22px; border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 0; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }"
+        appendLine builder ".slice-card__width-action { width: 22px; height: 22px; border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.96); color: #27435c; border-radius: 999px; padding: 0; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: -6px; margin-bottom: -6px; box-shadow: 0 2px 6px rgba(10, 27, 49, 0.12); }"
         appendLine builder ".slice-card__width-action:hover { background: rgba(255, 255, 255, 1.0); }"
         appendLine builder ".slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }"
         appendLine builder ".slice-card__title { grid-row: 2; margin: 3px 0 0; font-size: 0.82rem; line-height: 1.04; overflow: visible; }"
@@ -900,7 +915,6 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-card__gwt-topline { display: flex; justify-content: flex-start; }"
         appendLine builder ".slice-card__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; color: #4a647f; text-transform: lowercase; }"
         appendLine builder ".slice-card__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".slice-card__gwt-footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-card__row > .slice-block { flex: 1; }"
         appendLine builder ".slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }"
         appendLine builder ".slice-card__slot--row-fill { flex: 1; }"
@@ -932,7 +946,7 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }"
         appendLine builder ".slice-card--wide .slice-block__property-line--stacked { display: flex; flex-wrap: wrap; gap: 0.3rem; }"
         appendLine builder ".slice-card--wide .slice-block__property-line--stacked .slice-block__property-value { padding-left: 0; }"
-        appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
+        appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; align-items: flex-end; gap: 4px; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
         appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
         appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"

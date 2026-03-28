@@ -73,6 +73,7 @@ The current rule is:
 - view-side `GWT` can mix fact/view representations with short projection text
 - the slice frame itself should include that slice's `GWT`, not push it into a separate board-wide band
 - per-slice controls can widen an individual slice by one extra track when properties and `GWT` data need more horizontal room
+- those per-slice width controls can live on the lower-right corner of data-bearing blocks so the interaction stays near the pressured content
 
 ## Lens Rule
 
