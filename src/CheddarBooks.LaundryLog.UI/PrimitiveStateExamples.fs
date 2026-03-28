@@ -84,4 +84,5 @@ module PrimitiveStateExamples =
           SessionTotal =
             SummaryBarState.tryCreate (controlId "session-total") "Session Total" "$0.00"
             |> expect "session total"
+          RecentEntries = []
           SubmitAction = actionButton "log-expense" "Log Expense" true Primary }

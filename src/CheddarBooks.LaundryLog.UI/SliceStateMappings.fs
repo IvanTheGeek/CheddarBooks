@@ -123,6 +123,19 @@ module PrimitiveStateMappings =
         |> fun choices -> OptionGroupState.tryCreate (controlId "payment-type") None choices
         |> expect "payment options"
 
+    let private recentEntryCards visibleEntries =
+        visibleEntries
+        |> List.mapi (fun index visibleEntry ->
+            let controlIdValue = sprintf "entry-%d-%s" (index + 1) (ExpenseKind.slug visibleEntry.ExpenseKind)
+            let detailText = sprintf "Qty %d • %s" visibleEntry.Quantity (PaymentMethod.displayName visibleEntry.PaymentMethod)
+
+            EntryCardState.tryCreate
+                (controlId controlIdValue)
+                (ExpenseKind.displayName visibleEntry.ExpenseKind)
+                (Some detailText)
+                (Some visibleEntry.LineTotalText)
+            |> expect $"entry card '{controlIdValue}'")
+
     /// Maps the current CaptureLaundryLocation CommandSlice into the New Session primitive composition.
     let newSessionFromCommandSlice (commandSlice: CaptureLaundryLocationCommandSliceState) : NewSessionPrimitiveState =
         let draftLocationValue =
@@ -168,4 +181,5 @@ module PrimitiveStateMappings =
           SessionTotal =
             SummaryBarState.tryCreate (controlId "session-total") "Session Total" viewState.RunningTotalText
             |> expect "session total"
+          RecentEntries = recentEntryCards viewState.VisibleEntries
           SubmitAction = actionButton "log-expense" "Log Expense" commandSlice.CanSubmit Primary }

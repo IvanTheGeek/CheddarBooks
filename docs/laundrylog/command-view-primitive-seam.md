@@ -90,9 +90,11 @@ Current view-side pressure:
 
 - active location
 - running session total
-- later visible recent entries
+- visible recent entries
 
 That means the current `EntryForm` primitive state is composed from both sides.
+
+Those visible recent entries now project into local `EntryCardState` values.
 
 ## What Lives Where Right Now
 
@@ -124,7 +126,6 @@ It is not yet the final shared `FnTools` abstraction boundary.
 
 The current seam does not yet model everything visible in the eventual app:
 
-- recent entry cards in the UI
 - richer validation detail
 - time display surfaces
 - GPS acquisition details

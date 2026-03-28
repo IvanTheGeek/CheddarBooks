@@ -95,6 +95,18 @@ module LaundryLogTests =
                       Expect.equal moneyInput.PlaceholderText "0.00" "Expected the price placeholder text."
                       Expect.sequenceEqual moneyInput.QuickFillLabels [ "$2.50"; "$3.00" ] "Expected the quick-fill labels to stay stable.")
 
+              testCase "Entry cards keep title detail and amount text" (fun () ->
+                  let controlId =
+                      PrimitiveControlId.tryCreate "entry-1-washer"
+                      |> unwrap "entry card control id"
+
+                  match EntryCardState.tryCreate controlId "Washer" (Some "Qty 1 • Card") (Some "$3.00") with
+                  | Error message -> failtest $"Expected a valid entry card state. {message}"
+                  | Ok entryCard ->
+                      Expect.equal entryCard.TitleText "Washer" "Expected the entry-card title text."
+                      Expect.equal entryCard.DetailText (Some "Qty 1 • Card") "Expected the entry-card detail text."
+                      Expect.equal entryCard.AmountText (Some "$3.00") "Expected the entry-card amount text.")
+
               testCase "Penpot-backed new-session example starts with location unset" (fun () ->
                   let state = PrimitiveStateExamples.newSessionAwaitingLocation ()
 
@@ -128,7 +140,8 @@ module LaundryLogTests =
 
                   Expect.sequenceEqual selectedMachineLabels [ "Washer" ] "Expected washer to be the selected machine type."
                   Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected card to be the selected payment type."
-                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values.")
+                  Expect.equal state.PriceInput.QuickFillLabels [ "$2.50"; "$3.00"; "$3.50" ] "Expected the Penpot-backed quick-fill values."
+                  Expect.isEmpty state.RecentEntries "Expected the draft Penpot example to begin without visible entry cards.")
 
               testCase "New-session primitive mapping follows location command-slice state" (fun () ->
                   let noLocationState =
@@ -161,8 +174,12 @@ module LaundryLogTests =
                       VisibleLaundryExpenseViewLine.tryCreate ExpenseKind.Washer PaymentMethod.Card 1 "$3.00"
                       |> unwrap "visible washer expense line"
 
+                  let dryerEntry =
+                      VisibleLaundryExpenseViewLine.tryCreate ExpenseKind.Dryer PaymentMethod.Cash 1 "$2.50"
+                      |> unwrap "visible dryer expense line"
+
                   let sessionView =
-                      CurrentLaundrySessionViewState.tryCreate location [ washerEntry ] "$3.00" (Some "2026-03-28 01:10")
+                      CurrentLaundrySessionViewState.tryCreate location [ washerEntry; dryerEntry ] "$5.50" (Some "2026-03-28 01:10")
                       |> unwrap "current session view"
 
                   let expenseCommand =
@@ -190,4 +207,8 @@ module LaundryLogTests =
                   Expect.equal mappedState.Header.Subtitle (Some "Love's #123 - Springfield, OH") "Expected the active location from the ViewSlice to appear in the header."
                   Expect.sequenceEqual selectedMachineLabels [ "Dryer" ] "Expected the selected expense kind from the CommandSlice to drive machine selection."
                   Expect.sequenceEqual selectedPaymentLabels [ "Card" ] "Expected the selected payment method from the CommandSlice to drive payment selection."
-                  Expect.equal mappedState.SessionTotal.ValueText "$3.00" "Expected the running total from the ViewSlice to drive the summary bar.") ]
+                  Expect.equal mappedState.SessionTotal.ValueText "$5.50" "Expected the running total from the ViewSlice to drive the summary bar."
+                  Expect.equal mappedState.RecentEntries.Length 2 "Expected visible entries from the ViewSlice to project into recent entry cards."
+                  Expect.equal mappedState.RecentEntries.Head.TitleText "Washer" "Expected the first recent entry card to reflect the first visible entry."
+                  Expect.equal mappedState.RecentEntries.Head.DetailText (Some "Qty 1 • Card") "Expected the first recent entry card detail text."
+                  Expect.equal mappedState.RecentEntries.Tail.Head.AmountText (Some "$2.50") "Expected the second recent entry amount text.") ]

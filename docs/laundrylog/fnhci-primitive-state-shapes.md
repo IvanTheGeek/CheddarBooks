@@ -185,6 +185,25 @@ Example in LaundryLog:
 
 - session total
 
+### `EntryCardState`
+
+Purpose:
+
+- show one compact visible logged expense inside the current session list
+
+Current likely fields:
+
+- `control_id`
+- `title_text`
+- `detail_text`
+- `amount_text`
+
+Examples in LaundryLog:
+
+- `Washer`
+- `Qty 1 • Card`
+- `$3.00`
+
 ## First App-Level Compositions
 
 The current screens imply two first app-level primitive compositions.
@@ -208,6 +227,7 @@ Current likely composition:
 - `price_input`
 - `payment_options`
 - `session_total`
+- `recent_entries`
 - `submit_action`
 
 ## What Stays App-Specific

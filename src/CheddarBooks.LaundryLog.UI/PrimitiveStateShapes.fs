@@ -206,6 +206,26 @@ module SummaryBarState =
                   Label = label.Trim()
                   ValueText = valueText.Trim() }
 
+/// Describes one compact visible entry card in the current session list.
+type EntryCardState =
+    { ControlId: PrimitiveControlId
+      TitleText: string
+      DetailText: string option
+      AmountText: string option }
+
+[<RequireQualifiedAccess>]
+module EntryCardState =
+    /// Creates a validated entry-card state.
+    let tryCreate controlId titleText detailText amountText =
+        if String.IsNullOrWhiteSpace titleText then
+            Error "Entry cards must provide a title."
+        else
+            Ok
+                { ControlId = controlId
+                  TitleText = titleText.Trim()
+                  DetailText = detailText |> Option.map (fun (value: string) -> value.Trim())
+                  AmountText = amountText |> Option.map (fun (value: string) -> value.Trim()) }
+
 /// Describes the first local primitive composition for the New Session view.
 type NewSessionPrimitiveState =
     { Header: HeaderBarState
@@ -221,4 +241,5 @@ type EntryFormPrimitiveState =
       PriceInput: MoneyInputState
       PaymentOptions: OptionGroupState
       SessionTotal: SummaryBarState
+      RecentEntries: EntryCardState list
       SubmitAction: ActionButtonState }
