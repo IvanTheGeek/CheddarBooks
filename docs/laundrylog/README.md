@@ -9,6 +9,7 @@ Start here:
 - [`introduction.md`](introduction.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
+- [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md)
 - [`command-view-primitive-seam.md`](command-view-primitive-seam.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
@@ -38,6 +39,8 @@ If you want the user-facing explanation first, start with [`introduction.md`](in
 If you want the richer UI-design origin and concept-page rationale, go to [`concept-ui-page.md`](concept-ui-page.md).
 
 If you want the concrete screen evidence coming from the current `LaundryLog.penpot` file, go to [`penpot-screen-evidence.md`](penpot-screen-evidence.md).
+
+If you want the current deterministic HTML/CSS path-renderer direction that now sits in front of the Penpot experiments, go to [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md).
 
 If you want the first explicit bridge from Event Modeling `CommandSlice` and `ViewSlice` state into local UI primitive state, go to [`command-view-primitive-seam.md`](command-view-primitive-seam.md).
 

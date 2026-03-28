@@ -12,6 +12,8 @@ For the current Penpot-backed screen evidence behind these view contracts, see [
 
 For the current seam between Event Modeling state and local primitive composition, see [Command/View To Primitive Seam](command-view-primitive-seam.md).
 
+For the current deterministic HTML/CSS proving ground that projects those semantics into a reviewable artifact, see [HTML Path Renderer Proving Ground](html-path-renderer-proving-ground.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.
@@ -86,3 +88,5 @@ The first code boundary for this should live in:
 - `CheddarBooks.LaundryLog.UI`
 
 Those domain-specific contracts should depend on the renderer-neutral FnUI shell, not on Blazor implementation details directly.
+
+The current first deterministic projection work also lives locally in `CheddarBooks.LaundryLog.UI`, using self-contained HTML/CSS as the proving-ground render surface before wider extraction into shared `FnTools`.

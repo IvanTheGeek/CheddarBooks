@@ -13,6 +13,7 @@
     <Compile Include="PrimitiveStateShapes.fs" />
     <Compile Include="PrimitiveStateExamples.fs" />
     <Compile Include="SliceStateMappings.fs" />
+    <Compile Include="SliceHtmlRenderer.fs" />
     <Compile Include="LaundryLogShell.fs" />
   </ItemGroup>
 </Project>

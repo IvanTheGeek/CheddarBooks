@@ -211,4 +211,49 @@ module LaundryLogTests =
                   Expect.equal mappedState.RecentEntries.Length 2 "Expected visible entries from the ViewSlice to project into recent entry cards."
                   Expect.equal mappedState.RecentEntries.Head.TitleText "Washer" "Expected the first recent entry card to reflect the first visible entry."
                   Expect.equal mappedState.RecentEntries.Head.DetailText (Some "Qty 1 • Card") "Expected the first recent entry card detail text."
-                  Expect.equal mappedState.RecentEntries.Tail.Head.AmountText (Some "$2.50") "Expected the second recent entry amount text.") ]
+                  Expect.equal mappedState.RecentEntries.Tail.Head.AmountText (Some "$2.50") "Expected the second recent entry amount text.")
+
+              testCase "Classic path renderer includes PATH 1 command and view slices" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains htmlDocument "PATH 1: Manual Location -&gt; Washer -&gt; Dryer" "Expected the PATH 1 title in the rendered document."
+                  Expect.stringContains htmlDocument "COMMAND SLICE" "Expected the command-slice label in the rendered document."
+                  Expect.stringContains htmlDocument "VIEW SLICE" "Expected the view-slice label in the rendered document."
+                  Expect.stringContains htmlDocument "CaptureLaundryLocation" "Expected the location command name in the rendered document."
+                  Expect.stringContains htmlDocument "LaundryExpenseLogged" "Expected the logged-expense event title in the rendered document."
+                  Expect.stringContains htmlDocument "CurrentLaundrySession" "Expected the current-session view title in the rendered document."
+                  Expect.stringContains htmlDocument "classic em" "Expected the current lens footer badge.")
+
+              testCase "Classic path renderer hides the view screen blocks" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.isFalse
+                      (htmlDocument.Contains("Log Expense Screen - Washer And Dryer Visible"))
+                      "Expected the classic Event Modeling lens to hide the screen carried by the ViewSlice."
+
+                  Expect.stringContains htmlDocument "Set Location Screen" "Expected command-side screen blocks to stay visible.")
+
+              testCase "UI narrative path renderer shows the view-supported screens" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.uiNarrative "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains
+                      htmlDocument
+                      "Log Expense Screen - Washer And Dryer Visible"
+                      "Expected the UI-enriched lens to include the screen carried by the ViewSlice."
+
+                  Expect.stringContains htmlDocument "ui lens" "Expected the screen footer badge in the UI-enriched lens.") ]
