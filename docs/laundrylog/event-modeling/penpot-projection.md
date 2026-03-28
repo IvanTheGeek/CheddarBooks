@@ -255,6 +255,22 @@ And the first visible PATH 1 instances derived from them:
 
 The rough earlier first two PATH 1 cards were hidden rather than silently deleted so the transition stays traceable.
 
+## Current PATHS Row Proof
+
+The live `PATHS` page now also contains a first readable row projection:
+
+- `PATH1.Row.V1`
+
+Current characteristics:
+
+- one horizontal row for `PATH 1`
+- short descriptive note above the row
+- alternating `CommandSlice` and `ViewSlice` cards across the path
+- single-actor reading for now
+- screen rows still acting as screenshot-like references rather than full embedded screenshots
+
+So the `PATHS` page is now past the stage of being only screen boards and rough experiments.
+
 ## Current Surface Rule
 
 For this component-driven slice work:
@@ -263,3 +279,9 @@ For this component-driven slice work:
 - backend API is currently the stronger inspection/export surface
 
 The API mutation seam still matters, but it is currently lower-level and more schema-sensitive than the plugin path for this kind of board evolution.
+
+One additional practical finding from the current `PATH1.Row.V1` work is:
+
+- detached component shells are a good base for readable path cards
+- but directly editing inherited text did not reliably show up in exported visuals
+- the current reliable approach is to hide the inherited text nodes and overlay fresh local text nodes for the card-specific content

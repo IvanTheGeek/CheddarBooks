@@ -46,10 +46,25 @@ It already contains at least:
 - the newer V2 slice instances:
   - `PATH1: CommandSlice - Set Location (V2 Instance)`
   - `PATH1: ViewSlice - Ready (V2 Instance)`
+- the first readable row proof:
+  - `PATH1.Row.V1`
 
 So the current task is not to invent the page from nothing.
 
 It is to normalize and refine what is already there into a clearer row-per-path projection.
+
+## Current PATH 1 Row Proof
+
+`PATH1.Row.V1` is the first live proof that the `PATHS` page can carry a readable path row rather than only loose screens and scratch boards.
+
+Current shape:
+
+- path title and short descriptive note
+- one horizontal row of alternating `CommandSlice` and `ViewSlice` cards
+- current screen slots as screenshot-like references
+- single-actor reading for now
+
+That proof is still early, but it establishes the right kind of projection surface to keep refining.
 
 ## Current Top-Level Structure
 
