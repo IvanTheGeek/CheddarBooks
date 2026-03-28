@@ -256,4 +256,27 @@ module LaundryLogTests =
                       "Log Expense Screen - Washer And Dryer Visible"
                       "Expected the UI-enriched lens to include the screen carried by the ViewSlice."
 
-                  Expect.stringContains htmlDocument "ui lens" "Expected the screen footer badge in the UI-enriched lens.") ]
+                  Expect.stringContains htmlDocument "ui lens" "Expected the screen footer badge in the UI-enriched lens.")
+
+              testCase "Renderer stacks long property values onto an indented next line" (fun () ->
+                  let pathRow = SliceHtmlExamples.path1ManualLocationWasherDryer ()
+
+                  let htmlDocument =
+                      SliceHtmlRenderer.renderDocument
+                          (SliceRenderOptions.classicEventModel "LaundryLog PATH 1")
+                          pathRow
+
+                  Expect.stringContains
+                      htmlDocument
+                      "slice-block__property-line--stacked"
+                      "Expected long property values to use the stacked property-line format."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<span class=\"slice-block__property-key\">location_name =</span>"
+                      "Expected the property key to render separately from the value."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<span class=\"slice-block__property-value\">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>"
+                      "Expected the long property value to render in the indented value span.") ]

@@ -409,6 +409,28 @@ module SliceHtmlRenderer =
     let private renderBadge (builder: StringBuilder) cssClass text =
         appendLine builder $"<span class=\"{cssClass}\">{htmlEncode text}</span>"
 
+    let private renderPropertyLine (builder: StringBuilder) (line: string) =
+        let separator = " = "
+        let separatorIndex = line.IndexOf(separator, StringComparison.Ordinal)
+
+        if separatorIndex < 0 then
+            appendLine builder $"<div class=\"slice-block__property-line\">{htmlEncode line}</div>"
+        else
+            let key = line.Substring(0, separatorIndex)
+            let value = line.Substring(separatorIndex + separator.Length)
+            let shouldStack = line.Length >= 34 || value.Length >= 22
+
+            if shouldStack then
+                appendLine builder "<div class=\"slice-block__property-line slice-block__property-line--stacked\">"
+                appendLine builder $"<span class=\"slice-block__property-key\">{htmlEncode key} =</span>"
+                appendLine builder $"<span class=\"slice-block__property-value\">{htmlEncode value}</span>"
+                appendLine builder "</div>"
+            else
+                appendLine builder "<div class=\"slice-block__property-line slice-block__property-line--inline\">"
+                appendLine builder $"<span class=\"slice-block__property-key\">{htmlEncode key} =</span>"
+                appendLine builder $"<span class=\"slice-block__property-value\">{htmlEncode value}</span>"
+                appendLine builder "</div>"
+
     let private renderBlockContent (builder: StringBuilder) showProperties content =
         match content with
         | ScreenshotPlaceholder label ->
@@ -421,8 +443,7 @@ module SliceHtmlRenderer =
             appendLine builder "<div class=\"slice-block__properties\">"
 
             propertyLines
-            |> List.iter (fun line ->
-                appendLine builder $"<div class=\"slice-block__property-line\">{htmlEncode line}</div>")
+            |> List.iter (renderPropertyLine builder)
 
             appendLine builder "</div>"
             appendLine builder "</details>"
@@ -559,7 +580,12 @@ module SliceHtmlRenderer =
         appendLine builder ".slice-block__properties { display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.32); border-radius: 9px; padding: 6px 7px 5px; min-height: 48px; overflow: visible; }"
         appendLine builder ".slice-block__properties-panel:not([open]) .slice-block__properties { display: none; }"
         appendLine builder ".slice-block__properties--hidden { min-height: 0; padding: 0; background: transparent; }"
-        appendLine builder ".slice-block__property-line { font-family: \"IBM Plex Mono\", \"Cascadia Mono\", \"Consolas\", monospace; font-size: 0.58rem; line-height: 1.18; color: #27435c; overflow-wrap: break-word; word-break: normal; }"
+        appendLine builder ".slice-block__property-line { font-family: \"IBM Plex Mono\", \"Cascadia Mono\", \"Consolas\", monospace; font-size: 0.58rem; line-height: 1.18; color: #27435c; }"
+        appendLine builder ".slice-block__property-line--inline { display: flex; flex-wrap: wrap; gap: 0.3rem; }"
+        appendLine builder ".slice-block__property-line--stacked { display: flex; flex-direction: column; }"
+        appendLine builder ".slice-block__property-key { white-space: nowrap; }"
+        appendLine builder ".slice-block__property-value { overflow-wrap: break-word; word-break: normal; }"
+        appendLine builder ".slice-block__property-line--stacked .slice-block__property-value { padding-left: 1.2rem; }"
         appendLine builder ".slice-block__footer { display: flex; justify-content: flex-end; margin-top: auto; }"
         appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
         appendLine builder "@media (max-width: 1200px) { .slice-card { flex-basis: 216px; } .path-document { padding-left: 8px; padding-right: 8px; } }"
