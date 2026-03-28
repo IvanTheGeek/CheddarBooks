@@ -2,6 +2,8 @@
 
 These notes describe the first concrete LaundryLog screen surfaces and screen states currently visible in the imported design and workflow discussions.
 
+For the broader design rationale behind these screens, including the longer concept-page iteration thread, see [Concept UI Page](concept-ui-page.md).
+
 Primary source threads include:
 
 - [`019d174e-e9e9-7732-8fb0-053fb558797f.toml`](../../../../NEXUS-EventStore/projections/conversations/019d174e-e9e9-7732-8fb0-053fb558797f.toml)
@@ -18,6 +20,8 @@ That means screen work should stay aligned with:
 - path states
 - user decision milestones
 - reusable component composition
+
+These screens should therefore be read as distilled working screens from the broader concept-page effort, not as isolated mockups with no history behind them.
 
 ## Current Named Screens
 

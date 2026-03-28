@@ -2,6 +2,8 @@
 
 This note captures the first code-facing view shape for LaundryLog as a tool app under the CheddarBooks domain.
 
+For the fuller visual and workflow rationale behind these view contracts, see [Concept UI Page](concept-ui-page.md).
+
 ## Purpose
 
 LaundryLog is the first concrete application domain riding on top of the FnHCI and FnUI shell work.
@@ -12,6 +14,7 @@ That means the first view contracts should be:
 - explicit
 - stable enough to test
 - close to the currently understood path states
+- grounded in the concept-page work that already established the first practical mobile layout and command emphasis
 
 ## Current Active Views
 
