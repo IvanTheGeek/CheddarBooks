@@ -327,4 +327,33 @@ module LaundryLogTests =
                   Expect.stringContains
                       htmlDocument
                       "<span class=\"slice-block__property-value\">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>"
-                      "Expected the long property value to render in the indented value span.") ]
+                      "Expected the long property value to render in the indented value span.")
+
+              testCase "Screen renderer includes the current base LaundryLog screens" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the awaiting-location screen surface."
+                  Expect.stringContains htmlDocument "Screen.NewSession - Ready To Set" "Expected the ready-to-set screen surface."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the entry-form screen surface."
+                  Expect.stringContains htmlDocument "Use GPS Location" "Expected the GPS supporting action."
+                  Expect.stringContains htmlDocument "Set Location" "Expected the set-location command action."
+                  Expect.stringContains htmlDocument "Log Expense" "Expected the primary entry-form action."
+                  Expect.stringContains htmlDocument "Session Total" "Expected the summary bar label.")
+
+              testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains htmlDocument "ll-header" "Expected the screen header block."
+                  Expect.stringContains htmlDocument "ll-panel" "Expected the reusable screen panel block."
+                  Expect.stringContains htmlDocument "ll-option-group" "Expected the option-group block."
+                  Expect.stringContains htmlDocument "ll-stepper" "Expected the stepper block."
+                  Expect.stringContains htmlDocument "ll-money-input" "Expected the money-input block."
+                  Expect.stringContains htmlDocument "ll-entry-card" "Expected the recent-entry card block.") ]
