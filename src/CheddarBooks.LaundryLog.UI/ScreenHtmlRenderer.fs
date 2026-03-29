@@ -260,19 +260,41 @@ module ScreenHtmlRenderer =
             |> Option.defaultValue moneyInputState.PlaceholderText
             |> htmlEncode
 
+        let decreaseButton =
+            moneyInputState.QuarterAdjustButtons
+            |> List.tryFind (fun buttonState -> buttonState.Direction = Decrease)
+
+        let increaseButton =
+            moneyInputState.QuarterAdjustButtons
+            |> List.tryFind (fun buttonState -> buttonState.Direction = Increase)
+
         appendLine builder "<div class=\"ll-field\">"
         appendLine builder $"<div class=\"ll-field__label\">{htmlEncode label}</div>"
-        appendLine builder "<div class=\"ll-money-input\">"
-        appendLine builder $"<span class=\"ll-money-input__currency\">{htmlEncode moneyInputState.CurrencySymbol}</span>"
-        appendLine
-            builder
-            $"<input class=\"ll-money-input__field\" type=\"text\" data-control-id=\"{PrimitiveControlId.value moneyInputState.ControlId}\" value=\"{visibleValue}\" placeholder=\"{htmlEncode moneyInputState.PlaceholderText}\">"
-        appendLine builder "</div>"
 
-        if not (List.isEmpty moneyInputState.QuarterAdjustButtons) then
-            appendLine builder "<div class=\"ll-quarter-row\">"
-            moneyInputState.QuarterAdjustButtons |> List.iter (renderQuarterAdjustButton builder)
+        match decreaseButton, increaseButton with
+        | Some decreaseButtonState, Some increaseButtonState ->
+            appendLine builder "<div class=\"ll-money-input-grid\">"
+            renderQuarterAdjustButton builder decreaseButtonState
+            appendLine builder "<div class=\"ll-money-input\">"
+            appendLine builder $"<span class=\"ll-money-input__currency\">{htmlEncode moneyInputState.CurrencySymbol}</span>"
+            appendLine
+                builder
+                $"<input class=\"ll-money-input__field\" type=\"text\" data-control-id=\"{PrimitiveControlId.value moneyInputState.ControlId}\" value=\"{visibleValue}\" placeholder=\"{htmlEncode moneyInputState.PlaceholderText}\">"
             appendLine builder "</div>"
+            renderQuarterAdjustButton builder increaseButtonState
+            appendLine builder "</div>"
+        | _ ->
+            appendLine builder "<div class=\"ll-money-input\">"
+            appendLine builder $"<span class=\"ll-money-input__currency\">{htmlEncode moneyInputState.CurrencySymbol}</span>"
+            appendLine
+                builder
+                $"<input class=\"ll-money-input__field\" type=\"text\" data-control-id=\"{PrimitiveControlId.value moneyInputState.ControlId}\" value=\"{visibleValue}\" placeholder=\"{htmlEncode moneyInputState.PlaceholderText}\">"
+            appendLine builder "</div>"
+
+            if not (List.isEmpty moneyInputState.QuarterAdjustButtons) then
+                appendLine builder "<div class=\"ll-quarter-row\">"
+                moneyInputState.QuarterAdjustButtons |> List.iter (renderQuarterAdjustButton builder)
+                appendLine builder "</div>"
 
         if not (List.isEmpty moneyInputState.QuickFillLabels) then
             appendLine builder "<div class=\"ll-quick-fill-row\">"
@@ -541,9 +563,10 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-stepper__button { width: 72px; height: 72px; border: none; background: #ffcc80; color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3); }"
         appendLine builder ".ll-stepper__button:active { transform: scale(0.95); background: #ffb74d; }"
         appendLine builder ".ll-stepper__value { font-size: 3rem; font-weight: 700; color: #2d3748; min-width: 80px; width: 80px; text-align: center; padding: 0.5rem; border: 3px solid transparent; border-radius: 0.5rem; background: transparent; }"
-        appendLine builder ".ll-money-input { display: flex; align-items: center; justify-content: center; gap: 0.25rem; border: 0; background: transparent; overflow: visible; }"
+        appendLine builder ".ll-money-input-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr) 72px; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }"
+        appendLine builder ".ll-money-input { display: flex; align-items: center; justify-content: center; gap: 0.25rem; min-width: 0; border: 0; background: transparent; overflow: visible; }"
         appendLine builder ".ll-money-input__currency { font-size: 1.5rem; font-weight: 700; color: #64748b; padding: 0; }"
-        appendLine builder ".ll-money-input__field { width: 100%; max-width: 140px; padding: 0.875rem 0.5rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #2d3748; text-align: center; background: white; }"
+        appendLine builder ".ll-money-input__field { width: 100%; max-width: 140px; min-width: 0; padding: 0.875rem 0.5rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #2d3748; text-align: center; background: white; }"
         appendLine builder ".ll-quarter-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; }"
         appendLine builder ".ll-quarter-button { width: 72px; height: 72px; border: none; background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%); color: #4a4a4a; border-radius: 50%; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; border: 3px solid #a8a8a8; position: relative; font-family: 'Courier New', monospace; }"
         appendLine builder ".ll-quarter-button::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; border: 1px dashed rgba(128, 128, 128, 0.3); }"

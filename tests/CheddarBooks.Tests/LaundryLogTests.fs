@@ -434,4 +434,26 @@ module LaundryLogTests =
                   Expect.stringContains
                       htmlDocument
                       ".ll-gps-button { flex: 0 0 56px;"
-                      "Expected the GPS button width to stay fixed instead of overlapping the input.") ]
+                      "Expected the GPS button width to stay fixed instead of overlapping the input.")
+
+              testCase "Screen renderer uses a three-column unit-price grid" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-money-input-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr) 72px;"
+                      "Expected the unit-price control to use a fixed three-column grid."
+
+                  let decreaseIndex = htmlDocument.IndexOf("data-control-id=\"price-quarter-down\"")
+                  let fieldIndex = htmlDocument.IndexOf("data-control-id=\"price-input\"")
+                  let increaseIndex = htmlDocument.IndexOf("data-control-id=\"price-quarter-up\"")
+
+                  Expect.isGreaterThanOrEqual decreaseIndex 0 "Expected the decrease quarter button in the rendered HTML."
+                  Expect.isGreaterThanOrEqual fieldIndex 0 "Expected the price input field in the rendered HTML."
+                  Expect.isGreaterThanOrEqual increaseIndex 0 "Expected the increase quarter button in the rendered HTML."
+                  Expect.isLessThan decreaseIndex fieldIndex "Expected the decrease button to render to the left of the price field."
+                  Expect.isLessThan fieldIndex increaseIndex "Expected the increase button to render to the right of the price field.") ]
