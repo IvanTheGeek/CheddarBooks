@@ -11,6 +11,10 @@ The current checked-in screen-path artifact lives at:
 - [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 - [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js)
 
+Usual refresh helper:
+
+- [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
+
 Scratch copies may still be regenerated under `tmp/`, but the workspace copy is the checked-in current path surface.
 
 ## Lens Split

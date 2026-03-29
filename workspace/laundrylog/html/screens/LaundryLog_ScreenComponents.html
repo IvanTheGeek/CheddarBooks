@@ -313,6 +313,112 @@ body { margin: 0; background: #f8f9fa; color: #2d3748; font-family: -apple-syste
 </section>
 </article>
 <article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
+<p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-expense" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
 <p class="ll-screen-surface__note">first expense draft inside the current location context</p>
 <section class="ll-phone-screen ll-phone-screen--tall">

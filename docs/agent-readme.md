@@ -101,6 +101,7 @@ For local F# Interactive artifact generation:
 - do not default to piping large heredocs directly into raw `dotnet fsi`
 - treat `dotnet fsi <<'EOF' ... EOF` as a scratch-only fallback, not the usual path
 - if the artifact generation is recurring, prefer a checked-in helper script over ad hoc shell-wrapped REPL input
+- for the tracked LaundryLog workspace HTML, use [`../scripts/laundrylog/refresh-workspace-html.sh`](../scripts/laundrylog/refresh-workspace-html.sh) as the usual refresh path
 
 ## Verification Discipline
 

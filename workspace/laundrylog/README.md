@@ -23,12 +23,18 @@ Current structure:
 - `html/reference/`
   tracked design/reference HTML inputs that still matter
 
+Refresh helper:
+
+- [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
+- [`../../scripts/laundrylog/refresh-workspace-html.fsx`](../../scripts/laundrylog/refresh-workspace-html.fsx)
+
 Working rule:
 
 - review the checked-in artifacts in this workspace first
 - treat this workspace as the durable current artifact surface
 - `tmp/` remains scratch and should only be used when there is a specific reason to investigate local regeneration details, experiments, screenshots, or transient outputs
 - this workspace holds the checked-in current artifacts worth preserving in git history
+- refresh the tracked HTML with the checked-in helper under `scripts/laundrylog/` rather than ad hoc shell snippets
 - when renderer or artifact behavior changes materially, refresh the relevant workspace artifact in the same commit as the code/docs change
 - do not force separate artifact-only commits just to keep the workspace current
 
