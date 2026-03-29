@@ -128,6 +128,53 @@ module PrimitiveStateExamples =
           SetLocationAction = actionButton "set-location" "Set Location" true Primary }
 
     /// Captures the current Entry Form primitive composition for the first washer/card draft flow.
+    let entryFormReadyAtLocation () : EntryFormPrimitiveState =
+        { Header =
+            HeaderBarState.tryCreate "LaundryLog" (Some "Love's #123 - Springfield, OH") None
+            |> expect "entry-form ready header"
+          LocationInput = locationInput (Some "Love's #123 - Springfield, OH") |> Some
+          GpsAction = gpsAction () |> Some
+          StatusChips =
+            [ statusChip "status-location" "📍" "Location" Ready
+              statusChip "status-type" "🌊" "Type" NeedsAttention
+              statusChip "status-payment" "💳" "Payment" NeedsAttention ]
+          MachineTypeOptions =
+            optionGroup
+                "machine-type"
+                None
+                [ optionChoice "washer" "Washer" false
+                  optionChoice "dryer" "Dryer" false
+                  optionChoice "supplies" "Supplies" false ]
+          QuantityStepper =
+            StepperState.tryCreate (controlId "quantity-stepper") "-" "+" "1" false true
+            |> expect "entry-form ready quantity stepper"
+          PriceInput =
+            MoneyInputState.tryCreate
+                (controlId "price-input")
+                "$"
+                (Some "3.00")
+                "0.00"
+                [ "Historical $3.00"; "Last used $2.75"; "Community $3.50" ]
+                [ quarterAdjustButton "price-quarter-down" Decrease "25¢"
+                  quarterAdjustButton "price-quarter-up" Increase "25¢" ]
+            |> expect "entry-form ready price input"
+          PaymentOptions =
+            optionGroup
+                "payment-type"
+                None
+                [ optionChoice "cash" "Cash" false
+                  optionChoice "card" "Card" false
+                  optionChoice "app" "App" false
+                  optionChoice "points" "Points" false ]
+          PaymentDetailOptions = None
+          SessionTotal =
+            SummaryBarState.tryCreate (controlId "session-total") "Session Total" "$0.00"
+            |> expect "entry-form ready session total"
+          FeedbackBanner = None
+          RecentEntries = []
+          SubmitAction = actionButton "log-expense" "Log Expense" false Primary }
+
+    /// Captures the current Entry Form primitive composition for the first washer/card draft flow.
     let entryFormWasherCardDraft () : EntryFormPrimitiveState =
         { Header =
             HeaderBarState.tryCreate "LaundryLog" (Some "Love's #123 - Springfield, OH") None

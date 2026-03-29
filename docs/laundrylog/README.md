@@ -12,6 +12,7 @@ Start here:
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md)
 - [`html-screen-renderer-proving-ground.md`](html-screen-renderer-proving-ground.md)
+- [`html-screen-path-renderer-proving-ground.md`](html-screen-path-renderer-proving-ground.md)
 - [`command-view-primitive-seam.md`](command-view-primitive-seam.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
@@ -47,6 +48,8 @@ If you want the concrete screen evidence coming from the current `LaundryLog.pen
 If you want the current deterministic HTML/CSS path-renderer direction that now sits in front of the Penpot experiments, go to [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md).
 
 If you want the first deterministic HTML/CSS screen-renderer direction for the actual LaundryLog screens, go to [`html-screen-renderer-proving-ground.md`](html-screen-renderer-proving-ground.md).
+
+If you want the first deterministic HTML/CSS path file that sequences actual screens in order, go to [`html-screen-path-renderer-proving-ground.md`](html-screen-path-renderer-proving-ground.md).
 
 If you want the first explicit bridge from Event Modeling `CommandSlice` and `ViewSlice` state into local UI primitive state, go to [`command-view-primitive-seam.md`](command-view-primitive-seam.md).
 

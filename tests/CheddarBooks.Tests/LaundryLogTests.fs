@@ -346,6 +346,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "Screen.EntryForm - v7 Primary" "Expected the v7 primary screen surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the awaiting-location screen surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Ready To Set" "Expected the ready-to-set screen surface."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Ready At Location" "Expected the ready-at-location screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the entry-form screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Card Details Expanded" "Expected the card-details-expanded screen surface."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success screen surface."
@@ -380,6 +381,23 @@ module LaundryLogTests =
 
                   Expect.isGreaterThan v7PrimaryIndex primaryIndex "Expected the v7 primary name inside the primary surface."
                   Expect.isGreaterThan awaitingIndex v7PrimaryIndex "Expected the awaiting-location variant to appear after the primary surface.")
+
+              testCase "Screen path renderer sequences the first app and screen flow" (fun () ->
+                  let htmlDocument =
+                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      "PATH 1: App Started -&gt; Need Location -&gt; First Entry"
+                      "Expected the first screen-path title."
+
+                  Expect.stringContains htmlDocument "AppStarted" "Expected the app/system startup step."
+                  Expect.stringContains htmlDocument "Screen.AppStart - Boot" "Expected the boot screen surface."
+                  Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the need-location screen state."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Ready At Location" "Expected the ready-at-location screen state."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success path state."
+                  Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
+                  Expect.stringContains htmlDocument "app/system lens" "Expected the app/system startup lens badge.")
 
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =

@@ -42,6 +42,10 @@ module ScreenHtmlExamples =
                 Some "manual location entered and ready to confirm",
                 PrimitiveStateExamples.newSessionLocationEntered () )
           EntryFormScreen
+              ( "Screen.EntryForm - Ready At Location",
+                Some "location captured and the expense form is ready for the first selection",
+                PrimitiveStateExamples.entryFormReadyAtLocation () )
+          EntryFormScreen
               ( "Screen.EntryForm - Washer Draft",
                 Some "first expense draft inside the current location context",
                 PrimitiveStateExamples.entryFormWasherCardDraft () )
@@ -477,6 +481,12 @@ module ScreenHtmlRenderer =
         | EntryFormScreen (surfaceName, note, screenState) ->
             renderEntryFormScreen builder surfaceName note screenState
 
+    /// Renders one current screen surface as an embeddable HTML fragment.
+    let renderSurfaceHtml (screenSurface: ScreenSurfaceState) =
+        let builder = StringBuilder()
+        renderScreenSurface builder screenSurface
+        builder.ToString()
+
     let private splitPrimarySurface (screenSurfaces: ScreenSurfaceState list) =
         let isPrimaryEntryForm =
             function
@@ -603,6 +613,12 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }"
         appendLine builder "@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }"
         appendLine builder "</style>"
+
+    /// Returns the current self-contained style block used by the LaundryLog screen renderer.
+    let renderStyleBlock () =
+        let builder = StringBuilder()
+        renderStyles builder
+        builder.ToString()
 
     /// Renders a self-contained HTML document for the current LaundryLog screen proving ground.
     let renderDocument documentTitle description (screenSurfaces: ScreenSurfaceState list) =
