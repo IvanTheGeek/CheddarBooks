@@ -153,7 +153,7 @@ module ScreenHtmlRenderer =
 
     let private renderStatusChipRow (builder: StringBuilder) (chipStates: StatusChipState list) =
         if not (List.isEmpty chipStates) then
-            appendLine builder "<div class=\"ll-status-chip-row\">"
+            appendLine builder $"<div class=\"ll-status-chip-row\" style=\"--status-chip-count: {chipStates.Length};\">"
             chipStates |> List.iter (renderStatusChip builder)
             appendLine builder "</div>"
 
@@ -581,10 +581,10 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-entry-total__label { font-size: 0.875rem; font-weight: 600; color: #64748b; }"
         appendLine builder ".ll-entry-total__amount { font-size: 1.75rem; font-weight: 700; color: #2d3748; }"
         appendLine builder ".ll-button--submit { min-height: 56px; padding-top: 0.7rem; padding-bottom: 0.7rem; }"
-        appendLine builder ".ll-status-chip-row { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; width: 100%; }"
-        appendLine builder ".ll-status-chip { display: inline-flex; align-items: center; gap: 0.22rem; padding: 0.28rem 0.62rem; background: rgba(255, 255, 255, 0.92); border-radius: 999px; font-size: 0.74rem; font-weight: 600; color: #475569; box-shadow: none; line-height: 1; }"
+        appendLine builder ".ll-status-chip-row { display: grid; grid-template-columns: repeat(var(--status-chip-count, 1), minmax(0, 1fr)); gap: 0.3rem; align-items: center; width: 100%; }"
+        appendLine builder ".ll-status-chip { min-width: 0; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.22rem; padding: 0.28rem 0.5rem; background: rgba(255, 255, 255, 0.92); border-radius: 999px; font-size: 0.74rem; font-weight: 600; color: #475569; box-shadow: none; line-height: 1; white-space: nowrap; }"
         appendLine builder ".ll-status-chip__icon { opacity: 0.9; }"
-        appendLine builder ".ll-status-chip__label { color: inherit; }"
+        appendLine builder ".ll-status-chip__label { min-width: 0; color: inherit; overflow: hidden; text-overflow: ellipsis; }"
         appendLine builder ".ll-status-chip__mark { font-weight: 800; font-size: 0.68rem; }"
         appendLine builder ".ll-status-chip--ready .ll-status-chip__mark { color: #16a34a; }"
         appendLine builder ".ll-status-chip--needs-attention .ll-status-chip__mark { color: #dc2626; }"

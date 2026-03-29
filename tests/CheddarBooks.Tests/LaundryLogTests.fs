@@ -478,4 +478,26 @@ module LaundryLogTests =
                   Expect.stringContains
                       htmlDocument
                       "margin: 0.6rem 0 1.2rem;"
-                      "Expected the session-total bar to avoid side margins that can visually clip the border.") ]
+                      "Expected the session-total bar to avoid side margins that can visually clip the border.")
+
+              testCase "Screen renderer keeps validation chips in a counted grid row" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<div class=\"ll-status-chip-row\" style=\"--status-chip-count: 3;\">"
+                      "Expected the readiness chips to declare a fixed one-row chip count."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-status-chip-row { display: grid; grid-template-columns: repeat(var(--status-chip-count, 1), minmax(0, 1fr));"
+                      "Expected the readiness chips to use a counted grid instead of wrapping flex."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-status-chip { min-width: 0; width: 100%;"
+                      "Expected each readiness chip to shrink inside its grid column without wrapping to a second row.") ]
