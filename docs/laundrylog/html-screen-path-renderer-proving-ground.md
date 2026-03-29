@@ -91,7 +91,7 @@ That means:
   - browser-level scrollbars stay hidden
   - the header and top horizontal controls stay fixed
   - the path rows scroll inside an internal stage
-  - left/right controls can move the visible screen columns by one step at a time
+  - first/previous/next/end controls can move the visible screen columns by whole-step boundaries instead of partial drift
 
 ## Near-Term Direction
 

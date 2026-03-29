@@ -415,8 +415,13 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\""
-                      "Expected a dedicated top scroll rail above the screen strip."
+                      "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\""
+                      "Expected a dedicated button for returning to the beginning of the path."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\""
+                      "Expected a dedicated button for jumping to the end of the path."
 
                   Expect.stringContains
                       htmlDocument
@@ -440,8 +445,28 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "viewport.scrollBy({ left: direction * stepWidth(), behavior: 'smooth' });"
-                      "Expected left and right controls to move the visible screen columns by one step width.")
+                      "const scrollByOneColumn = (direction) => {"
+                      "Expected explicit one-column stepping logic for path navigation."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const offsets = stepOffsets();"
+                      "Expected navigation to snap to actual step offsets instead of a guessed partial scroll amount."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "scrollToColumn(offsets[targetIndex]);"
+                      "Expected the next and previous buttons to land on full step boundaries."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "startButton.disabled = currentLeft <= 2;"
+                      "Expected the beginning button to show a disabled state at the start of the path."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-path-nav-button:disabled { background: #cbd5e1;"
+                      "Expected inactive navigation buttons to use a stronger disabled visual state.")
 
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
