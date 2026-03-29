@@ -425,6 +425,16 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
+                      ".ll-path-nav-button__chevron--left { transform: rotate(-135deg); }"
+                      "Expected the left navigation buttons to use explicit shaped chevrons instead of text glyphs."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-path-nav-button__chevron--right { transform: rotate(45deg); }"
+                      "Expected the right navigation buttons to use explicit shaped chevrons instead of text glyphs."
+
+                  Expect.stringContains
+                      htmlDocument
                       "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\">"
                       "Expected the screen strip to live in its own horizontal viewport."
 
