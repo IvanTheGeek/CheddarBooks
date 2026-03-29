@@ -114,6 +114,52 @@ The current page now has first-pass viewer controls:
 
 This is only a first step, but it establishes that a path surface should not assume one permanently fixed verbosity level.
 
+## Lens Visibility
+
+The current page now also has first-pass lens visibility controls in the header.
+
+That means the page can turn lens families on and off, instead of only printing the lens label inside every step.
+
+Current lens families:
+
+- `Application Lifecycle Lens`
+- `App Runtime Lens`
+- `Screen Path Lens`
+
+Working rule:
+
+- the header controls decide which lens families are currently visible
+- each visible step still states its own bounded context and lens explicitly
+- the page should not force one permanently fixed lens mix
+
+## Step Metadata Hierarchy
+
+For the current screen-path page, step metadata should distinguish at least:
+
+- `bounded context`
+- `lens`
+- `surface`
+
+Example:
+
+- `Context · RuntimeOrchestration`
+- `app runtime lens`
+- `Screen.AppStart - Runtime Checks`
+
+Current rule:
+
+- `domain` is broader and usually implicit at the page/doc level here
+- `bounded context` is the stronger per-step semantic label
+- `lens` is the current viewing/projection perspective
+- `surface` is the actual rendered screen/app surface being shown
+
+So for this page:
+
+- `SoftwareDevelopment` / interaction work is the broader domain pressure
+- `ApplicationLifecycle`, `RuntimeOrchestration`, and `ScreenPath` are the bounded contexts being surfaced
+- `Application Lifecycle Lens`, `App Runtime Lens`, and `Screen Path Lens` are the current viewer-selectable lenses
+- `Screen.AppStart - Runtime Checks` and similar names are the rendered surfaces
+
 ## Local Update Monitor
 
 The current `file://` path artifact now uses a small companion update manifest:

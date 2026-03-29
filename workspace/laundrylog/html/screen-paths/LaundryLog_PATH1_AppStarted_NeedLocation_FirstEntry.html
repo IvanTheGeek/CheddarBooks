@@ -135,6 +135,11 @@ html, body { height: 100%; overflow: hidden; }
 .ll-path-view-toggle { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }
 .ll-path-view-toggle:hover { border-color: #94a3b8; }
 .ll-path-view-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }
+.ll-path-document__lens-controls { display: flex; flex-direction: column; gap: 0.28rem; align-items: flex-start; }
+.ll-path-document__lens-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.ll-path-lens-toggle { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }
+.ll-path-lens-toggle:hover { border-color: #94a3b8; }
+.ll-path-lens-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }
 .ll-path-document__update-controls { display: flex; flex-direction: column; gap: 0.28rem; align-items: flex-start; min-width: 280px; }
 .ll-path-document__update-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
 .ll-path-document__update-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
@@ -147,7 +152,7 @@ html, body { height: 100%; overflow: hidden; }
 .ll-path-document__update-status[data-state="available"] { color: #9a3412; font-weight: 700; }
 .ll-path-document__update-status[data-state="error"] { color: #b91c1c; }
 .ll-path-document__update-status[data-state="auto"] { color: #0e5883; font-weight: 700; }
-.ll-path-document[data-view-mode="summary"] .ll-path-document__assumptions, .ll-path-document[data-view-mode="summary"] .ll-path-step__note, .ll-path-document[data-view-mode="summary"] .ll-path-step__lens, .ll-path-document[data-view-mode="summary"] .ll-screen-surface__name, .ll-path-document[data-view-mode="summary"] .ll-screen-surface__note { display: none; }
+.ll-path-document[data-view-mode="summary"] .ll-path-document__assumptions, .ll-path-document[data-view-mode="summary"] .ll-path-step__note, .ll-path-document[data-view-mode="summary"] .ll-path-step__meta, .ll-path-document[data-view-mode="summary"] .ll-screen-surface__name, .ll-path-document[data-view-mode="summary"] .ll-screen-surface__note { display: none; }
 .ll-path-document[data-view-mode="summary"] .ll-path-document__context-panel { display: none; }
 .ll-path-document[data-view-mode="standard"] .ll-path-document__context-panel .ll-path-document__assumptions { display: none; }
 .ll-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }
@@ -170,6 +175,8 @@ html, body { height: 100%; overflow: hidden; }
 .ll-path-step__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
 .ll-path-step__title { margin: 0; font-size: 0.82rem; line-height: 1.15; font-weight: 700; color: #0f172a; }
 .ll-path-step__note { margin: 0; font-size: 0.72rem; line-height: 1.28; color: #64748b; min-height: 2.4em; }
+.ll-path-step__meta { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
+.ll-path-step__context { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #eef2f7; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; }
 .ll-path-step__lens { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #e2e8f0; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 .ll-panel--boot { min-height: 520px; justify-content: center; }
 .ll-boot-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.85rem; padding: 2rem 1rem; }
@@ -217,6 +224,14 @@ html, body { height: 100%; overflow: hidden; }
 <button class="ll-path-view-toggle" type="button" data-view-mode="detailed" aria-pressed="false">Detailed</button>
 </div>
 </section>
+<section class="ll-path-document__lens-controls" aria-label="Lens visibility controls">
+<div class="ll-path-document__view-label">Lenses</div>
+<div class="ll-path-document__lens-buttons">
+<button class="ll-path-lens-toggle" type="button" data-lens-key="application-lifecycle" aria-pressed="true">Lifecycle</button>
+<button class="ll-path-lens-toggle" type="button" data-lens-key="app-runtime" aria-pressed="true">Runtime</button>
+<button class="ll-path-lens-toggle" type="button" data-lens-key="screen-path" aria-pressed="true">Screen Path</button>
+</div>
+</section>
 <section class="ll-path-document__update-controls" aria-label="Path update controls">
 <div class="ll-path-document__update-label">Updates</div>
 <div class="ll-path-document__update-buttons">
@@ -241,11 +256,14 @@ html, body { height: 100%; overflow: hidden; }
 <section class="ll-path-stage">
 <div id="ll-path-flow-viewport" class="ll-path-flow-viewport">
 <section id="ll-path-flow" class="ll-path-flow">
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="application-lifecycle">
 <div class="ll-path-step__eyebrow">Step 01 · 01-app-started</div>
 <h2 class="ll-path-step__title">AppStarted</h2>
 <p class="ll-path-step__note">User taps the app icon and the splash screen appears immediately.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ApplicationLifecycle</div>
 <div class="ll-path-step__lens">application lifecycle lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Splash</div>
 <p class="ll-screen-surface__note">fresh first launch before runtime checks complete</p>
@@ -280,11 +298,14 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 02 · 02-runtime-checks</div>
 <h2 class="ll-path-step__title">Runtime Checks</h2>
 <p class="ll-path-step__note">Startup/runtime checks begin while the splash state remains visible.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · RuntimeOrchestration</div>
 <div class="ll-path-step__lens">app runtime lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Runtime Checks</div>
 <p class="ll-screen-surface__note">first-launch runtime checks are in progress</p>
@@ -319,11 +340,14 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 03 · 03-no-local-session</div>
 <h2 class="ll-path-step__title">No Local Session</h2>
 <p class="ll-path-step__note">Fresh-first-launch assumptions are confirmed: no saved location and no active session were found.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · RuntimeOrchestration</div>
 <div class="ll-path-step__lens">app runtime lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - No Local Session</div>
 <p class="ll-screen-surface__note">fresh first launch confirmed from local/runtime checks</p>
@@ -358,11 +382,14 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 04 · 04-route-resolved</div>
 <h2 class="ll-path-step__title">Route Resolved</h2>
 <p class="ll-path-step__note">Runtime orchestration resolves Need Location as the first usable screen.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · RuntimeOrchestration</div>
 <div class="ll-path-step__lens">app runtime lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Route Resolved</div>
 <p class="ll-screen-surface__note">runtime routes the app to the first usable screen</p>
@@ -397,11 +424,14 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 05 · 05-need-location</div>
 <h2 class="ll-path-step__title">Need Location</h2>
 <p class="ll-path-step__note">Fresh start with no known location yet.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ScreenPath</div>
 <div class="ll-path-step__lens">screen path lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.NewSession - Awaiting Location</div>
 <p class="ll-screen-surface__note">manual location entry before the first expense</p>
@@ -434,11 +464,14 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 06 · 06-ready-to-set-location</div>
 <h2 class="ll-path-step__title">Ready To Set Location</h2>
 <p class="ll-path-step__note">The location text is entered and the confirm action is available.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ScreenPath</div>
 <div class="ll-path-step__lens">screen path lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
 <p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
@@ -471,11 +504,14 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 07 · 07-entry-form-ready</div>
 <h2 class="ll-path-step__title">Entry Form Ready</h2>
 <p class="ll-path-step__note">The app enters the main entry surface after location capture.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ScreenPath</div>
 <div class="ll-path-step__lens">screen path lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
 <p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
@@ -584,11 +620,14 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 08 · 08-washer-draft</div>
 <h2 class="ll-path-step__title">Washer Draft</h2>
 <p class="ll-path-step__note">The first expense draft is composed on the main screen.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ScreenPath</div>
 <div class="ll-path-step__lens">screen path lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
 <p class="ll-screen-surface__note">first expense draft inside the current location context</p>
@@ -700,11 +739,14 @@ Log Expense
 </article>
 
 </section>
-<section class="ll-path-step">
+<section class="ll-path-step" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 09 · 09-logged-success</div>
 <h2 class="ll-path-step__title">Logged Success</h2>
 <p class="ll-path-step__note">The first entry is logged and the screen is ready for the next quick entry.</p>
+<div class="ll-path-step__meta">
+<div class="ll-path-step__context">Context · ScreenPath</div>
 <div class="ll-path-step__lens">screen path lens</div>
+</div>
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
 <p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
@@ -840,10 +882,14 @@ Log Expense
   const nextButton = document.getElementById('ll-path-nav-next');
   const endButton = document.getElementById('ll-path-nav-end');
   const viewModeButtons = Array.from(document.querySelectorAll('.ll-path-view-toggle'));
+  const lensButtons = Array.from(document.querySelectorAll('.ll-path-lens-toggle'));
+  const stepElements = Array.from(document.querySelectorAll('.ll-path-step'));
   const updateModeButtons = Array.from(document.querySelectorAll('.ll-path-update-toggle'));
   const updateStatus = document.getElementById('ll-path-update-status');
   const refreshButton = document.getElementById('ll-path-refresh-now');
   const updateModeStorageKey = 'll-path-update-mode::path1';
+  const lensFilterStorageKey = 'll-path-lenses::path1';
+  const defaultLensKeys = ['application-lifecycle', 'app-runtime', 'screen-path'];
   const applyViewMode = (mode) => {
     if (!pathDocument) { return; }
     pathDocument.dataset.viewMode = mode;
@@ -857,6 +903,49 @@ Log Expense
     button.addEventListener('click', () => applyViewMode(button.dataset.viewMode || 'standard'));
   });
   applyViewMode((pathDocument && pathDocument.dataset.viewMode) || 'standard');
+  const readStoredLensKeys = () => {
+    try {
+      const raw = window.localStorage.getItem(lensFilterStorageKey);
+      if (!raw) { return defaultLensKeys.slice(); }
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) { return defaultLensKeys.slice(); }
+      const normalized = parsed.filter((value, index, array) => typeof value === 'string' && defaultLensKeys.includes(value) && array.indexOf(value) === index);
+      return normalized.length > 0 ? normalized : defaultLensKeys.slice();
+    } catch (_) {
+      return defaultLensKeys.slice();
+    }
+  };
+  const persistLensKeys = (lensKeys) => {
+    try { window.localStorage.setItem(lensFilterStorageKey, JSON.stringify(lensKeys)); } catch (_) { }
+  };
+  const applyLensFilters = (lensKeys) => {
+    const activeLensKeys = lensKeys.filter((value, index, array) => defaultLensKeys.includes(value) && array.indexOf(value) === index);
+    if (activeLensKeys.length === 0) { return; }
+    if (pathDocument) { pathDocument.dataset.activeLenses = activeLensKeys.join(','); }
+    lensButtons.forEach((button) => {
+      const isActive = activeLensKeys.includes(button.dataset.lensKey || '');
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    stepElements.forEach((step) => {
+      const stepLensKey = step.dataset.lensKey || '';
+      step.hidden = !activeLensKeys.includes(stepLensKey);
+    });
+    persistLensKeys(activeLensKeys);
+    window.requestAnimationFrame(syncWidth);
+  };
+  lensButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const clickedLensKey = button.dataset.lensKey || '';
+      const currentLensKeys = readStoredLensKeys();
+      const isActive = currentLensKeys.includes(clickedLensKey);
+      const nextLensKeys = isActive
+        ? (currentLensKeys.length > 1 ? currentLensKeys.filter((lensKey) => lensKey !== clickedLensKey) : currentLensKeys)
+        : currentLensKeys.concat(clickedLensKey);
+      applyLensFilters(nextLensKeys);
+    });
+  });
+  applyLensFilters(readStoredLensKeys());
   const setUpdateStatus = (message, state) => {
     if (!updateStatus) { return; }
     updateStatus.textContent = message;
@@ -895,7 +984,7 @@ Log Expense
   let animationFrameId = 0;
   let currentStepMetrics = { targets: [0], logicalMaxTarget: 0 };
   const measureStepMetrics = () => {
-    const steps = Array.from(flow.querySelectorAll('.ll-path-step'));
+    const steps = Array.from(flow.querySelectorAll('.ll-path-step')).filter((step) => !step.hidden);
     if (steps.length === 0) {
       return { targets: [0], logicalMaxTarget: 0 };
     }
@@ -1008,8 +1097,8 @@ Log Expense
   if (window.ResizeObserver) {
     new ResizeObserver(syncWidth).observe(flow);
   }
-  const currentArtifactVersion = "screen-path::20260329125110622";
-  const currentArtifactUpdatedAt = "2026-03-29T12:51:10Z";
+  const currentArtifactVersion = "screen-path::20260329131209572";
+  const currentArtifactUpdatedAt = "2026-03-29T13:12:09Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updatePollTimer = 0;

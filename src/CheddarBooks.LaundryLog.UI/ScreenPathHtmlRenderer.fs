@@ -31,11 +31,19 @@ type ScreenPathSurfaceState =
     | AppBootSurface of AppBootScreenState
     | AppScreenSurface of ScreenSurfaceState
 
+/// Distinguishes the current screen-path lenses.
+type ScreenPathLensKind =
+    | ApplicationLifecycleLens
+    | AppRuntimeLens
+    | ScreenPathLens
+
 /// Describes one ordered screen-path step.
 type ScreenPathStepState =
     { StepKey: string
       StepTitle: string
       StepNote: string option
+      ContextLabel: string
+      LensKind: ScreenPathLensKind
       LensLabel: string
       Surface: ScreenPathSurfaceState }
 
@@ -72,6 +80,15 @@ module ScreenPathHtmlExamples =
           SecondaryMessage = secondaryMessage
           BootChecks = bootChecks }
 
+    let private step stepKey stepTitle stepNote contextLabel lensKind lensLabel surface =
+        { StepKey = stepKey
+          StepTitle = stepTitle
+          StepNote = stepNote
+          ContextLabel = contextLabel
+          LensKind = lensKind
+          LensLabel = lensLabel
+          Surface = surface }
+
     /// Returns the first app/screen-path lens for LaundryLog.
     let path1StartupToFirstEntry () : ScreenPathState =
         { PathId = "PATH1"
@@ -85,122 +102,152 @@ module ScreenPathHtmlExamples =
               "Startup/runtime checks must finish before the first usable screen appears."
               "The initial route should resolve to Need Location before the first entry is composed." ]
           Steps =
-            [ { StepKey = "01-app-started"
-                StepTitle = "AppStarted"
-                StepNote = Some "User taps the app icon and the splash screen appears immediately."
-                LensLabel = "application lifecycle lens"
-                Surface =
-                    appBootSurface
-                        "Screen.AppStart - Splash"
-                        "fresh first launch before runtime checks complete"
-                        "Starting LaundryLog"
-                        "Preparing the first-launch startup sequence."
-                        [ bootCheck "AppStarted observed" Active
-                          bootCheck "Runtime checks running" Pending
-                          bootCheck "No known local session" Pending
-                          bootCheck "Route to Need Location" Pending ]
-                    |> AppBootSurface }
-              { StepKey = "02-runtime-checks"
-                StepTitle = "Runtime Checks"
-                StepNote = Some "Startup/runtime checks begin while the splash state remains visible."
-                LensLabel = "app runtime lens"
-                Surface =
-                    appBootSurface
-                        "Screen.AppStart - Runtime Checks"
-                        "first-launch runtime checks are in progress"
-                        "Checking startup requirements"
-                        "Inspecting local state, offline readiness, and runtime startup conditions."
-                        [ bootCheck "AppStarted observed" Complete
-                          bootCheck "Runtime checks running" Active
-                          bootCheck "No known local session" Pending
-                          bootCheck "Route to Need Location" Pending ]
-                    |> AppBootSurface }
-              { StepKey = "03-no-local-session"
-                StepTitle = "No Local Session"
-                StepNote = Some "Fresh-first-launch assumptions are confirmed: no saved location and no active session were found."
-                LensLabel = "app runtime lens"
-                Surface =
-                    appBootSurface
-                        "Screen.AppStart - No Local Session"
-                        "fresh first launch confirmed from local/runtime checks"
-                        "No local session found"
-                        "No saved location, active session, or pending expense draft was discovered."
-                        [ bootCheck "AppStarted observed" Complete
-                          bootCheck "Runtime checks running" Complete
-                          bootCheck "No known local session" Active
-                          bootCheck "Route to Need Location" Pending ]
-                    |> AppBootSurface }
-              { StepKey = "04-route-resolved"
-                StepTitle = "Route Resolved"
-                StepNote = Some "Runtime orchestration resolves Need Location as the first usable screen."
-                LensLabel = "app runtime lens"
-                Surface =
-                    appBootSurface
-                        "Screen.AppStart - Route Resolved"
-                        "runtime routes the app to the first usable screen"
-                        "Routing to Need Location"
-                        "Startup checks are complete and the first-launch path is ready to enter the app."
-                        [ bootCheck "AppStarted observed" Complete
-                          bootCheck "Runtime checks running" Complete
-                          bootCheck "No known local session" Complete
-                          bootCheck "Route to Need Location" Active ]
-                    |> AppBootSurface }
-              { StepKey = "05-need-location"
-                StepTitle = "Need Location"
-                StepNote = Some "Fresh start with no known location yet."
-                LensLabel = "screen path lens"
-                Surface =
-                    NewSessionScreen
-                        ( "Screen.NewSession - Awaiting Location",
-                          Some "manual location entry before the first expense",
-                          PrimitiveStateExamples.newSessionAwaitingLocation () )
-                    |> AppScreenSurface }
-              { StepKey = "06-ready-to-set-location"
-                StepTitle = "Ready To Set Location"
-                StepNote = Some "The location text is entered and the confirm action is available."
-                LensLabel = "screen path lens"
-                Surface =
-                    NewSessionScreen
-                        ( "Screen.NewSession - Ready To Set",
-                          Some "manual location entered and ready to confirm",
-                          PrimitiveStateExamples.newSessionLocationEntered () )
-                    |> AppScreenSurface }
-              { StepKey = "07-entry-form-ready"
-                StepTitle = "Entry Form Ready"
-                StepNote = Some "The app enters the main entry surface after location capture."
-                LensLabel = "screen path lens"
-                Surface =
-                    EntryFormScreen
-                        ( "Screen.EntryForm - Ready At Location",
-                          Some "location captured and the expense form is ready for the first selection",
-                          PrimitiveStateExamples.entryFormReadyAtLocation () )
-                    |> AppScreenSurface }
-              { StepKey = "08-washer-draft"
-                StepTitle = "Washer Draft"
-                StepNote = Some "The first expense draft is composed on the main screen."
-                LensLabel = "screen path lens"
-                Surface =
-                    EntryFormScreen
-                        ( "Screen.EntryForm - Washer Draft",
-                          Some "first expense draft inside the current location context",
-                          PrimitiveStateExamples.entryFormWasherCardDraft () )
-                    |> AppScreenSurface }
-              { StepKey = "09-logged-success"
-                StepTitle = "Logged Success"
-                StepNote = Some "The first entry is logged and the screen is ready for the next quick entry."
-                LensLabel = "screen path lens"
-                Surface =
-                    EntryFormScreen
-                        ( "Screen.EntryForm - Logged Success",
-                          Some "entry logged and the surface is ready for the next quick entry",
-                          PrimitiveStateExamples.entryFormLoggedSuccess () )
-                    |> AppScreenSurface } ] }
+            [ step
+                  "01-app-started"
+                  "AppStarted"
+                  (Some "User taps the app icon and the splash screen appears immediately.")
+                  "ApplicationLifecycle"
+                  ApplicationLifecycleLens
+                  "application lifecycle lens"
+                  (appBootSurface
+                      "Screen.AppStart - Splash"
+                      "fresh first launch before runtime checks complete"
+                      "Starting LaundryLog"
+                      "Preparing the first-launch startup sequence."
+                      [ bootCheck "AppStarted observed" Active
+                        bootCheck "Runtime checks running" Pending
+                        bootCheck "No known local session" Pending
+                        bootCheck "Route to Need Location" Pending ]
+                   |> AppBootSurface)
+              step
+                  "02-runtime-checks"
+                  "Runtime Checks"
+                  (Some "Startup/runtime checks begin while the splash state remains visible.")
+                  "RuntimeOrchestration"
+                  AppRuntimeLens
+                  "app runtime lens"
+                  (appBootSurface
+                      "Screen.AppStart - Runtime Checks"
+                      "first-launch runtime checks are in progress"
+                      "Checking startup requirements"
+                      "Inspecting local state, offline readiness, and runtime startup conditions."
+                      [ bootCheck "AppStarted observed" Complete
+                        bootCheck "Runtime checks running" Active
+                        bootCheck "No known local session" Pending
+                        bootCheck "Route to Need Location" Pending ]
+                   |> AppBootSurface)
+              step
+                  "03-no-local-session"
+                  "No Local Session"
+                  (Some "Fresh-first-launch assumptions are confirmed: no saved location and no active session were found.")
+                  "RuntimeOrchestration"
+                  AppRuntimeLens
+                  "app runtime lens"
+                  (appBootSurface
+                      "Screen.AppStart - No Local Session"
+                      "fresh first launch confirmed from local/runtime checks"
+                      "No local session found"
+                      "No saved location, active session, or pending expense draft was discovered."
+                      [ bootCheck "AppStarted observed" Complete
+                        bootCheck "Runtime checks running" Complete
+                        bootCheck "No known local session" Active
+                        bootCheck "Route to Need Location" Pending ]
+                   |> AppBootSurface)
+              step
+                  "04-route-resolved"
+                  "Route Resolved"
+                  (Some "Runtime orchestration resolves Need Location as the first usable screen.")
+                  "RuntimeOrchestration"
+                  AppRuntimeLens
+                  "app runtime lens"
+                  (appBootSurface
+                      "Screen.AppStart - Route Resolved"
+                      "runtime routes the app to the first usable screen"
+                      "Routing to Need Location"
+                      "Startup checks are complete and the first-launch path is ready to enter the app."
+                      [ bootCheck "AppStarted observed" Complete
+                        bootCheck "Runtime checks running" Complete
+                        bootCheck "No known local session" Complete
+                        bootCheck "Route to Need Location" Active ]
+                   |> AppBootSurface)
+              step
+                  "05-need-location"
+                  "Need Location"
+                  (Some "Fresh start with no known location yet.")
+                  "ScreenPath"
+                  ScreenPathLens
+                  "screen path lens"
+                  (NewSessionScreen
+                      ( "Screen.NewSession - Awaiting Location",
+                        Some "manual location entry before the first expense",
+                        PrimitiveStateExamples.newSessionAwaitingLocation () )
+                   |> AppScreenSurface)
+              step
+                  "06-ready-to-set-location"
+                  "Ready To Set Location"
+                  (Some "The location text is entered and the confirm action is available.")
+                  "ScreenPath"
+                  ScreenPathLens
+                  "screen path lens"
+                  (NewSessionScreen
+                      ( "Screen.NewSession - Ready To Set",
+                        Some "manual location entered and ready to confirm",
+                        PrimitiveStateExamples.newSessionLocationEntered () )
+                   |> AppScreenSurface)
+              step
+                  "07-entry-form-ready"
+                  "Entry Form Ready"
+                  (Some "The app enters the main entry surface after location capture.")
+                  "ScreenPath"
+                  ScreenPathLens
+                  "screen path lens"
+                  (EntryFormScreen
+                      ( "Screen.EntryForm - Ready At Location",
+                        Some "location captured and the expense form is ready for the first selection",
+                        PrimitiveStateExamples.entryFormReadyAtLocation () )
+                   |> AppScreenSurface)
+              step
+                  "08-washer-draft"
+                  "Washer Draft"
+                  (Some "The first expense draft is composed on the main screen.")
+                  "ScreenPath"
+                  ScreenPathLens
+                  "screen path lens"
+                  (EntryFormScreen
+                      ( "Screen.EntryForm - Washer Draft",
+                        Some "first expense draft inside the current location context",
+                        PrimitiveStateExamples.entryFormWasherCardDraft () )
+                   |> AppScreenSurface)
+              step
+                  "09-logged-success"
+                  "Logged Success"
+                  (Some "The first entry is logged and the screen is ready for the next quick entry.")
+                  "ScreenPath"
+                  ScreenPathLens
+                  "screen path lens"
+                  (EntryFormScreen
+                      ( "Screen.EntryForm - Logged Success",
+                        Some "entry logged and the surface is ready for the next quick entry",
+                        PrimitiveStateExamples.entryFormLoggedSuccess () )
+                   |> AppScreenSurface) ] }
 
 /// Renders deterministic HTML/CSS screen-path documents from the current screen surfaces.
 [<RequireQualifiedAccess>]
 module ScreenPathHtmlRenderer =
     let private htmlEncode (value: string) = WebUtility.HtmlEncode value
     let private jsonString (value: string) = JsonSerializer.Serialize value
+
+    let private lensKindDomKey =
+        function
+        | ApplicationLifecycleLens -> "application-lifecycle"
+        | AppRuntimeLens -> "app-runtime"
+        | ScreenPathLens -> "screen-path"
+
+    let private lensKindButtonLabel =
+        function
+        | ApplicationLifecycleLens -> "Lifecycle"
+        | AppRuntimeLens -> "Runtime"
+        | ScreenPathLens -> "Screen Path"
 
     let private defaultUpdateState () =
         let now = DateTime.UtcNow
@@ -300,6 +347,11 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-view-toggle { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }"
         appendLine builder ".ll-path-view-toggle:hover { border-color: #94a3b8; }"
         appendLine builder ".ll-path-view-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }"
+        appendLine builder ".ll-path-document__lens-controls { display: flex; flex-direction: column; gap: 0.28rem; align-items: flex-start; }"
+        appendLine builder ".ll-path-document__lens-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; }"
+        appendLine builder ".ll-path-lens-toggle { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }"
+        appendLine builder ".ll-path-lens-toggle:hover { border-color: #94a3b8; }"
+        appendLine builder ".ll-path-lens-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }"
         appendLine builder ".ll-path-document__update-controls { display: flex; flex-direction: column; gap: 0.28rem; align-items: flex-start; min-width: 280px; }"
         appendLine builder ".ll-path-document__update-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
         appendLine builder ".ll-path-document__update-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }"
@@ -312,7 +364,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-document__update-status[data-state=\"available\"] { color: #9a3412; font-weight: 700; }"
         appendLine builder ".ll-path-document__update-status[data-state=\"error\"] { color: #b91c1c; }"
         appendLine builder ".ll-path-document__update-status[data-state=\"auto\"] { color: #0e5883; font-weight: 700; }"
-        appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__assumptions, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__note, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__lens, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
+        appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__assumptions, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__note, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__meta, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
         appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__context-panel { display: none; }"
         appendLine builder ".ll-path-document[data-view-mode=\"standard\"] .ll-path-document__context-panel .ll-path-document__assumptions { display: none; }"
         appendLine builder ".ll-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }"
@@ -335,6 +387,8 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-step__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }"
         appendLine builder ".ll-path-step__title { margin: 0; font-size: 0.82rem; line-height: 1.15; font-weight: 700; color: #0f172a; }"
         appendLine builder ".ll-path-step__note { margin: 0; font-size: 0.72rem; line-height: 1.28; color: #64748b; min-height: 2.4em; }"
+        appendLine builder ".ll-path-step__meta { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }"
+        appendLine builder ".ll-path-step__context { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #eef2f7; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; }"
         appendLine builder ".ll-path-step__lens { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #e2e8f0; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }"
         appendLine builder ".ll-panel--boot { min-height: 520px; justify-content: center; }"
         appendLine builder ".ll-boot-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.85rem; padding: 2rem 1rem; }"
@@ -363,10 +417,14 @@ module ScreenPathHtmlRenderer =
         appendLine builder "  const nextButton = document.getElementById('ll-path-nav-next');"
         appendLine builder "  const endButton = document.getElementById('ll-path-nav-end');"
         appendLine builder "  const viewModeButtons = Array.from(document.querySelectorAll('.ll-path-view-toggle'));"
+        appendLine builder "  const lensButtons = Array.from(document.querySelectorAll('.ll-path-lens-toggle'));"
+        appendLine builder "  const stepElements = Array.from(document.querySelectorAll('.ll-path-step'));"
         appendLine builder "  const updateModeButtons = Array.from(document.querySelectorAll('.ll-path-update-toggle'));"
         appendLine builder "  const updateStatus = document.getElementById('ll-path-update-status');"
         appendLine builder "  const refreshButton = document.getElementById('ll-path-refresh-now');"
         appendLine builder $"  const updateModeStorageKey = 'll-path-update-mode::{htmlEncode (screenPathState.PathId.ToLowerInvariant())}';"
+        appendLine builder $"  const lensFilterStorageKey = 'll-path-lenses::{htmlEncode (screenPathState.PathId.ToLowerInvariant())}';"
+        appendLine builder "  const defaultLensKeys = ['application-lifecycle', 'app-runtime', 'screen-path'];"
         appendLine builder "  const applyViewMode = (mode) => {"
         appendLine builder "    if (!pathDocument) { return; }"
         appendLine builder "    pathDocument.dataset.viewMode = mode;"
@@ -380,6 +438,49 @@ module ScreenPathHtmlRenderer =
         appendLine builder "    button.addEventListener('click', () => applyViewMode(button.dataset.viewMode || 'standard'));"
         appendLine builder "  });"
         appendLine builder "  applyViewMode((pathDocument && pathDocument.dataset.viewMode) || 'standard');"
+        appendLine builder "  const readStoredLensKeys = () => {"
+        appendLine builder "    try {"
+        appendLine builder "      const raw = window.localStorage.getItem(lensFilterStorageKey);"
+        appendLine builder "      if (!raw) { return defaultLensKeys.slice(); }"
+        appendLine builder "      const parsed = JSON.parse(raw);"
+        appendLine builder "      if (!Array.isArray(parsed)) { return defaultLensKeys.slice(); }"
+        appendLine builder "      const normalized = parsed.filter((value, index, array) => typeof value === 'string' && defaultLensKeys.includes(value) && array.indexOf(value) === index);"
+        appendLine builder "      return normalized.length > 0 ? normalized : defaultLensKeys.slice();"
+        appendLine builder "    } catch (_) {"
+        appendLine builder "      return defaultLensKeys.slice();"
+        appendLine builder "    }"
+        appendLine builder "  };"
+        appendLine builder "  const persistLensKeys = (lensKeys) => {"
+        appendLine builder "    try { window.localStorage.setItem(lensFilterStorageKey, JSON.stringify(lensKeys)); } catch (_) { }"
+        appendLine builder "  };"
+        appendLine builder "  const applyLensFilters = (lensKeys) => {"
+        appendLine builder "    const activeLensKeys = lensKeys.filter((value, index, array) => defaultLensKeys.includes(value) && array.indexOf(value) === index);"
+        appendLine builder "    if (activeLensKeys.length === 0) { return; }"
+        appendLine builder "    if (pathDocument) { pathDocument.dataset.activeLenses = activeLensKeys.join(','); }"
+        appendLine builder "    lensButtons.forEach((button) => {"
+        appendLine builder "      const isActive = activeLensKeys.includes(button.dataset.lensKey || '');"
+        appendLine builder "      button.classList.toggle('is-active', isActive);"
+        appendLine builder "      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');"
+        appendLine builder "    });"
+        appendLine builder "    stepElements.forEach((step) => {"
+        appendLine builder "      const stepLensKey = step.dataset.lensKey || '';"
+        appendLine builder "      step.hidden = !activeLensKeys.includes(stepLensKey);"
+        appendLine builder "    });"
+        appendLine builder "    persistLensKeys(activeLensKeys);"
+        appendLine builder "    window.requestAnimationFrame(syncWidth);"
+        appendLine builder "  };"
+        appendLine builder "  lensButtons.forEach((button) => {"
+        appendLine builder "    button.addEventListener('click', () => {"
+        appendLine builder "      const clickedLensKey = button.dataset.lensKey || '';"
+        appendLine builder "      const currentLensKeys = readStoredLensKeys();"
+        appendLine builder "      const isActive = currentLensKeys.includes(clickedLensKey);"
+        appendLine builder "      const nextLensKeys = isActive"
+        appendLine builder "        ? (currentLensKeys.length > 1 ? currentLensKeys.filter((lensKey) => lensKey !== clickedLensKey) : currentLensKeys)"
+        appendLine builder "        : currentLensKeys.concat(clickedLensKey);"
+        appendLine builder "      applyLensFilters(nextLensKeys);"
+        appendLine builder "    });"
+        appendLine builder "  });"
+        appendLine builder "  applyLensFilters(readStoredLensKeys());"
         appendLine builder "  const setUpdateStatus = (message, state) => {"
         appendLine builder "    if (!updateStatus) { return; }"
         appendLine builder "    updateStatus.textContent = message;"
@@ -418,7 +519,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder "  let animationFrameId = 0;"
         appendLine builder "  let currentStepMetrics = { targets: [0], logicalMaxTarget: 0 };"
         appendLine builder "  const measureStepMetrics = () => {"
-        appendLine builder "    const steps = Array.from(flow.querySelectorAll('.ll-path-step'));"
+        appendLine builder "    const steps = Array.from(flow.querySelectorAll('.ll-path-step')).filter((step) => !step.hidden);"
         appendLine builder "    if (steps.length === 0) {"
         appendLine builder "      return { targets: [0], logicalMaxTarget: 0 };"
         appendLine builder "    }"
@@ -666,6 +767,18 @@ module ScreenPathHtmlRenderer =
         appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-view-mode=\"detailed\" aria-pressed=\"false\">Detailed</button>"
         appendLine builder "</div>"
         appendLine builder "</section>"
+        appendLine builder "<section class=\"ll-path-document__lens-controls\" aria-label=\"Lens visibility controls\">"
+        appendLine builder "<div class=\"ll-path-document__view-label\">Lenses</div>"
+        appendLine builder "<div class=\"ll-path-document__lens-buttons\">"
+
+        [ ApplicationLifecycleLens; AppRuntimeLens; ScreenPathLens ]
+        |> List.iter (fun lensKind ->
+            let lensKey = lensKindDomKey lensKind
+            let lensLabel = lensKindButtonLabel lensKind
+            appendLine builder $"<button class=\"ll-path-lens-toggle\" type=\"button\" data-lens-key=\"{htmlEncode lensKey}\" aria-pressed=\"true\">{htmlEncode lensLabel}</button>")
+
+        appendLine builder "</div>"
+        appendLine builder "</section>"
         appendLine builder "<section class=\"ll-path-document__update-controls\" aria-label=\"Path update controls\">"
         appendLine builder "<div class=\"ll-path-document__update-label\">Updates</div>"
         appendLine builder "<div class=\"ll-path-document__update-buttons\">"
@@ -695,7 +808,9 @@ module ScreenPathHtmlRenderer =
         |> List.iteri (fun index stepState ->
             let stepNumber = index + 1
             let stepNumberText = stepNumber.ToString("00")
-            appendLine builder "<section class=\"ll-path-step\">"
+            let stepLensKey = lensKindDomKey stepState.LensKind
+
+            appendLine builder $"<section class=\"ll-path-step\" data-lens-key=\"{htmlEncode stepLensKey}\">"
             appendLine builder $"<div class=\"ll-path-step__eyebrow\">Step {stepNumberText} · {htmlEncode stepState.StepKey}</div>"
             appendLine builder $"<h2 class=\"ll-path-step__title\">{htmlEncode stepState.StepTitle}</h2>"
 
@@ -703,7 +818,10 @@ module ScreenPathHtmlRenderer =
             | Some noteText -> appendLine builder $"<p class=\"ll-path-step__note\">{htmlEncode noteText}</p>"
             | None -> appendLine builder "<p class=\"ll-path-step__note\"></p>"
 
+            appendLine builder "<div class=\"ll-path-step__meta\">"
+            appendLine builder $"<div class=\"ll-path-step__context\">Context · {htmlEncode stepState.ContextLabel}</div>"
             appendLine builder $"<div class=\"ll-path-step__lens\">{htmlEncode stepState.LensLabel}</div>"
+            appendLine builder "</div>"
             renderPathSurface builder stepState.Surface
             appendLine builder "</section>")
 
