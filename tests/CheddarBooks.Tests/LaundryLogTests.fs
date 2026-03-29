@@ -445,12 +445,12 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "viewport.scrollLeft = scrollbar.scrollLeft;"
-                      "Expected the top rail to drive horizontal scrolling of the screen strip."
+                      "setSyncedScrollLeft(scrollbar.scrollLeft);"
+                      "Expected the top rail to drive horizontal scrolling of the screen strip through the shared sync helper."
 
                   Expect.stringContains
                       htmlDocument
-                      "scrollbar.scrollLeft = viewport.scrollLeft;"
+                      "scrollbar.scrollLeft = clampLeft(viewport.scrollLeft);"
                       "Expected the rail to stay synced when the screen viewport itself is scrolled."
 
                   Expect.stringContains
@@ -460,13 +460,48 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "const offsets = stepOffsets();"
-                      "Expected navigation to snap to actual step offsets instead of a guessed partial scroll amount."
+                      "const firstOffset = steps[0].offsetLeft;"
+                      "Expected navigation to normalize the measured step offsets against the first rendered column."
 
                   Expect.stringContains
                       htmlDocument
-                      "scrollToColumn(offsets[targetIndex]);"
-                      "Expected the next and previous buttons to land on full step boundaries."
+                      "const contentRightEdge = Math.max(...steps.map((step, index) => normalizedTargets[index] + Math.round(step.getBoundingClientRect().width)));"
+                      "Expected the end-of-content boundary to be measured from the real rendered columns."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const maxStartIndexCandidate = normalizedTargets.findIndex((target) => contentRightEdge - target <= viewport.clientWidth + 1);"
+                      "Expected the last logical whole-column target to be derived from what still fits in the viewport."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);"
+                      "Expected the path viewport to add enough trailing space for the last logical whole-column target."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const setSyncedScrollLeft = (left) => {"
+                      "Expected the path viewport and top rail to be updated together from one scroll position."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const animateScrollToColumn = (targetLeft) => {"
+                      "Expected button-driven navigation to use an explicit deterministic column animation."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "animationFrameId = window.requestAnimationFrame(tick);"
+                      "Expected the path buttons to animate between whole-column targets with requestAnimationFrame."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "animateScrollToColumn(targets[targetIndex]);"
+                      "Expected the next and previous buttons to land on measured whole-column targets."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const scrollToEnd = () => animateScrollToColumn(logicalMaxScrollLeft());"
+                      "Expected the end button to use the logical whole-column maximum rather than the native scroll width."
 
                   Expect.stringContains
                       htmlDocument

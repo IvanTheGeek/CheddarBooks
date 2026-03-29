@@ -93,6 +93,34 @@ That means:
   - the path rows scroll inside an internal stage
   - first/previous/next/end controls can move the visible screen columns by whole-step boundaries instead of partial drift
 
+## Horizontal Navigation Guidance
+
+For this path surface, "move one column" should mean:
+
+- the next rendered screen column becomes the new leftmost visible column
+- not "scroll by a guessed pixel amount"
+- and not "stop at the browser's native content edge if that prevents the next whole column from aligning"
+
+The current working rule is:
+
+- measure the actual rendered step starts
+- normalize them against the first rendered column
+- compute the last logical left-edge target from what remaining content can still fit inside the viewport
+- add explicit trailing space when needed so that last logical target is actually reachable
+
+This matters because a continuous horizontal screen path may need to leave a small blank tail at the far right in order to let the next whole column align at the left edge. The desired behavior is path readability, not strict native scroll-width purity.
+
+For investigation/debugging:
+
+- inspect the generated HTML/JS directly
+- then verify the behavior in a real browser surface, not just by source reading
+- prefer measured geometry over guessed widths when snap behavior matters
+
+One concrete finding from this path:
+
+- native `scrollTo({ behavior: "smooth" })` was not trustworthy enough for the whole-column path buttons here
+- the stable pattern was to keep measured logical targets, then drive the viewport and top rail together with an explicit `requestAnimationFrame` animation
+
 ## Near-Term Direction
 
 The next likely moves are:
