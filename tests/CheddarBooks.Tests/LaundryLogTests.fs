@@ -388,16 +388,33 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "PATH 1: App Started -&gt; Need Location -&gt; First Entry"
+                      "PATH 1: Fresh First Launch -&gt; Need Location -&gt; First Entry"
                       "Expected the first screen-path title."
 
                   Expect.stringContains htmlDocument "AppStarted" "Expected the app/system startup step."
-                  Expect.stringContains htmlDocument "Screen.AppStart - Boot" "Expected the boot screen surface."
+                  Expect.stringContains htmlDocument "Screen.AppStart - Splash" "Expected the splash startup surface."
+                  Expect.stringContains htmlDocument "Screen.AppStart - Runtime Checks" "Expected the runtime-check startup surface."
+                  Expect.stringContains htmlDocument "Screen.AppStart - Route Resolved" "Expected the route-resolved startup surface."
                   Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the need-location screen state."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Ready At Location" "Expected the ready-at-location screen state."
                   Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success path state."
                   Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
-                  Expect.stringContains htmlDocument "app/system lens" "Expected the app/system startup lens badge.")
+                  Expect.stringContains htmlDocument "application lifecycle lens" "Expected the application-lifecycle startup lens badge."
+                  Expect.stringContains htmlDocument "app runtime lens" "Expected the app-runtime startup lens badge."
+                  Expect.stringContains htmlDocument "fresh first launch with no known local data" "Expected explicit scenario context for the path."
+                  Expect.stringContains htmlDocument "No saved location is available yet." "Expected the first-launch assumptions to be visible in detailed mode.")
+
+              testCase "Screen path renderer includes view controls and headerless splash surfaces" (fun () ->
+                  let htmlDocument =
+                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
+
+                  Expect.stringContains htmlDocument "data-view-mode=\"standard\"" "Expected the path document to carry a default view mode."
+                  Expect.stringContains htmlDocument "class=\"ll-path-view-toggle\"" "Expected explicit path viewer controls."
+                  Expect.stringContains htmlDocument "button.dataset.viewMode" "Expected the viewer controls to be wired by script."
+                  Expect.stringContains htmlDocument "<section class=\"ll-phone-screen ll-phone-screen--boot\">" "Expected the splash family to render as a dedicated headerless phone screen."
+                  Expect.stringContains htmlDocument "ll-boot-state__check--active" "Expected active startup checkpoints."
+                  Expect.stringContains htmlDocument "ll-boot-state__check--complete" "Expected completed startup checkpoints."
+                  Expect.stringContains htmlDocument "Route to Need Location" "Expected route-resolution checkpoint copy in the splash progression.")
 
               testCase "Screen path renderer adds a synced top horizontal scroll rail" (fun () ->
                   let htmlDocument =

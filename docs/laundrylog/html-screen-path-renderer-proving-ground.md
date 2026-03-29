@@ -59,25 +59,50 @@ For the current screen-path work:
 The first screen-path proving ground is:
 
 - `PATH1`
-  `App Started -> Need Location -> First Entry`
+  `Fresh First Launch -> Need Location -> First Entry`
+
+For this path, the scenario is explicit:
+
+- fresh first launch with no known local data
+- no saved location
+- no active local session or pending draft
+- runtime should resolve the app to `Need Location` before the first entry
 
 It currently walks through:
 
 1. `AppStarted`
-2. `Need Location`
-3. `Ready To Set Location`
-4. `Entry Form Ready`
-5. `Washer Draft`
-6. `Logged Success`
+2. `Runtime Checks`
+3. `No Local Session`
+4. `Route Resolved`
+5. `Need Location`
+6. `Ready To Set Location`
+7. `Entry Form Ready`
+8. `Washer Draft`
+9. `Logged Success`
 
 This is intentionally still small.
 
 It is enough to pressure:
 
+- application lifecycle visibility
+- app runtime orchestration before the first usable screen
 - app/system startup
 - route-to-screen flow
 - screen-by-screen state changes
 - where app mechanics are different from business `AEM` slices
+
+## View Modes
+
+The current page now has first-pass viewer controls:
+
+- `Summary`
+  hides some supporting metadata and keeps the path focused on the visible columns
+- `Standard`
+  the default working mode
+- `Detailed`
+  shows the scenario assumptions beside the path
+
+This is only a first step, but it establishes that a path surface should not assume one permanently fixed verbosity level.
 
 ## Relationship To The Screen Renderer
 
