@@ -5,6 +5,7 @@ LaundryLog is the first concrete tool app inside the CheddarBooks domain and bra
 Start here:
 
 - [`../../README.md`](../../README.md)
+- [`../../workspace/laundrylog/README.md`](../../workspace/laundrylog/README.md)
 - [`../foundation.md`](../foundation.md)
 - [`introduction.md`](introduction.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
@@ -44,6 +45,8 @@ If you want the richer UI-design origin and concept-page rationale, go to [`conc
 If you want the more specific Claude-era visual and interaction nuances that the current renderer should still honor, go to [`claude-design-nuances.md`](claude-design-nuances.md).
 
 If you want the concrete screen evidence coming from the current `LaundryLog.penpot` file, go to [`penpot-screen-evidence.md`](penpot-screen-evidence.md).
+
+If you want the checked-in current HTML artifacts you can open directly from the repo and revisit through git history, go to [`../../workspace/laundrylog/README.md`](../../workspace/laundrylog/README.md).
 
 If you want the current deterministic HTML/CSS path-renderer direction that now sits in front of the Penpot experiments, go to [`html-path-renderer-proving-ground.md`](html-path-renderer-proving-ground.md).
 

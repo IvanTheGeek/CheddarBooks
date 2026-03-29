@@ -4,6 +4,15 @@ This note captures the first deterministic HTML/CSS screen-path renderer for Lau
 
 It is separate from the current Event Modeling path renderer on purpose.
 
+## Tracked Workspace Artifact
+
+The current checked-in screen-path artifact lives at:
+
+- [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
+- [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js)
+
+Scratch copies may still be regenerated under `tmp/`, but the workspace copy is the checked-in current path surface.
+
 ## Lens Split
 
 For LaundryLog, there are now at least two useful path lenses:
@@ -52,7 +61,8 @@ For the current screen-path work:
 - use actual typed screen states rather than fresh mockups where possible
 - reuse the current screen renderer for real screen surfaces
 - add local app/system surfaces only where the path needs something not yet represented by the normal app screens
-- keep one self-contained HTML file per path in the scratch work area for now
+- keep one self-contained HTML file per path in the tracked workspace area
+- let scratch regeneration in `tmp/` remain optional and local
 
 ## Current First Path
 
@@ -120,6 +130,7 @@ This pattern exists because a local `file://` page cannot be treated like a norm
 - `fetch(window.location.href)` is not reliable enough in the current browser/file setup
 - but loading a cache-busted sibling script file does work
 - so the page can detect updates without needing a server
+- the sibling update manifest should be checked in beside the tracked workspace HTML artifact whenever that artifact is refreshed
 
 ## Relationship To The Screen Renderer
 

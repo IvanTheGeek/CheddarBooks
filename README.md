@@ -22,6 +22,7 @@ Start here:
 - [`docs/foundation.md`](docs/foundation.md)
 - [`docs/laundrylog/introduction.md`](docs/laundrylog/introduction.md)
 - [`docs/laundrylog/requirements.md`](docs/laundrylog/requirements.md)
+- [`workspace/laundrylog/README.md`](workspace/laundrylog/README.md)
 
 ## Agent And Repo Memory Surfaces
 

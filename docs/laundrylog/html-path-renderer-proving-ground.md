@@ -4,6 +4,14 @@ This note captures the first deterministic HTML/CSS path-renderer direction for 
 
 It exists because the recent Penpot exploration was useful research, but not reliable enough to be the primary working engine for path and slice rendering.
 
+## Tracked Workspace Artifact
+
+The current checked-in `AEM` path artifact lives at:
+
+- [`../../workspace/laundrylog/html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html`](../../workspace/laundrylog/html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html)
+
+Scratch copies may still exist under `tmp/`, but the workspace copy is the repo-tracked review surface.
+
 ## Current Working Rule
 
 For the near-term proving ground:

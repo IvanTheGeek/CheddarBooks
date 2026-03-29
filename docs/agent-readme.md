@@ -89,6 +89,8 @@ For concrete UI, HTML, CSS, and screen-renderer work:
 - do not guess from memory, screenshots, or prior chat when the local code can be inspected directly
 - inspect the actual renderer/source files first
 - inspect the currently generated artifact when one exists
+- for LaundryLog renderer work, keep the checked-in current artifact under [`../workspace/laundrylog/README.md`](../workspace/laundrylog/README.md) refreshed when the related renderer change is committed
+- treat `tmp/` as scratch and the repo workspace as the durable current artifact surface
 - prefer correcting the real code and renderer contract over describing what the UI "should probably be"
 - add or update a regression test when a layout or rendering bug is fixed
 

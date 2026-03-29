@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaundryLog - CheddarBooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            color: #2d3748;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
+            color: white;
+            padding: 1rem 1rem 1rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.125rem;
+        }
+
+        .header-text p {
+            font-size: 0.75rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .header-badge {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .button-group-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .button-group-4 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .btn-option {
+            padding: 1.125rem 1rem;
+            border: 3px solid #e2e8f0;
+            background: white;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-option:active {
+            transform: scale(0.97);
+        }
+
+        .btn-option.selected {
+            background: #fff8e1;
+            border-color: #ffcc80;
+            color: #f57c00;
+        }
+
+        .location-section {
+            display: flex;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .location-input {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            color: #2d3748;
+            transition: border-color 0.2s;
+            font-weight: 500;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #ffcc80;
+        }
+
+        .btn-gps {
+            width: 64px;
+            min-height: 56px;
+            border: 3px solid #e2e8f0;
+            background: white;
+            border-radius: 0.75rem;
+            font-size: 1.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-gps:active {
+            transform: scale(0.97);
+            background: #fff8e1;
+            border-color: #ffcc80;
+        }
+
+        .location-info {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .quantity-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .counter-btn {
+            width: 72px;
+            height: 72px;
+            border: none;
+            background: #ffcc80;
+            color: white;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3);
+        }
+
+        .counter-btn:active {
+            transform: scale(0.95);
+            background: #ffb74d;
+        }
+
+        .counter-input {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2d3748;
+            min-width: 80px;
+            width: 80px;
+            text-align: center;
+            padding: 0.5rem;
+            border: 3px solid transparent;
+            border-radius: 0.5rem;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .counter-input:focus {
+            outline: none;
+            border-color: #ffcc80;
+            background: #fff;
+        }
+
+        .price-input-section {
+            margin-bottom: 1rem;
+        }
+
+        .price-main-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .quarter-btn {
+            width: 72px;
+            height: 72px;
+            border: none;
+            background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%);
+            color: #4a4a4a;
+            border-radius: 50%;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #a8a8a8;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .quarter-btn::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 50%;
+            border: 1px dashed rgba(128, 128, 128, 0.3);
+        }
+
+        .quarter-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .quarter-content {
+            display: flex;
+            align-items: center;
+            gap: 0.125rem;
+        }
+
+        .quarter-sign {
+            font-size: 1.25rem;
+            font-weight: 900;
+            margin-right: -0.125rem;
+        }
+
+        .quarter-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .price-input-wrapper {
+            flex: 1;
+            max-width: 140px;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .dollar-sign {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .price-input {
+            width: 100%;
+            padding: 0.875rem 0.5rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .price-input:focus {
+            outline: none;
+            border-color: #ffcc80;
+        }
+
+        .quick-fill-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-fill-btn {
+            padding: 0.875rem 0.5rem;
+            border: 2px solid #ffcc80;
+            background: #fff8e1;
+            border-radius: 0.5rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #f57c00;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-fill-btn:active {
+            transform: scale(0.97);
+            background: #ffecb3;
+        }
+
+        .quick-fill-label {
+            font-size: 0.625rem;
+            opacity: 0.8;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .entry-total {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .entry-total-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .entry-total-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
+            color: white;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 204, 128, 0.4);
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(255, 204, 128, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .validation-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.375rem 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .validation-tag.invalid {
+            color: #dc2626;
+        }
+
+        .validation-tag.valid {
+            color: #16a34a;
+        }
+
+        .session-total {
+            background: #fff8e1;
+            padding: 0.875rem 1rem;
+            border-bottom: 2px solid #ffcc80;
+            border-top: 2px solid #ffcc80;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0.25rem 1.5rem 0.25rem;
+            border-radius: 0.5rem;
+        }
+
+        .session-total-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #f57c00;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .session-total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f57c00;
+        }
+
+        .recent-entries {
+            margin-top: 0;
+        }
+
+        .entries-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .entry-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border-left: 4px solid #cbd5e1;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .entry-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .entry-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .entry-details {
+            font-size: 0.9375rem;
+            color: #64748b;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-text">
+            <h1>🧺 LaundryLog</h1>
+            <p>by CheddarBooks</p>
+        </div>
+        <div class="header-badge">🧀</div>
+    </div>
+
+    <div class="container">
+        <!-- Location Section -->
+        <div class="form-section">
+            <div class="section-title">📍 Location</div>
+            <div class="location-section">
+                <div class="location-input">
+                    <input type="text" class="input-field" id="locationField" placeholder="Tap 📍 or enter location" oninput="validateForm()">
+                    <div class="location-info">GPS will check personal & community data</div>
+                </div>
+                <button class="btn-gps" onclick="getLocation()">📍</button>
+            </div>
+        </div>
+
+        <!-- Machine Type Section (no heading) -->
+        <div class="form-section">
+            <div class="button-group button-group-3">
+                <button class="btn-option" onclick="selectMachine('washer')">🌊<br>Washer</button>
+                <button class="btn-option" onclick="selectMachine('dryer')">🔥<br>Dryer</button>
+                <button class="btn-option" onclick="selectMachine('supplies')">🧴<br>Supplies</button>
+            </div>
+        </div>
+
+        <!-- Quantity Section -->
+        <div class="form-section" id="quantitySection">
+            <div class="quantity-section">
+                <div class="field-label">Quantity</div>
+                <div class="quantity-controls">
+                    <button class="counter-btn" onclick="updateCounter(-1)">−</button>
+                    <input type="number" 
+                           class="counter-input" 
+                           id="quantityField"
+                           value="1" 
+                           min="1"
+                           inputmode="numeric"
+                           onfocus="scrollQuantityIntoView()"
+                           onchange="updateCounterFromInput()">
+                    <button class="counter-btn" onclick="updateCounter(1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unit Price Section -->
+        <div class="form-section" id="priceSection">
+            <div class="price-input-section">
+                <div class="field-label">Unit Price</div>
+                <div class="price-main-row">
+                    <button class="quarter-btn" onclick="adjustPrice(-0.25)">
+                        <div class="quarter-content">
+                            <span class="quarter-sign">−</span>
+                            <span class="quarter-value">25¢</span>
+                        </div>
+                    </button>
+                    <div class="price-input-wrapper">
+                        <span class="dollar-sign">$</span>
+                        <input type="number" 
+                               step="0.01" 
+                               class="price-input" 
+                               id="priceField"
+                               value="3.00"
+                               inputmode="decimal"
+                               onfocus="scrollPriceIntoView()">
+                    </div>
+                    <button class="quarter-btn" onclick="adjustPrice(0.25)">
+                        <div class="quarter-content">
+                            <span class="quarter-sign">+</span>
+                            <span class="quarter-value">25¢</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="quick-fill-buttons">
+                    <button class="quick-fill-btn" onclick="quickFillPrice(3.75)">
+                        $3.75
+                        <span class="quick-fill-label">Last used</span>
+                    </button>
+                    <button class="quick-fill-btn" onclick="quickFillPrice(4.00)">
+                        $4.00
+                        <span class="quick-fill-label">Historical</span>
+                    </button>
+                    <button class="quick-fill-btn" onclick="quickFillPrice(3.50)">
+                        $3.50
+                        <span class="quick-fill-label">Community</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="entry-total">
+                <span class="entry-total-label">Entry Total</span>
+                <span class="entry-total-amount" id="entryTotal">$3.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Type Section (no heading) -->
+        <div class="form-section">
+            <div class="button-group button-group-4">
+                <button class="btn-option" onclick="selectPayment('cash')">💵<br>Cash</button>
+                <button class="btn-option" onclick="selectPayment('points')">⭐<br>Points</button>
+                <button class="btn-option" onclick="selectPayment('card')">💳<br>Card</button>
+                <button class="btn-option" onclick="selectPayment('app')">📱<br>App</button>
+            </div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="logEntry()" disabled>
+            <span class="validation-tag invalid">📍 Location ✗</span>
+            <span class="validation-tag invalid">🌊 Type ✗</span>
+            <span class="validation-tag invalid">💳 Payment ✗</span>
+        </button>
+
+        <!-- Session Total Bar -->
+        <div class="session-total">
+            <span class="session-total-label">Session Total</span>
+            <span class="session-total-amount">$0.00</span>
+        </div>
+
+        <!-- Recent Entries -->
+        <div class="recent-entries">
+            <div class="entries-title">Today's Entries</div>
+            
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-amount">$11.25</div>
+                    <div class="entry-time">2:34 PM</div>
+                </div>
+                <div class="entry-details">
+                    3 Washers @ $3.75 • Credit Card
+                </div>
+            </div>
+
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-amount">$6.00</div>
+                    <div class="entry-time">2:38 PM</div>
+                </div>
+                <div class="entry-details">
+                    3 Dryers @ $2.00 • Credit Card
+                </div>
+            </div>
+
+            <div class="entry-card">
+                <div class="entry-header">
+                    <div class="entry-amount">$2.50</div>
+                    <div class="entry-time">2:40 PM</div>
+                </div>
+                <div class="entry-details">
+                    1 Supplies @ $2.50 • Cash
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMachine = null;
+        let selectedPayment = null;
+        let sessionTotal = 0.00;
+
+        // Initialize with default values
+        calculateEntryTotal();
+
+        function selectMachine(type) {
+            selectedMachine = type;
+            document.querySelectorAll('.button-group-3 .btn-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Update machine type icon in validation
+            const machineIcons = {
+                'washer': '🌊',
+                'dryer': '🔥',
+                'supplies': '🧴'
+            };
+            document.getElementById('machineValidation').innerHTML = machineIcons[type] + ' Type ✓';
+            
+            calculateEntryTotal();
+            validateForm();
+        }
+
+        function selectPayment(type) {
+            selectedPayment = type;
+            document.querySelectorAll('.button-group-4 .btn-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Update payment icon in validation
+            const paymentIcons = {
+                'cash': '💵',
+                'points': '⭐',
+                'card': '💳',
+                'app': '📱'
+            };
+            document.getElementById('paymentValidation').innerHTML = paymentIcons[type] + ' Payment ✓';
+            
+            validateForm();
+        }
+
+        function updateCounter(delta) {
+            const quantityField = document.getElementById('quantityField');
+            let currentValue = parseInt(quantityField.value) || 1;
+            let newValue = Math.max(1, currentValue + delta);
+            quantityField.value = newValue;
+            calculateEntryTotal();
+        }
+
+        function updateCounterFromInput() {
+            const quantityField = document.getElementById('quantityField');
+            let value = parseInt(quantityField.value) || 1;
+            quantityField.value = Math.max(1, value);
+            calculateEntryTotal();
+        }
+
+        function adjustPrice(delta) {
+            const priceField = document.getElementById('priceField');
+            const currentPrice = parseFloat(priceField.value) || 0;
+            const newPrice = Math.max(0, currentPrice + delta);
+            priceField.value = newPrice.toFixed(2);
+            calculateEntryTotal();
+        }
+
+        function quickFillPrice(amount) {
+            document.getElementById('priceField').value = amount.toFixed(2);
+            calculateEntryTotal();
+        }
+
+        function calculateEntryTotal() {
+            const quantity = parseInt(document.getElementById('quantityField').value) || 1;
+            const unitPrice = parseFloat(document.getElementById('priceField').value) || 0;
+            const total = quantity * unitPrice;
+            document.getElementById('entryTotal').textContent = '$' + total.toFixed(2);
+        }
+
+        function validateForm() {
+            const location = document.getElementById('locationField').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            const isValid = location && selectedMachine && selectedPayment;
+            
+            // Update location validation
+            const locationTag = document.getElementById('locationValidation');
+            if (location) {
+                locationTag.innerHTML = '📍 Location ✓';
+                locationTag.className = 'validation-tag valid';
+            } else {
+                locationTag.innerHTML = '📍 Location ✗';
+                locationTag.className = 'validation-tag invalid';
+            }
+            
+            // Update machine validation
+            const machineTag = document.getElementById('machineValidation');
+            if (selectedMachine) {
+                machineTag.className = 'validation-tag valid';
+            } else {
+                machineTag.className = 'validation-tag invalid';
+            }
+            
+            // Update payment validation
+            const paymentTag = document.getElementById('paymentValidation');
+            if (selectedPayment) {
+                paymentTag.className = 'validation-tag valid';
+            } else {
+                paymentTag.className = 'validation-tag invalid';
+            }
+            
+            // Enable/disable button and update content
+            if (isValid) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Log Entry';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <span class="validation-tag ${location ? 'valid' : 'invalid'}" id="locationValidation">📍 Location ${location ? '✓' : '✗'}</span>
+                    <span class="validation-tag ${selectedMachine ? 'valid' : 'invalid'}" id="machineValidation">${selectedMachine ? (selectedMachine === 'washer' ? '🌊' : selectedMachine === 'dryer' ? '🔥' : '🧴') + ' Type ✓' : '🌊 Type ✗'}</span>
+                    <span class="validation-tag ${selectedPayment ? 'valid' : 'invalid'}" id="paymentValidation">${selectedPayment ? (selectedPayment === 'cash' ? '💵' : selectedPayment === 'points' ? '⭐' : selectedPayment === 'card' ? '💳' : '📱') + ' Payment ✓' : '💳 Payment ✗'}</span>
+                `;
+            }
+        }
+
+        function scrollQuantityIntoView() {
+            setTimeout(() => {
+                const quantitySection = document.getElementById('quantitySection');
+                quantitySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        function scrollPriceIntoView() {
+            setTimeout(() => {
+                const priceSection = document.getElementById('priceSection');
+                priceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('locationField').value = 'Pilot Travel Center, Exit 42';
+                        validateForm();
+                        alert(`GPS: ${position.coords.latitude}, ${position.coords.longitude}\n\nIn real app: Would check personal datastore first, then community database for this location.`);
+                    },
+                    (error) => {
+                        alert('Unable to get GPS location. Please enter manually.');
+                    }
+                );
+            } else {
+                alert('Geolocation not supported by this browser.');
+            }
+        }
+
+        function logEntry() {
+            const location = document.getElementById('locationField').value;
+            const quantity = parseInt(document.getElementById('quantityField').value) || 1;
+            const unitPrice = parseFloat(document.getElementById('priceField').value) || 0;
+            
+            const entryTotal = quantity * unitPrice;
+            sessionTotal += entryTotal;
+            document.querySelector('.session-total-amount').textContent = '$' + sessionTotal.toFixed(2);
+
+            // Reset for next entry (but keep location and payment type)
+            document.getElementById('quantityField').value = '1';
+            // Keep the price prefilled from historical/last used/default
+            calculateEntryTotal();
+            
+            // Clear machine selection
+            selectedMachine = null;
+            document.querySelectorAll('.button-group-3 .btn-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            validateForm();
+
+            alert('Entry logged! Session total: $' + sessionTotal.toFixed(2));
+        }
+
+        // Listen for field changes
+        document.getElementById('priceField').addEventListener('input', calculateEntryTotal);
+        document.getElementById('quantityField').addEventListener('input', calculateEntryTotal);
+        
+        // Initial validation state
+        validateForm();
+    </script>
+</body>
+</html>

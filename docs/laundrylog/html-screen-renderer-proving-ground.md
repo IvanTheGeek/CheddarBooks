@@ -7,6 +7,14 @@ It sits beside the HTML path renderer, but it serves a different purpose:
 - the path renderer proves slice and path semantics
 - the screen renderer proves reusable page and component composition for the actual app screens
 
+## Tracked Workspace Artifact
+
+The current checked-in screen artifact lives at:
+
+- [`../../workspace/laundrylog/html/screens/LaundryLog_ScreenComponents.html`](../../workspace/laundrylog/html/screens/LaundryLog_ScreenComponents.html)
+
+Scratch or quick-regeneration copies may still appear under `tmp/`, but the repo-tracked workspace artifact is the one that should stay reviewable through git history.
+
 ## Current Working Rule
 
 For the current LaundryLog screen work:
@@ -25,7 +33,7 @@ The current first screen renderer is grounded in:
 - [`screens.md`](screens.md)
 - [`concept-ui-page.md`](concept-ui-page.md)
 - [`claude-design-nuances.md`](claude-design-nuances.md)
-- local reference artifact: [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
+- tracked reference artifact: [`../../workspace/laundrylog/html/reference/laundrylog-v7.html`](../../workspace/laundrylog/html/reference/laundrylog-v7.html)
 - [`penpot-screen-evidence.md`](penpot-screen-evidence.md)
 - [`fnhci-primitive-map.md`](fnhci-primitive-map.md)
 - [`fnhci-primitive-state-shapes.md`](fnhci-primitive-state-shapes.md)
@@ -96,7 +104,7 @@ These are still proving-ground implementations, but they are now structural rath
 
 For the mobile LaundryLog screen renderer, the current visual source of truth is:
 
-- [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
+- [`../../workspace/laundrylog/html/reference/laundrylog-v7.html`](../../workspace/laundrylog/html/reference/laundrylog-v7.html)
 
 Future refinements should treat the current HTML renderer as successful only insofar as it converges toward that `v7` look-and-feel while still staying typed, deterministic, and built from reusable seams.
 

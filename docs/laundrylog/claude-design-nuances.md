@@ -38,7 +38,7 @@ The strongest current source threads are:
 
 The strongest surviving visual artifact from that line is:
 
-- [`/home/ivan/NEXUS/tmp/laundrylog-v7.html`](/home/ivan/NEXUS/tmp/laundrylog-v7.html)
+- [`../../workspace/laundrylog/html/reference/laundrylog-v7.html`](../../workspace/laundrylog/html/reference/laundrylog-v7.html)
 
 ## Stable Nuances To Preserve
 
