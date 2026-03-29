@@ -95,6 +95,13 @@ For concrete UI, HTML, CSS, and screen-renderer work:
 - prefer correcting the real code and renderer contract over describing what the UI "should probably be"
 - add or update a regression test when a layout or rendering bug is fixed
 
+For local F# Interactive artifact generation:
+
+- prefer `.fsx` scripts plus `dotnet fsi --exec`
+- do not default to piping large heredocs directly into raw `dotnet fsi`
+- treat `dotnet fsi <<'EOF' ... EOF` as a scratch-only fallback, not the usual path
+- if the artifact generation is recurring, prefer a checked-in helper script over ad hoc shell-wrapped REPL input
+
 ## Verification Discipline
 
 When verifying .NET work in this repo:
