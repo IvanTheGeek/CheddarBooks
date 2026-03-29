@@ -300,7 +300,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder "    const nativeMaxScroll = Math.max(0, flow.scrollWidth - viewport.clientWidth);"
         appendLine builder "    const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);"
         appendLine builder "    flow.style.paddingRight = `${baseFlowPaddingRight + extraTrailingSpace}px`;"
-        appendLine builder "    scrollbarContent.style.width = `${Math.ceil(flow.getBoundingClientRect().width)}px`;"
+        appendLine builder "    scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;"
         appendLine builder "    if (!syncingScroll) { scrollbar.scrollLeft = clampLeft(viewport.scrollLeft); }"
         appendLine builder "    updateButtonState();"
         appendLine builder "  };"

@@ -480,6 +480,11 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
+                      "scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;"
+                      "Expected the top rail to use the logical whole-column range so the far-right position matches the last readable path column."
+
+                  Expect.stringContains
+                      htmlDocument
                       "const setSyncedScrollLeft = (left) => {"
                       "Expected the path viewport and top rail to be updated together from one scroll position."
 

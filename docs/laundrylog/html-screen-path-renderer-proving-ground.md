@@ -107,6 +107,8 @@ The current working rule is:
 - normalize them against the first rendered column
 - compute the last logical left-edge target from what remaining content can still fit inside the viewport
 - add explicit trailing space when needed so that last logical target is actually reachable
+- size the top rail from that logical target range rather than from the native content width, so rail start/end match the readable path start/end
+- when the rail uses stable scrollbar gutters, derive that width from the rail's full box width, not only its client width
 
 This matters because a continuous horizontal screen path may need to leave a small blank tail at the far right in order to let the next whole column align at the left edge. The desired behavior is path readability, not strict native scroll-width purity.
 
