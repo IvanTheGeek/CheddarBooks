@@ -104,6 +104,23 @@ The current page now has first-pass viewer controls:
 
 This is only a first step, but it establishes that a path surface should not assume one permanently fixed verbosity level.
 
+## Local Update Monitor
+
+The current `file://` path artifact now uses a small companion update manifest:
+
+- the HTML artifact remains self-contained for the visible page
+- a sibling `.update.js` file is regenerated alongside it
+- the open page polls that sidecar script for a newer `version`
+- when a newer build exists, the page can either:
+  - notify that a refresh is available
+  - or auto-refresh if the user chose that sticky mode
+
+This pattern exists because a local `file://` page cannot be treated like a normal served web app:
+
+- `fetch(window.location.href)` is not reliable enough in the current browser/file setup
+- but loading a cache-busted sibling script file does work
+- so the page can detect updates without needing a server
+
 ## Relationship To The Screen Renderer
 
 The current screen-path renderer reuses the actual LaundryLog screen renderer for the app screens.

@@ -1,7 +1,9 @@
 namespace CheddarBooks.LaundryLog.UI
 
+open System
 open System.Net
 open System.Text
+open System.Text.Json
 
 /// Tracks the visible status of one startup checkpoint in the boot sequence.
 type AppBootCheckStatus =
@@ -45,6 +47,12 @@ type ScreenPathState =
       ScenarioLabel: string
       Assumptions: string list
       Steps: ScreenPathStepState list }
+
+/// Carries self-update metadata for a generated path artifact.
+type ScreenPathUpdateState =
+    { Version: string
+      UpdatedAtUtc: string
+      PollIntervalMs: int }
 
 [<RequireQualifiedAccess>]
 module ScreenPathHtmlExamples =
@@ -192,6 +200,14 @@ module ScreenPathHtmlExamples =
 [<RequireQualifiedAccess>]
 module ScreenPathHtmlRenderer =
     let private htmlEncode (value: string) = WebUtility.HtmlEncode value
+    let private jsonString (value: string) = JsonSerializer.Serialize value
+
+    let private defaultUpdateState () =
+        let now = DateTime.UtcNow
+
+        { Version = $"screen-path::{now:yyyyMMddHHmmssfff}"
+          UpdatedAtUtc = now.ToString("yyyy-MM-ddTHH:mm:ssZ")
+          PollIntervalMs = 3000 }
 
     let private appendLine (builder: StringBuilder) (value: string) =
         builder.AppendLine(value) |> ignore
@@ -279,6 +295,19 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-view-toggle { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }"
         appendLine builder ".ll-path-view-toggle:hover { border-color: #94a3b8; }"
         appendLine builder ".ll-path-view-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }"
+        appendLine builder ".ll-path-document__secondary-controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start; }"
+        appendLine builder ".ll-path-document__update-controls { display: flex; flex-direction: column; gap: 0.38rem; align-items: flex-start; min-width: 280px; }"
+        appendLine builder ".ll-path-document__update-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
+        appendLine builder ".ll-path-document__update-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }"
+        appendLine builder ".ll-path-update-toggle, .ll-path-update-refresh { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }"
+        appendLine builder ".ll-path-update-toggle:hover, .ll-path-update-refresh:hover:not(:disabled) { border-color: #94a3b8; }"
+        appendLine builder ".ll-path-update-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }"
+        appendLine builder ".ll-path-update-refresh { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); border-color: #ffb74d; color: #ffffff; }"
+        appendLine builder ".ll-path-update-refresh:disabled { background: #e2e8f0; border-color: #cbd5e1; color: #94a3b8; cursor: default; }"
+        appendLine builder ".ll-path-document__update-status { font-size: 0.72rem; line-height: 1.3; color: #64748b; }"
+        appendLine builder ".ll-path-document__update-status[data-state=\"available\"] { color: #9a3412; font-weight: 700; }"
+        appendLine builder ".ll-path-document__update-status[data-state=\"error\"] { color: #b91c1c; }"
+        appendLine builder ".ll-path-document__update-status[data-state=\"auto\"] { color: #0e5883; font-weight: 700; }"
         appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__description, .ll-path-document[data-view-mode=\"summary\"] .ll-path-document__assumptions, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__note, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__lens, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
         appendLine builder ".ll-path-document[data-view-mode=\"standard\"] .ll-path-document__assumptions { display: none; }"
         appendLine builder ".ll-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 4px 10px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }"
@@ -316,7 +345,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder "@media (max-width: 920px) { .ll-path-document { padding-left: 12px; padding-right: 12px; } .ll-path-flow { grid-auto-columns: minmax(320px, 88vw); } }"
         appendLine builder "</style>"
 
-    let private renderPathScript (builder: StringBuilder) =
+    let private renderPathScript (builder: StringBuilder) (screenPathState: ScreenPathState) (updateState: ScreenPathUpdateState option) =
         appendLine builder "<script>"
         appendLine builder "(function () {"
         appendLine builder "  const pathDocument = document.querySelector('.ll-path-document');"
@@ -329,6 +358,10 @@ module ScreenPathHtmlRenderer =
         appendLine builder "  const nextButton = document.getElementById('ll-path-nav-next');"
         appendLine builder "  const endButton = document.getElementById('ll-path-nav-end');"
         appendLine builder "  const viewModeButtons = Array.from(document.querySelectorAll('.ll-path-view-toggle'));"
+        appendLine builder "  const updateModeButtons = Array.from(document.querySelectorAll('.ll-path-update-toggle'));"
+        appendLine builder "  const updateStatus = document.getElementById('ll-path-update-status');"
+        appendLine builder "  const refreshButton = document.getElementById('ll-path-refresh-now');"
+        appendLine builder $"  const updateModeStorageKey = 'll-path-update-mode::{htmlEncode (screenPathState.PathId.ToLowerInvariant())}';"
         appendLine builder "  const applyViewMode = (mode) => {"
         appendLine builder "    if (!pathDocument) { return; }"
         appendLine builder "    pathDocument.dataset.viewMode = mode;"
@@ -342,6 +375,37 @@ module ScreenPathHtmlRenderer =
         appendLine builder "    button.addEventListener('click', () => applyViewMode(button.dataset.viewMode || 'standard'));"
         appendLine builder "  });"
         appendLine builder "  applyViewMode((pathDocument && pathDocument.dataset.viewMode) || 'standard');"
+        appendLine builder "  const setUpdateStatus = (message, state) => {"
+        appendLine builder "    if (!updateStatus) { return; }"
+        appendLine builder "    updateStatus.textContent = message;"
+        appendLine builder "    if (state) { updateStatus.dataset.state = state; } else { delete updateStatus.dataset.state; }"
+        appendLine builder "  };"
+        appendLine builder "  const setRefreshPending = (isPending) => {"
+        appendLine builder "    if (!refreshButton) { return; }"
+        appendLine builder "    refreshButton.disabled = !isPending;"
+        appendLine builder "    refreshButton.hidden = !isPending;"
+        appendLine builder "  };"
+        appendLine builder "  const readStoredUpdateMode = () => {"
+        appendLine builder "    try { return window.localStorage.getItem(updateModeStorageKey) || 'notify'; } catch (_) { return 'notify'; }"
+        appendLine builder "  };"
+        appendLine builder "  const persistUpdateMode = (mode) => {"
+        appendLine builder "    try { window.localStorage.setItem(updateModeStorageKey, mode); } catch (_) { }"
+        appendLine builder "  };"
+        appendLine builder "  const applyUpdateMode = (mode) => {"
+        appendLine builder "    const normalizedMode = mode === 'auto' ? 'auto' : 'notify';"
+        appendLine builder "    if (pathDocument) { pathDocument.dataset.updateMode = normalizedMode; }"
+        appendLine builder "    persistUpdateMode(normalizedMode);"
+        appendLine builder "    updateModeButtons.forEach((button) => {"
+        appendLine builder "      const isActive = button.dataset.updateMode === normalizedMode;"
+        appendLine builder "      button.classList.toggle('is-active', isActive);"
+        appendLine builder "      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');"
+        appendLine builder "    });"
+        appendLine builder "    return normalizedMode;"
+        appendLine builder "  };"
+        appendLine builder "  updateModeButtons.forEach((button) => {"
+        appendLine builder "    button.addEventListener('click', () => applyUpdateMode(button.dataset.updateMode || 'notify'));"
+        appendLine builder "  });"
+        appendLine builder "  applyUpdateMode(readStoredUpdateMode());"
         appendLine builder "  if (!scrollbar || !scrollbarContent || !viewport || !flow) { return; }"
         appendLine builder "  const baseFlowPaddingRight = parseFloat(window.getComputedStyle(flow).paddingRight) || 0;"
         appendLine builder "  let syncingScroll = false;"
@@ -462,11 +526,97 @@ module ScreenPathHtmlRenderer =
         appendLine builder "  if (window.ResizeObserver) {"
         appendLine builder "    new ResizeObserver(syncWidth).observe(flow);"
         appendLine builder "  }"
+
+        match updateState with
+        | Some updateInfo ->
+            let versionJson = JsonSerializer.Serialize(updateInfo.Version)
+            let updatedAtJson = JsonSerializer.Serialize(updateInfo.UpdatedAtUtc)
+
+            appendLine builder $"  const currentArtifactVersion = {versionJson};"
+            appendLine builder $"  const currentArtifactUpdatedAt = {updatedAtJson};"
+            appendLine builder $"  const updatePollIntervalMs = {updateInfo.PollIntervalMs};"
+            appendLine builder "  let pendingUpdateManifest = null;"
+            appendLine builder "  let updatePollTimer = 0;"
+            appendLine builder "  let updateCheckInFlight = false;"
+            appendLine builder "  const buildUpdateManifestUrl = () => {"
+            appendLine builder "    const pathName = window.location.pathname;"
+            appendLine builder "    const manifestPath = /\\.html?$/i.test(pathName) ? pathName.replace(/\\.html?$/i, '.update.js') : `${pathName}.update.js`;"
+            appendLine builder "    return `${manifestPath}?ts=${Date.now()}`;"
+            appendLine builder "  };"
+            appendLine builder "  const loadUpdateManifest = () => {"
+            appendLine builder "    return new Promise((resolve, reject) => {"
+            appendLine builder "      delete window.__llPathUpdateManifest;"
+            appendLine builder "      const script = document.createElement('script');"
+            appendLine builder "      script.async = true;"
+            appendLine builder "      script.src = buildUpdateManifestUrl();"
+            appendLine builder "      script.onload = () => {"
+            appendLine builder "        const manifest = window.__llPathUpdateManifest || null;"
+            appendLine builder "        script.remove();"
+            appendLine builder "        resolve(manifest);"
+            appendLine builder "      };"
+            appendLine builder "      script.onerror = () => {"
+            appendLine builder "        script.remove();"
+            appendLine builder "        reject(new Error('update manifest unavailable'));"
+            appendLine builder "      };"
+            appendLine builder "      document.head.appendChild(script);"
+            appendLine builder "    });"
+            appendLine builder "  };"
+            appendLine builder "  const maybeApplyPendingUpdate = () => {"
+            appendLine builder "    if (!pendingUpdateManifest) { return; }"
+            appendLine builder "    if (readStoredUpdateMode() === 'auto') {"
+            appendLine builder "      setUpdateStatus(`Update detected (${pendingUpdateManifest.updatedAt || 'new build'}) — refreshing…`, 'auto');"
+            appendLine builder "      window.location.reload();"
+            appendLine builder "    }"
+            appendLine builder "  };"
+            appendLine builder "  const checkForArtifactUpdate = async () => {"
+            appendLine builder "    if (updateCheckInFlight) { return; }"
+            appendLine builder "    updateCheckInFlight = true;"
+            appendLine builder "    try {"
+            appendLine builder "      const manifest = await loadUpdateManifest();"
+            appendLine builder "      if (!manifest || !manifest.version) {"
+            appendLine builder "        setUpdateStatus('Update monitor unavailable for this artifact.', 'error');"
+            appendLine builder "        return;"
+            appendLine builder "      }"
+            appendLine builder "      if (manifest.version !== currentArtifactVersion) {"
+            appendLine builder "        pendingUpdateManifest = manifest;"
+            appendLine builder "        setRefreshPending(true);"
+            appendLine builder "        setUpdateStatus(`Update available (${manifest.updatedAt || 'new build'}).`, 'available');"
+            appendLine builder "        maybeApplyPendingUpdate();"
+            appendLine builder "      } else if (!pendingUpdateManifest) {"
+            appendLine builder "        setRefreshPending(false);"
+            appendLine builder "        setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);"
+            appendLine builder "      }"
+            appendLine builder "    } catch (_) {"
+            appendLine builder "      setUpdateStatus('Update monitor unavailable for this artifact.', 'error');"
+            appendLine builder "    } finally {"
+            appendLine builder "      updateCheckInFlight = false;"
+            appendLine builder "    }"
+            appendLine builder "  };"
+            appendLine builder "  if (refreshButton) {"
+            appendLine builder "    refreshButton.addEventListener('click', () => window.location.reload());"
+            appendLine builder "  }"
+            appendLine builder "  updateModeButtons.forEach((button) => {"
+            appendLine builder "    button.addEventListener('click', maybeApplyPendingUpdate);"
+            appendLine builder "  });"
+            appendLine builder "  setRefreshPending(false);"
+            appendLine builder "  setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);"
+            appendLine builder "  checkForArtifactUpdate();"
+            appendLine builder "  updatePollTimer = window.setInterval(checkForArtifactUpdate, updatePollIntervalMs);"
+        | None ->
+            appendLine builder "  setRefreshPending(false);"
+            appendLine builder "  setUpdateStatus('Live update monitor disabled for this artifact.', null);"
+
         appendLine builder "})();"
         appendLine builder "</script>"
 
+    let renderUpdateManifestScript (updateState: ScreenPathUpdateState) =
+        let builder = StringBuilder()
+
+        appendLine builder $"window.__llPathUpdateManifest = {{ version: {jsonString updateState.Version}, updatedAt: {jsonString updateState.UpdatedAtUtc} }};"
+        builder.ToString()
+
     /// Renders a self-contained HTML document for one current screen-path lens.
-    let renderDocument (screenPathState: ScreenPathState) =
+    let renderDocumentWithUpdateState (screenPathState: ScreenPathState) (updateState: ScreenPathUpdateState option) =
         let builder = StringBuilder()
 
         appendLine builder "<!DOCTYPE html>"
@@ -496,6 +646,7 @@ module ScreenPathHtmlRenderer =
 
         appendLine builder "</ul>"
         appendLine builder "</section>"
+        appendLine builder "<div class=\"ll-path-document__secondary-controls\">"
         appendLine builder "<section class=\"ll-path-document__view-controls\" aria-label=\"Path viewer controls\">"
         appendLine builder "<div class=\"ll-path-document__view-label\">View</div>"
         appendLine builder "<div class=\"ll-path-document__view-buttons\">"
@@ -504,6 +655,16 @@ module ScreenPathHtmlRenderer =
         appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-view-mode=\"detailed\" aria-pressed=\"false\">Detailed</button>"
         appendLine builder "</div>"
         appendLine builder "</section>"
+        appendLine builder "<section class=\"ll-path-document__update-controls\" aria-label=\"Path update controls\">"
+        appendLine builder "<div class=\"ll-path-document__update-label\">Updates</div>"
+        appendLine builder "<div class=\"ll-path-document__update-buttons\">"
+        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-update-mode=\"notify\" aria-pressed=\"true\">Notify Me</button>"
+        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-update-mode=\"auto\" aria-pressed=\"false\">Auto Refresh</button>"
+        appendLine builder "<button id=\"ll-path-refresh-now\" class=\"ll-path-update-refresh\" type=\"button\" hidden>Refresh Now</button>"
+        appendLine builder "</div>"
+        appendLine builder "<div id=\"ll-path-update-status\" class=\"ll-path-document__update-status\" aria-live=\"polite\"></div>"
+        appendLine builder "</section>"
+        appendLine builder "</div>"
         appendLine builder "</div>"
         appendLine builder "</header>"
         appendLine builder "<section class=\"ll-path-scroll-controls\">"
@@ -538,9 +699,12 @@ module ScreenPathHtmlRenderer =
         appendLine builder "</section>"
         appendLine builder "</div>"
         appendLine builder "</section>"
-        renderPathScript builder
+        renderPathScript builder screenPathState updateState
         appendLine builder "</main>"
         appendLine builder "</body>"
         appendLine builder "</html>"
 
         builder.ToString()
+
+    let renderDocument (screenPathState: ScreenPathState) =
+        renderDocumentWithUpdateState screenPathState (Some(defaultUpdateState ()))

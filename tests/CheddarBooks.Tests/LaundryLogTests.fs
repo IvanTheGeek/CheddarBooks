@@ -535,6 +535,30 @@ module LaundryLogTests =
                       ".ll-path-nav-button:disabled { background: #cbd5e1;"
                       "Expected inactive navigation buttons to use a stronger disabled visual state.")
 
+              testCase "Screen path renderer includes update monitor controls for local artifacts" (fun () ->
+                  let htmlDocument =
+                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
+
+                  Expect.stringContains htmlDocument "Notify Me" "Expected a sticky notify-only update mode."
+                  Expect.stringContains htmlDocument "Auto Refresh" "Expected a sticky auto-refresh update mode."
+                  Expect.stringContains htmlDocument "ll-path-refresh-now" "Expected a manual refresh button when an update is pending."
+                  Expect.stringContains htmlDocument "ll-path-update-status" "Expected a visible update-status surface."
+                  Expect.stringContains htmlDocument "window.__llPathUpdateManifest" "Expected the page to read a sidecar manifest script."
+                  Expect.stringContains htmlDocument ".update.js" "Expected the update monitor to target the companion update script."
+                  Expect.stringContains htmlDocument "updateModeStorageKey" "Expected the update preference to be stored locally."
+                  Expect.stringContains htmlDocument "window.location.reload()" "Expected the page to support explicit refresh.")
+
+              testCase "Screen path renderer emits the sidecar update manifest script" (fun () ->
+                  let manifestScript =
+                      ScreenPathHtmlRenderer.renderUpdateManifestScript
+                          { Version = "screen-path::test"
+                            UpdatedAtUtc = "2026-03-29T12:34:56Z"
+                            PollIntervalMs = 3000 }
+
+                  Expect.stringContains manifestScript "window.__llPathUpdateManifest" "Expected the manifest bootstrap global."
+                  Expect.stringContains manifestScript "screen-path::test" "Expected the manifest version."
+                  Expect.stringContains manifestScript "2026-03-29T12:34:56Z" "Expected the manifest timestamp.")
+
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
                       ScreenHtmlRenderer.renderDocument
