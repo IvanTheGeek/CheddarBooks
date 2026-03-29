@@ -412,4 +412,26 @@ module LaundryLogTests =
                   Expect.stringContains
                       htmlDocument
                       ".ll-two-up { display: grid; grid-template-columns: 1fr; gap: 12px; }"
-                      "Expected quantity and unit-price panels to stack vertically.") ]
+                      "Expected quantity and unit-price panels to stack vertically.")
+
+              testCase "Screen renderer protects the location input from gps overlap" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      "*, *::before, *::after { box-sizing: border-box; }"
+                      "Expected the v7-style border-box baseline."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-location-input { flex: 1; min-width: 0; display: flex; flex-direction: column; }"
+                      "Expected the location input flex child to allow shrinking."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-gps-button { flex: 0 0 56px;"
+                      "Expected the GPS button width to stay fixed instead of overlapping the input.") ]
