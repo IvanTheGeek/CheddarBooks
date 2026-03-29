@@ -2,6 +2,10 @@
 
 This workspace holds checked-in, human-viewable LaundryLog artifacts that should be reviewable directly from the repo and traceable through git history.
 
+This is the primary review surface for current LaundryLog HTML artifacts.
+
+If you want to open and review the current renderer output, start here rather than in `tmp/`.
+
 Use this area for:
 
 - current self-contained HTML artifacts that represent the latest meaningful renderer state
@@ -21,7 +25,15 @@ Current structure:
 
 Working rule:
 
-- `tmp/` remains scratch and can be noisier or more experimental
+- review the checked-in artifacts in this workspace first
+- treat this workspace as the durable current artifact surface
+- `tmp/` remains scratch and should only be used when there is a specific reason to investigate local regeneration details, experiments, screenshots, or transient outputs
 - this workspace holds the checked-in current artifacts worth preserving in git history
 - when renderer or artifact behavior changes materially, refresh the relevant workspace artifact in the same commit as the code/docs change
 - do not force separate artifact-only commits just to keep the workspace current
+
+Current first review targets:
+
+- [`html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
+- [`html/screens/LaundryLog_ScreenComponents.html`](html/screens/LaundryLog_ScreenComponents.html)
+- [`html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html`](html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html)
