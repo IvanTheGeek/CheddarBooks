@@ -24,6 +24,27 @@ It is a neighboring lens that helps model:
 
 Later, these lenses should be able to pressure each other and be woven together.
 
+## Shared Row Direction
+
+The current proving ground is still mostly a horizontal strip of stacked step documents.
+
+That is good enough for the first path, but the stronger direction is:
+
+- one continuous horizontal path
+- shared row bands across all step columns
+- rows that can be turned on and off by lens
+- row heights that stay coherent across the whole path whenever a lens is visible
+
+That means later path surfaces should be able to add rows like:
+
+- runtime/app-mechanics row
+- screen row
+- `AEM` row
+- `ADM` row
+- other future lens rows
+
+without losing the shared path rhythm.
+
 ## Current Working Rule
 
 For the current screen-path work:
@@ -66,6 +87,7 @@ That means:
 
 - the screen proving ground remains the source of current screen composition
 - the screen-path proving ground is the ordered path projection over those screens
+- the path page can now expose a sticky horizontal scroll rail under the header so wide path rows can be panned without dropping to the browser's bottom scrollbar
 
 ## Near-Term Direction
 

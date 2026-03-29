@@ -172,7 +172,10 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }"
         appendLine builder ".ll-path-document__title { margin: 0; font-size: 0.96rem; line-height: 1.06; font-weight: 700; }"
         appendLine builder ".ll-path-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; max-width: 84ch; }"
-        appendLine builder ".ll-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(360px, 380px); gap: 18px; align-items: start; overflow-x: auto; padding: 4px 4px 18px; }"
+        appendLine builder ".ll-path-scroll-shell { display: flex; flex-direction: column; gap: 10px; }"
+        appendLine builder ".ll-path-scrollbar { position: sticky; top: 0; z-index: 20; overflow-x: auto; overflow-y: hidden; padding: 2px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); scrollbar-gutter: stable both-edges; }"
+        appendLine builder ".ll-path-scrollbar__content { height: 1px; }"
+        appendLine builder ".ll-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(360px, 380px); width: max-content; gap: 18px; align-items: start; overflow-x: auto; padding: 4px 4px 18px; }"
         appendLine builder ".ll-path-step { display: flex; flex-direction: column; gap: 8px; }"
         appendLine builder ".ll-path-step__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }"
         appendLine builder ".ll-path-step__title { margin: 0; font-size: 0.82rem; line-height: 1.15; font-weight: 700; color: #0f172a; }"
@@ -187,6 +190,39 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-boot-state__check { padding: 0.65rem 0.8rem; border-radius: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.76rem; font-weight: 600; color: #475569; }"
         appendLine builder "@media (max-width: 920px) { .ll-path-document { padding-left: 12px; padding-right: 12px; } .ll-path-flow { grid-auto-columns: minmax(320px, 88vw); } }"
         appendLine builder "</style>"
+
+    let private renderPathScript (builder: StringBuilder) =
+        appendLine builder "<script>"
+        appendLine builder "(function () {"
+        appendLine builder "  const scrollbar = document.getElementById('ll-path-scrollbar');"
+        appendLine builder "  const scrollbarContent = document.getElementById('ll-path-scrollbar-content');"
+        appendLine builder "  const flow = document.getElementById('ll-path-flow');"
+        appendLine builder "  if (!scrollbar || !scrollbarContent || !flow) { return; }"
+        appendLine builder "  let syncingFromScrollbar = false;"
+        appendLine builder "  let syncingFromFlow = false;"
+        appendLine builder "  const syncWidth = () => {"
+        appendLine builder "    scrollbarContent.style.width = `${flow.scrollWidth}px`;"
+        appendLine builder "    if (!syncingFromFlow) { scrollbar.scrollLeft = flow.scrollLeft; }"
+        appendLine builder "  };"
+        appendLine builder "  scrollbar.addEventListener('scroll', () => {"
+        appendLine builder "    if (syncingFromFlow) { return; }"
+        appendLine builder "    syncingFromScrollbar = true;"
+        appendLine builder "    flow.scrollLeft = scrollbar.scrollLeft;"
+        appendLine builder "    syncingFromScrollbar = false;"
+        appendLine builder "  });"
+        appendLine builder "  flow.addEventListener('scroll', () => {"
+        appendLine builder "    if (syncingFromScrollbar) { return; }"
+        appendLine builder "    syncingFromFlow = true;"
+        appendLine builder "    scrollbar.scrollLeft = flow.scrollLeft;"
+        appendLine builder "    syncingFromFlow = false;"
+        appendLine builder "  });"
+        appendLine builder "  syncWidth();"
+        appendLine builder "  window.addEventListener('resize', syncWidth);"
+        appendLine builder "  if (window.ResizeObserver) {"
+        appendLine builder "    new ResizeObserver(syncWidth).observe(flow);"
+        appendLine builder "  }"
+        appendLine builder "})();"
+        appendLine builder "</script>"
 
     /// Renders a self-contained HTML document for one current screen-path lens.
     let renderDocument (screenPathState: ScreenPathState) =
@@ -208,7 +244,11 @@ module ScreenPathHtmlRenderer =
         appendLine builder $"<h1 class=\"ll-path-document__title\">{htmlEncode screenPathState.Title}</h1>"
         appendLine builder $"<p class=\"ll-path-document__description\">{htmlEncode screenPathState.Description}</p>"
         appendLine builder "</header>"
-        appendLine builder "<section class=\"ll-path-flow\">"
+        appendLine builder "<section class=\"ll-path-scroll-shell\">"
+        appendLine builder "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\" aria-label=\"Screen path horizontal scroll rail\">"
+        appendLine builder "<div id=\"ll-path-scrollbar-content\" class=\"ll-path-scrollbar__content\"></div>"
+        appendLine builder "</div>"
+        appendLine builder "<section id=\"ll-path-flow\" class=\"ll-path-flow\">"
 
         screenPathState.Steps
         |> List.iteri (fun index stepState ->
@@ -227,6 +267,8 @@ module ScreenPathHtmlRenderer =
             appendLine builder "</section>")
 
         appendLine builder "</section>"
+        appendLine builder "</section>"
+        renderPathScript builder
         appendLine builder "</main>"
         appendLine builder "</body>"
         appendLine builder "</html>"

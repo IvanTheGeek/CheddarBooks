@@ -399,6 +399,40 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
                   Expect.stringContains htmlDocument "app/system lens" "Expected the app/system startup lens badge.")
 
+              testCase "Screen path renderer adds a synced top horizontal scroll rail" (fun () ->
+                  let htmlDocument =
+                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\""
+                      "Expected a dedicated top scroll rail above the screen strip."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "<section id=\"ll-path-flow\" class=\"ll-path-flow\">"
+                      "Expected the screen strip itself to remain the scrolled surface."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-path-scrollbar { position: sticky; top: 0;"
+                      "Expected the top scroll rail to stay pinned beneath the header while vertical scrolling."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(360px, 380px); width: max-content;"
+                      "Expected the screen strip to stay a single continuous horizontal grid."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "flow.scrollLeft = scrollbar.scrollLeft;"
+                      "Expected the top rail to drive horizontal scrolling of the screen strip."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "scrollbar.scrollLeft = flow.scrollLeft;"
+                      "Expected the rail to stay synced when the screen strip itself is scrolled.")
+
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
                       ScreenHtmlRenderer.renderDocument
