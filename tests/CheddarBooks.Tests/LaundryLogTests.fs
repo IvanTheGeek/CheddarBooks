@@ -405,18 +405,23 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
+                      "html, body { height: 100%; overflow: hidden; }"
+                      "Expected the browser-level scrollbars to be disabled for the screen-path page."
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-path-stage { min-height: 0; overflow-y: auto; overflow-x: hidden;"
+                      "Expected an internal vertical stage for screen-path rows."
+
+                  Expect.stringContains
+                      htmlDocument
                       "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\""
                       "Expected a dedicated top scroll rail above the screen strip."
 
                   Expect.stringContains
                       htmlDocument
-                      "<section id=\"ll-path-flow\" class=\"ll-path-flow\">"
-                      "Expected the screen strip itself to remain the scrolled surface."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-scrollbar { position: sticky; top: 0;"
-                      "Expected the top scroll rail to stay pinned beneath the header while vertical scrolling."
+                      "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\">"
+                      "Expected the screen strip to live in its own horizontal viewport."
 
                   Expect.stringContains
                       htmlDocument
@@ -425,13 +430,18 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "flow.scrollLeft = scrollbar.scrollLeft;"
+                      "viewport.scrollLeft = scrollbar.scrollLeft;"
                       "Expected the top rail to drive horizontal scrolling of the screen strip."
 
                   Expect.stringContains
                       htmlDocument
-                      "scrollbar.scrollLeft = flow.scrollLeft;"
-                      "Expected the rail to stay synced when the screen strip itself is scrolled.")
+                      "scrollbar.scrollLeft = viewport.scrollLeft;"
+                      "Expected the rail to stay synced when the screen viewport itself is scrolled."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "viewport.scrollBy({ left: direction * stepWidth(), behavior: 'smooth' });"
+                      "Expected left and right controls to move the visible screen columns by one step width.")
 
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =

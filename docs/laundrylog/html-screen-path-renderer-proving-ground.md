@@ -87,7 +87,11 @@ That means:
 
 - the screen proving ground remains the source of current screen composition
 - the screen-path proving ground is the ordered path projection over those screens
-- the path page can now expose a sticky horizontal scroll rail under the header so wide path rows can be panned without dropping to the browser's bottom scrollbar
+- the path page can now behave more like an app viewport:
+  - browser-level scrollbars stay hidden
+  - the header and top horizontal controls stay fixed
+  - the path rows scroll inside an internal stage
+  - left/right controls can move the visible screen columns by one step at a time
 
 ## Near-Term Direction
 
