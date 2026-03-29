@@ -163,18 +163,23 @@ module ScreenHtmlRenderer =
     let private renderPanelEnd (builder: StringBuilder) =
         appendLine builder "</section>"
 
-    let private renderTextInput (builder: StringBuilder) label (inputState: TextInputState) =
-        let visibleValue =
-            inputState.ValueText
-            |> Option.defaultValue inputState.PlaceholderText
-            |> htmlEncode
-
+    let private renderTextInput (builder: StringBuilder) labelText (inputState: TextInputState) =
         let readOnlyAttribute = if inputState.IsReadOnly then " readonly" else ""
+        let valueAttribute =
+            match inputState.ValueText with
+            | Some valueText -> $" value=\"{htmlEncode valueText}\""
+            | None -> ""
+
         appendLine builder "<div class=\"ll-field\">"
-        appendLine builder $"<label class=\"ll-field__label\" for=\"{PrimitiveControlId.value inputState.ControlId}\">{htmlEncode label}</label>"
+
+        match labelText with
+        | Some label ->
+            appendLine builder $"<label class=\"ll-field__label\" for=\"{PrimitiveControlId.value inputState.ControlId}\">{htmlEncode label}</label>"
+        | None -> ()
+
         appendLine
             builder
-            $"<input id=\"{PrimitiveControlId.value inputState.ControlId}\" class=\"ll-text-input\" type=\"text\" value=\"{visibleValue}\" placeholder=\"{htmlEncode inputState.PlaceholderText}\"{readOnlyAttribute}>"
+            $"<input id=\"{PrimitiveControlId.value inputState.ControlId}\" class=\"ll-text-input\" type=\"text\"{valueAttribute} placeholder=\"{htmlEncode inputState.PlaceholderText}\"{readOnlyAttribute}>"
         appendLine builder "</div>"
 
     let private renderOptionGroup (builder: StringBuilder) label (optionGroup: OptionGroupState) =
@@ -348,7 +353,7 @@ module ScreenHtmlRenderer =
         appendLine builder "<h3 class=\"ll-panel__title\">📍 Location</h3>"
         appendLine builder "<div class=\"ll-location-section\">"
         appendLine builder "<div class=\"ll-location-input\">"
-        renderTextInput builder "Location" screenState.LocationInput
+        renderTextInput builder None screenState.LocationInput
         appendLine builder "<div class=\"ll-location-info\">GPS will check personal &amp; community data</div>"
         appendLine builder "</div>"
         appendLine builder $"<button type=\"button\" class=\"ll-gps-button\" data-control-id=\"{PrimitiveControlId.value screenState.GpsAction.ControlId}\">📍</button>"
@@ -379,7 +384,7 @@ module ScreenHtmlRenderer =
             appendLine builder "<h3 class=\"ll-panel__title\">📍 Location</h3>"
             appendLine builder "<div class=\"ll-location-section\">"
             appendLine builder "<div class=\"ll-location-input\">"
-            renderTextInput builder "Location" locationInput
+            renderTextInput builder None locationInput
             appendLine builder "<div class=\"ll-location-info\">GPS will check personal &amp; community data</div>"
             appendLine builder "</div>"
             appendLine builder $"<button type=\"button\" class=\"ll-gps-button\" data-control-id=\"{PrimitiveControlId.value gpsAction.ControlId}\">📍</button>"
@@ -490,26 +495,26 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }"
         appendLine builder ".ll-phone-screen { width: 100%; max-width: 360px; min-height: 667px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; gap: 0; }"
         appendLine builder ".ll-phone-screen--tall { min-height: 980px; }"
-        appendLine builder ".ll-screen-body { padding: 1rem; }"
+        appendLine builder ".ll-screen-body { padding: 0.85rem; }"
         appendLine builder ".ll-location-context { margin: 0 0 1rem; color: #64748b; font-size: 0.82rem; font-weight: 600; }"
-        appendLine builder ".ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }"
+        appendLine builder ".ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 0.9rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }"
         appendLine builder ".ll-header__text { display: flex; flex-direction: column; gap: 0.125rem; }"
         appendLine builder ".ll-header__title { margin: 0; font-size: 1.5rem; font-weight: 700; line-height: 1.05; }"
         appendLine builder ".ll-header__subtitle { margin: 0; font-size: 0.75rem; opacity: 0.95; font-weight: 500; color: rgba(255,255,255,0.95); }"
         appendLine builder ".ll-header__badge { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3); }"
-        appendLine builder ".ll-panel { background: white; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.75rem; }"
-        appendLine builder ".ll-panel--compact { padding-top: 1rem; padding-bottom: 1rem; }"
-        appendLine builder ".ll-panel--location { gap: 0.75rem; }"
+        appendLine builder ".ll-panel { background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.625rem; }"
+        appendLine builder ".ll-panel--compact { padding-top: 0.9rem; padding-bottom: 0.9rem; }"
+        appendLine builder ".ll-panel--location { gap: 0.5rem; }"
         appendLine builder ".ll-panel__title { margin: 0; font-size: 0.875rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }"
-        appendLine builder ".ll-field { display: flex; flex-direction: column; gap: 0.5rem; }"
+        appendLine builder ".ll-field { display: flex; flex-direction: column; gap: 0.35rem; }"
         appendLine builder ".ll-field__label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; }"
-        appendLine builder ".ll-location-section { display: flex; gap: 0.75rem; align-items: stretch; }"
+        appendLine builder ".ll-location-section { display: flex; gap: 0.625rem; align-items: stretch; }"
         appendLine builder ".ll-location-input { flex: 1; display: flex; flex-direction: column; }"
-        appendLine builder ".ll-location-info { font-size: 0.75rem; color: #64748b; margin-top: 0.5rem; font-weight: 500; }"
-        appendLine builder ".ll-text-input { width: 100%; padding: 1rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1rem; color: #2d3748; transition: border-color 0.2s; font-weight: 500; }"
+        appendLine builder ".ll-location-info { font-size: 0.68rem; color: #64748b; margin-top: 0.2rem; font-weight: 500; }"
+        appendLine builder ".ll-text-input { width: 100%; padding: 0.85rem 0.9rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; font-size: 0.95rem; color: #2d3748; transition: border-color 0.2s; font-weight: 500; }"
         appendLine builder ".ll-text-input:focus { outline: none; border-color: #ffcc80; }"
         appendLine builder ".ll-text-input::placeholder { color: #8aa0b7; }"
-        appendLine builder ".ll-gps-button { width: 64px; min-height: 56px; border: 3px solid #e2e8f0; background: white; border-radius: 0.75rem; font-size: 1.75rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }"
+        appendLine builder ".ll-gps-button { width: 56px; min-height: 52px; border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }"
         appendLine builder ".ll-gps-button:active { transform: scale(0.97); background: #fff8e1; border-color: #ffcc80; }"
         appendLine builder ".ll-primary-action-row { display: flex; flex-direction: column; gap: 0.75rem; }"
         appendLine builder ".ll-button { width: 100%; border: none; border-radius: 0.75rem; min-height: 64px; padding: 1rem; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }"
@@ -519,12 +524,12 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-button--secondary { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }"
         appendLine builder ".ll-button--disabled { background: #cbd5e1; color: #475569; box-shadow: none; }"
         appendLine builder ".ll-button--success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }"
-        appendLine builder ".ll-option-group { display: grid; gap: 0.75rem; }"
+        appendLine builder ".ll-option-group { display: grid; gap: 0.625rem; }"
         appendLine builder ".ll-option-group--machine { grid-template-columns: repeat(3, 1fr); }"
         appendLine builder ".ll-option-group--payment { grid-template-columns: repeat(2, 1fr); }"
         appendLine builder ".ll-option-group--detail { grid-template-columns: repeat(2, 1fr); margin-top: 0.25rem; }"
-        appendLine builder ".ll-chip { border: 3px solid #e2e8f0; background: white; border-radius: 0.75rem; color: #475569; cursor: pointer; transition: all 0.2s; }"
-        appendLine builder ".ll-chip--tile { min-height: 64px; padding: 0.875rem 0.5rem; font-size: 0.9375rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; }"
+        appendLine builder ".ll-chip { border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; color: #475569; cursor: pointer; transition: all 0.2s; }"
+        appendLine builder ".ll-chip--tile { min-height: 58px; padding: 0.75rem 0.45rem; font-size: 0.875rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.18rem; }"
         appendLine builder ".ll-chip--detail { min-height: 48px; padding: 0.75rem 0.6rem; font-size: 0.82rem; font-weight: 600; }"
         appendLine builder ".ll-chip--selected { background: #fff8e1; border-color: #ffcc80; color: #f57c00; }"
         appendLine builder ".ll-chip__icon { font-size: 1rem; line-height: 1; }"

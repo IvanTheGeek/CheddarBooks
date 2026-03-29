@@ -370,6 +370,9 @@ module LaundryLogTests =
                       htmlDocument
                       "placeholder=\"Tap &#128205; or enter location\""
                       "Expected the primary surface to carry the v7 location-card placeholder."
+                  Expect.isFalse
+                      (htmlDocument.Contains("value=\"Tap &#128205; or enter location\""))
+                      "Expected the empty v7 location field to render as a placeholder, not as a prefilled value."
 
                   let primaryIndex = htmlDocument.IndexOf("ll-primary-surface")
                   let v7PrimaryIndex = htmlDocument.IndexOf("Screen.EntryForm - v7 Primary")
