@@ -588,7 +588,7 @@ module ScreenHtmlRenderer =
         appendLine builder ".ll-status-chip__mark { font-weight: 800; font-size: 0.68rem; }"
         appendLine builder ".ll-status-chip--ready .ll-status-chip__mark { color: #16a34a; }"
         appendLine builder ".ll-status-chip--needs-attention .ll-status-chip__mark { color: #dc2626; }"
-        appendLine builder ".ll-summary-bar { background: #fff8e1; padding: 0.8rem 1rem; border-bottom: 2px solid #ffcc80; border-top: 2px solid #ffcc80; display: flex; justify-content: space-between; align-items: center; margin: 0.6rem 0.25rem 1.2rem 0.25rem; border-radius: 0.5rem; }"
+        appendLine builder ".ll-summary-bar { width: 100%; max-width: 100%; box-sizing: border-box; background: #fff8e1; padding: 0.8rem 1rem; border: 2px solid #ffcc80; display: flex; justify-content: space-between; align-items: center; margin: 0.6rem 0 1.2rem; border-radius: 0.5rem; }"
         appendLine builder ".ll-summary-bar__label { font-size: 0.875rem; font-weight: 600; color: #f57c00; text-transform: uppercase; letter-spacing: 0.05em; }"
         appendLine builder ".ll-summary-bar__value { font-size: 1.5rem; font-weight: 700; color: #f57c00; }"
         appendLine builder ".ll-feedback-banner { border-radius: 0.75rem; background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 700; }"

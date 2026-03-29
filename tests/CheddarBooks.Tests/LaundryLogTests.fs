@@ -456,4 +456,26 @@ module LaundryLogTests =
                   Expect.isGreaterThanOrEqual fieldIndex 0 "Expected the price input field in the rendered HTML."
                   Expect.isGreaterThanOrEqual increaseIndex 0 "Expected the increase quarter button in the rendered HTML."
                   Expect.isLessThan decreaseIndex fieldIndex "Expected the decrease button to render to the left of the price field."
-                  Expect.isLessThan fieldIndex increaseIndex "Expected the increase button to render to the right of the price field.") ]
+                  Expect.isLessThan fieldIndex increaseIndex "Expected the increase button to render to the right of the price field.")
+
+              testCase "Screen renderer keeps the session total fully boxed" (fun () ->
+                  let htmlDocument =
+                      ScreenHtmlRenderer.renderDocument
+                          "LaundryLog Screen Components"
+                          "Deterministic HTML/CSS proving ground for the current LaundryLog screens."
+                          (ScreenHtmlExamples.laundryLogBaseScreens ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      ".ll-summary-bar { width: 100%; max-width: 100%; box-sizing: border-box;"
+                      "Expected the session-total bar to use a full border-box width contract."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "border: 2px solid #ffcc80;"
+                      "Expected the session-total bar to render a full border on all sides."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "margin: 0.6rem 0 1.2rem;"
+                      "Expected the session-total bar to avoid side margins that can visually clip the border.") ]
