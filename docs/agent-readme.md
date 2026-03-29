@@ -82,6 +82,14 @@ When local app understanding changes:
 
 When work is docs-only or tests are not applicable, say so explicitly.
 
+For concrete UI, HTML, CSS, and screen-renderer work:
+
+- do not guess from memory, screenshots, or prior chat when the local code can be inspected directly
+- inspect the actual renderer/source files first
+- inspect the currently generated artifact when one exists
+- prefer correcting the real code and renderer contract over describing what the UI "should probably be"
+- add or update a regression test when a layout or rendering bug is fixed
+
 ## Verification Discipline
 
 When verifying .NET work in this repo:

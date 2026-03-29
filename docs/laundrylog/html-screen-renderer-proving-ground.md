@@ -15,6 +15,8 @@ For the current LaundryLog screen work:
 - Penpot remains real design evidence, not the automatic generator
 - the first deterministic page surface is self-contained HTML/CSS
 - the screen renderer should stay built from reusable component blocks, not one-off page markup
+- when refining the HTML/CSS renderer, inspect the actual source and generated artifact first rather than guessing from memory or screenshots alone
+- if a visual/layout bug is fixed, add or update a regression test for the renderer contract that caused it
 
 ## Current Source Pressure
 
