@@ -20,6 +20,9 @@ Working rules:
 - use local docs for app meaning and upstream NEXUS doctrine only where it is truly foundational
 - keep scratch, durable docs, bootstrap provenance, and derived views distinct
 - if a discovery will matter later, record it durably here
+- when code, renderer, or visible behavior changes, add or update tests by default
+- if a relevant test is not added or updated, say why explicitly
+- for UI, HTML, CSS, and screen work, inspect the actual source and current generated artifact before changing behavior
 
 Primary references:
 

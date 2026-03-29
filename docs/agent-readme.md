@@ -77,6 +77,8 @@ When local app understanding changes:
 
 - update the relevant local docs
 - update tests when app behavior changes
+- when code, renderer, UI, HTML, CSS, or visible behavior changes, add or update tests by default
+- if a relevant test is not added or updated, say why explicitly
 - record discoveries durably if they will matter later
 - keep README, foundation docs, and LaundryLog docs locally navigable
 
