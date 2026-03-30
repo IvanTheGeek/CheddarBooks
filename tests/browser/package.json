@@ -2,11 +2,11 @@
   "name": "cheddarbooks-browser-tests",
   "private": true,
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui",
+    "test": "env -u FORCE_COLOR -u NO_COLOR playwright test",
+    "test:headed": "env -u FORCE_COLOR -u NO_COLOR playwright test --headed",
+    "test:ui": "env -u FORCE_COLOR -u NO_COLOR playwright test --ui",
     "install:browsers": "playwright install chromium",
-    "show-report": "playwright show-report"
+    "show-report": "env -u FORCE_COLOR -u NO_COLOR playwright show-report"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

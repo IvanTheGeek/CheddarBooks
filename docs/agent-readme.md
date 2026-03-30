@@ -105,6 +105,7 @@ For local F# Interactive artifact generation:
 - for the full LaundryLog renderer/browser verification path, use [`../scripts/laundrylog/verify-workspace-html.sh`](../scripts/laundrylog/verify-workspace-html.sh) so refresh, Expecto, and Playwright run in serial
 - for formal browser verification of tracked LaundryLog HTML behavior, use the Playwright workspace under [`../tests/browser/README.md`](../tests/browser/README.md)
 - keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
+- when a long `Expecto` test block suddenly reports offside `let` / unmatched `[` compiler errors, inspect the most recent closing parentheses in the same test block before assuming the indentation is wrong
 - when using Playwright MCP for tracked local HTML, do not target `file://` first; the MCP browser sandbox blocks `file:` URLs, so serve the tracked workspace HTML over local HTTP and point MCP there
 - when a checked-in helper script exists for a recurring build/test/refresh/verify flow, treat that script as the default AI entry point rather than rebuilding the command sequence ad hoc
 - when rendering a live HTML preview of a surface that already contains interactive controls, do not wrap the whole preview in a literal `<button>`; use a non-button activator wrapper or a separate expand control so the browser does not corrupt the DOM by auto-fixing nested interactive HTML

@@ -250,7 +250,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-path-document__update-status[data-state="available"] { color: #9a3412; font-weight: 700; }
 .nm-path-document__update-status[data-state="error"] { color: #b91c1c; }
 .nm-path-document__update-status[data-state="auto"] { color: #0e5883; font-weight: 700; }
-.nm-path-document[data-view-mode="summary"] .nm-path-document__context-panel, .nm-path-document[data-view-mode="summary"] .nm-column__note, .nm-path-document[data-view-mode="summary"] .nm-column__meta, .nm-path-document[data-view-mode="summary"] .nm-column__technical, .nm-path-document[data-view-mode="summary"] .nm-column__changes, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__name, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__note { display: none; }
+.nm-path-document[data-view-mode="summary"] .nm-path-document__context-panel, .nm-path-document[data-view-mode="summary"] .nm-column__note, .nm-path-document[data-view-mode="summary"] .nm-column__meta, .nm-path-document[data-view-mode="summary"] .nm-column__detail-copy, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__name, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__note { display: none; }
 .nm-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }
 .nm-path-nav-button { width: 42px; height: 42px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(255, 183, 77, 0.32); }
 .nm-path-nav-button:hover:not(:disabled) { filter: brightness(0.98); }
@@ -267,14 +267,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }
 .nm-path-flow-viewport::-webkit-scrollbar { display: none; }
 .nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }
-.nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; }
+.nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; overflow: visible; }
 .nm-column[hidden] { display: none !important; }
 .nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }
 .nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }
 .nm-column--business { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); }
+.nm-column--context-application-lifecycle { background: linear-gradient(180deg, #e7effc 0%, #f8fbff 100%); border-color: #19395c; }
+.nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }
+.nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }
+.nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }
 .nm-column__header { display: flex; flex-direction: column; gap: 4px; }
-.nm-column__topline { display: flex; align-items: flex-start; justify-content: flex-end; gap: 10px; }
-.nm-column__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }
+.nm-column__classification-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.nm-column__kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; color: #1e293b; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; margin-top: 2px; }
 .nm-column__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
 .nm-column__title { margin: 0; font-size: 0.84rem; line-height: 1.05; font-weight: 700; color: #0f172a; }
 .nm-column__note { margin: 0; font-size: 0.7rem; line-height: 1.22; color: #556b85; min-height: 2.35em; }
@@ -285,16 +289,35 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; }
 .nm-column__surface-rendering { position: absolute; top: 0; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; }
 .nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }
-.nm-column__body { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-.nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
-.nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4a647f; white-space: nowrap; }
+.nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.nm-column__body--aem { gap: 6px; }
+.nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }
+.nm-column__pill-wrap { position: relative; display: inline-flex; max-width: 100%; }
+.nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }
 .nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }
+.nm-column__badge--interactive { appearance: none; -webkit-appearance: none; }
+.nm-column__badge--interactive:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
 .nm-column__badge--role { text-transform: none; }
-.nm-column__technical { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }
-.nm-column__changes { display: grid; gap: 0.25rem; padding: 0.55rem 0.7rem; border-radius: 0.85rem; background: rgba(255, 255, 255, 0.72); border: 1px solid #dce5ef; }
-.nm-column__changes-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
-.nm-column__changes-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.16rem; color: #475569; font-size: 0.7rem; line-height: 1.25; }
+.nm-column__pill-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease; }
+.nm-column__pill-wrap:hover .nm-column__pill-popover, .nm-column__pill-wrap:focus-within .nm-column__pill-popover { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.nm-column__pill-popover-title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }
+.nm-column__pill-popover-text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }
+.nm-column__detail-boxes { display: grid; gap: 8px; }
+.nm-column__detail-box { display: grid; gap: 5px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; background: rgba(255, 255, 255, 0.82); }
+.nm-column__detail-box--screen { border-color: #c8dcff; background: rgba(255, 255, 255, 0.82); }
+.nm-column__detail-box--transition { border-color: #89b6e8; background: rgba(82, 155, 246, 0.14); }
+.nm-column__detail-box--orchestration { border-color: #8ac3dd; background: rgba(84, 165, 200, 0.14); }
+.nm-column__detail-box--interaction { border-color: #8ad1a1; background: rgba(93, 194, 120, 0.16); }
+.nm-column__detail-topline { display: grid; gap: 5px; }
+.nm-column__detail-kind { justify-self: end; display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1e293b; }
+.nm-column__detail-title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; color: #0f172a; }
+.nm-column__detail-copy { display: grid; gap: 0.28rem; }
+.nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }
+.nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }
+.nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }
 .nm-column__aem-detail { display: flex; flex-direction: column; }
+.nm-column__aem-detail .slice-card__slot--screen { display: none; }
+.nm-column__aem-detail .slice-card { padding-top: 2px; }
 .nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }
 .nm-column__aem-row .slice-card { width: 100%; }
 .nm-column__aem-row .slice-card__title { font-size: 0.78rem; }
@@ -411,10 +434,44 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-path-stage">
 <div id="nm-path-flow-viewport" class="nm-path-flow-viewport" data-testid="nm-path-flow-viewport">
 <section id="nm-path-flow" class="nm-path-flow" data-testid="nm-path-flow">
-<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="01-app-started" data-lens-keys="lifecycle">
+<section class="nm-column nm-column--app-runtime nm-column--context-application-lifecycle" data-testid="nm-path-column" data-column-key="01-app-started" data-context-key="application-lifecycle" data-lens-keys="lifecycle">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">LIFECYCLE</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-01-app-started-group-app-runtime">App Runtime</button>
+<div id="nm-pill-popover-01-app-started-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">App Runtime</div>
+<p class="nm-column__pill-popover-text">App Runtime covers startup, lifecycle, route choice, and other app/system mechanics.</p>
+<p class="nm-column__pill-popover-text">This column is in App Runtime because AppStarted is driven by app/system startup or route mechanics.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ApplicationLifecycle" aria-describedby="nm-pill-popover-01-app-started-context-applicationlifecycle">ApplicationLifecycle</button>
+<div id="nm-pill-popover-01-app-started-context-applicationlifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ApplicationLifecycle</div>
+<p class="nm-column__pill-popover-text">ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.</p>
+<p class="nm-column__pill-popover-text">This column is in ApplicationLifecycle because AppStarted marks an app lifecycle phase becoming visible.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Lifecycle" aria-describedby="nm-pill-popover-01-app-started-lens-lifecycle">Lifecycle</button>
+<div id="nm-pill-popover-01-app-started-lens-lifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Lifecycle</div>
+<p class="nm-column__pill-popover-text">Lifecycle lens focuses on app phase changes.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Lifecycle lens because AppStarted contributes to the app lifecycle story.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="System" aria-describedby="nm-pill-popover-01-app-started-role-system">System</button>
+<div id="nm-pill-popover-01-app-started-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">System</div>
+<p class="nm-column__pill-popover-text">System means the app/runtime is acting at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged System because AppStarted happens through app/runtime work rather than direct user input.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">BOOT</span>
 </div>
 <div class="nm-column__eyebrow">Step 01 · 01-app-started</div>
 <h2 class="nm-column__title">AppStarted</h2>
@@ -464,28 +521,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ApplicationLifecycle</span>
-<span class="nm-column__badge nm-column__badge--lens">Lifecycle</span>
-<span class="nm-column__badge nm-column__badge--role">System</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.AppStart - Splash</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.AppStart - Splash</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The visible boot surface linked to this lifecycle step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.AppStart - Splash</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--transition" data-testid="nm-column-changes" data-detail-kind="transition">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">TRANSITION</span>
+<h3 class="nm-column__detail-title">AppStarted</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user launches the app and the first splash-state surface becomes visible.</p>
+<ul class="nm-column__detail-list">
 <li>The splash screen becomes visible as the first surface.</li>
 <li>The AppStarted checkpoint becomes active.</li>
 <li>No runtime or route checkpoints are complete yet.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">RUNTIME</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-02-runtime-checks-group-app-runtime">App Runtime</button>
+<div id="nm-pill-popover-02-runtime-checks-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">App Runtime</div>
+<p class="nm-column__pill-popover-text">App Runtime covers startup, lifecycle, route choice, and other app/system mechanics.</p>
+<p class="nm-column__pill-popover-text">This column is in App Runtime because Runtime Checks is driven by app/system startup or route mechanics.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-02-runtime-checks-context-runtimeorchestration">RuntimeOrchestration</button>
+<div id="nm-pill-popover-02-runtime-checks-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
+<p class="nm-column__pill-popover-text">RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.</p>
+<p class="nm-column__pill-popover-text">This column is in RuntimeOrchestration because Runtime Checks coordinates checks, route choice, or state handoff.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-02-runtime-checks-lens-runtime">Runtime</button>
+<div id="nm-pill-popover-02-runtime-checks-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Runtime</div>
+<p class="nm-column__pill-popover-text">Runtime lens focuses on orchestration and app mechanics.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Runtime lens because Runtime Checks contributes to app/runtime coordination.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="System" aria-describedby="nm-pill-popover-02-runtime-checks-role-system">System</button>
+<div id="nm-pill-popover-02-runtime-checks-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">System</div>
+<p class="nm-column__pill-popover-text">System means the app/runtime is acting at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged System because Runtime Checks happens through app/runtime work rather than direct user input.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">BOOT</span>
 </div>
 <div class="nm-column__eyebrow">Step 02 · 02-runtime-checks</div>
 <h2 class="nm-column__title">Runtime Checks</h2>
@@ -535,28 +637,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
-<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
-<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
-<span class="nm-column__badge nm-column__badge--role">System</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.AppStart - Runtime Checks</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.AppStart - Runtime Checks</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.AppStart - Runtime Checks</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">ORCHESTRATION</span>
+<h3 class="nm-column__detail-title">Runtime Checks</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">Startup/runtime checks begin while the splash surface remains visible.</p>
+<ul class="nm-column__detail-list">
 <li>The splash message changes to startup checking.</li>
 <li>AppStarted becomes complete.</li>
 <li>Runtime checks becomes the active checkpoint.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="03-no-local-session" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="03-no-local-session" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">RUNTIME</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-03-no-local-session-group-app-runtime">App Runtime</button>
+<div id="nm-pill-popover-03-no-local-session-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">App Runtime</div>
+<p class="nm-column__pill-popover-text">App Runtime covers startup, lifecycle, route choice, and other app/system mechanics.</p>
+<p class="nm-column__pill-popover-text">This column is in App Runtime because No Local Session is driven by app/system startup or route mechanics.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-03-no-local-session-context-runtimeorchestration">RuntimeOrchestration</button>
+<div id="nm-pill-popover-03-no-local-session-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
+<p class="nm-column__pill-popover-text">RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.</p>
+<p class="nm-column__pill-popover-text">This column is in RuntimeOrchestration because No Local Session coordinates checks, route choice, or state handoff.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-03-no-local-session-lens-runtime">Runtime</button>
+<div id="nm-pill-popover-03-no-local-session-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Runtime</div>
+<p class="nm-column__pill-popover-text">Runtime lens focuses on orchestration and app mechanics.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Runtime lens because No Local Session contributes to app/runtime coordination.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="System" aria-describedby="nm-pill-popover-03-no-local-session-role-system">System</button>
+<div id="nm-pill-popover-03-no-local-session-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">System</div>
+<p class="nm-column__pill-popover-text">System means the app/runtime is acting at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged System because No Local Session happens through app/runtime work rather than direct user input.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">BOOT</span>
 </div>
 <div class="nm-column__eyebrow">Step 03 · 03-no-local-session</div>
 <h2 class="nm-column__title">No Local Session</h2>
@@ -606,28 +753,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
-<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
-<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
-<span class="nm-column__badge nm-column__badge--role">System</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.AppStart - No Local Session</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.AppStart - No Local Session</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.AppStart - No Local Session</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">ORCHESTRATION</span>
+<h3 class="nm-column__detail-title">No Local Session</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">Fresh-first-launch assumptions are confirmed from local/runtime inspection.</p>
+<ul class="nm-column__detail-list">
 <li>Runtime checks become complete.</li>
 <li>No known local session becomes the active checkpoint.</li>
 <li>The splash message confirms there is no saved location, active session, or pending draft.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="04-route-resolved" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="04-route-resolved" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">RUNTIME</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-04-route-resolved-group-app-runtime">App Runtime</button>
+<div id="nm-pill-popover-04-route-resolved-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">App Runtime</div>
+<p class="nm-column__pill-popover-text">App Runtime covers startup, lifecycle, route choice, and other app/system mechanics.</p>
+<p class="nm-column__pill-popover-text">This column is in App Runtime because Route Resolved is driven by app/system startup or route mechanics.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-04-route-resolved-context-runtimeorchestration">RuntimeOrchestration</button>
+<div id="nm-pill-popover-04-route-resolved-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
+<p class="nm-column__pill-popover-text">RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.</p>
+<p class="nm-column__pill-popover-text">This column is in RuntimeOrchestration because Route Resolved coordinates checks, route choice, or state handoff.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-04-route-resolved-lens-runtime">Runtime</button>
+<div id="nm-pill-popover-04-route-resolved-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Runtime</div>
+<p class="nm-column__pill-popover-text">Runtime lens focuses on orchestration and app mechanics.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Runtime lens because Route Resolved contributes to app/runtime coordination.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="System" aria-describedby="nm-pill-popover-04-route-resolved-role-system">System</button>
+<div id="nm-pill-popover-04-route-resolved-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">System</div>
+<p class="nm-column__pill-popover-text">System means the app/runtime is acting at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged System because Route Resolved happens through app/runtime work rather than direct user input.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">BOOT</span>
 </div>
 <div class="nm-column__eyebrow">Step 04 · 04-route-resolved</div>
 <h2 class="nm-column__title">Route Resolved</h2>
@@ -677,28 +869,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
-<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
-<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
-<span class="nm-column__badge nm-column__badge--role">System</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.AppStart - Route Resolved</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.AppStart - Route Resolved</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.AppStart - Route Resolved</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">ORCHESTRATION</span>
+<h3 class="nm-column__detail-title">Route Resolved</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">Runtime orchestration resolves Need Location as the first usable screen.</p>
+<ul class="nm-column__detail-list">
 <li>All earlier startup checkpoints are complete.</li>
 <li>Route to Need Location becomes the active checkpoint.</li>
 <li>The splash message changes from checking to entering the app.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="05-need-location" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="05-need-location" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">SCREEN</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-05-need-location-group-interaction">Interaction</button>
+<div id="nm-pill-popover-05-need-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Interaction</div>
+<p class="nm-column__pill-popover-text">Interaction covers user-visible screens and UI progression through the path.</p>
+<p class="nm-column__pill-popover-text">This column is in Interaction because Need Location is represented as a user-visible screen or interaction step.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-05-need-location-context-screenpath">ScreenPath</button>
+<div id="nm-pill-popover-05-need-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ScreenPath</div>
+<p class="nm-column__pill-popover-text">ScreenPath owns the ordered user-visible screen states in the path.</p>
+<p class="nm-column__pill-popover-text">This column is in ScreenPath because Need Location is a user-visible screen or interaction state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-05-need-location-lens-screen">Screen</button>
+<div id="nm-pill-popover-05-need-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Screen</div>
+<p class="nm-column__pill-popover-text">Screen lens focuses on user-visible UI progression.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Screen lens because Need Location contributes to the user-visible path.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-05-need-location-role-user">User</button>
+<div id="nm-pill-popover-05-need-location-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because Need Location depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 05 · 05-need-location</div>
 <h2 class="nm-column__title">Need Location</h2>
@@ -745,28 +982,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Interaction</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
-<span class="nm-column__badge nm-column__badge--lens">Screen</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.NewSession - Awaiting Location</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.NewSession - Awaiting Location</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.NewSession - Awaiting Location</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">INTERACTION</span>
+<h3 class="nm-column__detail-title">Need Location</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">Fresh start with no known location yet.</p>
+<ul class="nm-column__detail-list">
 <li>The first usable screen replaces the splash surface.</li>
 <li>The location field is empty.</li>
 <li>Set Location remains disabled until a location is entered.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">SCREEN</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-06-ready-to-set-location-group-interaction">Interaction</button>
+<div id="nm-pill-popover-06-ready-to-set-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Interaction</div>
+<p class="nm-column__pill-popover-text">Interaction covers user-visible screens and UI progression through the path.</p>
+<p class="nm-column__pill-popover-text">This column is in Interaction because Ready To Set Location is represented as a user-visible screen or interaction step.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-06-ready-to-set-location-context-screenpath">ScreenPath</button>
+<div id="nm-pill-popover-06-ready-to-set-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ScreenPath</div>
+<p class="nm-column__pill-popover-text">ScreenPath owns the ordered user-visible screen states in the path.</p>
+<p class="nm-column__pill-popover-text">This column is in ScreenPath because Ready To Set Location is a user-visible screen or interaction state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-06-ready-to-set-location-lens-screen">Screen</button>
+<div id="nm-pill-popover-06-ready-to-set-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Screen</div>
+<p class="nm-column__pill-popover-text">Screen lens focuses on user-visible UI progression.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Screen lens because Ready To Set Location contributes to the user-visible path.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-06-ready-to-set-location-role-user">User</button>
+<div id="nm-pill-popover-06-ready-to-set-location-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because Ready To Set Location depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 06 · 06-ready-to-set-location</div>
 <h2 class="nm-column__title">Ready To Set Location</h2>
@@ -813,28 +1095,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Interaction</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
-<span class="nm-column__badge nm-column__badge--lens">Screen</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.NewSession - Ready To Set</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.NewSession - Ready To Set</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.NewSession - Ready To Set</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">INTERACTION</span>
+<h3 class="nm-column__detail-title">Ready To Set Location</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user has entered location text and the confirm action is now available.</p>
+<ul class="nm-column__detail-list">
 <li>The location input now contains the chosen text.</li>
 <li>Set Location becomes enabled.</li>
 <li>The rest of the expense form is still not visible yet.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">COMMAND</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-07-capture-laundry-location-group-business">Business</button>
+<div id="nm-pill-popover-07-capture-laundry-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Business</div>
+<p class="nm-column__pill-popover-text">Business covers commands, events, and views that express the business truth.</p>
+<p class="nm-column__pill-popover-text">This column is in Business because CaptureLaundryLocation is expressed in Event Modeling terms rather than only as UI state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-07-capture-laundry-location-context-eventmodeling">EventModeling</button>
+<div id="nm-pill-popover-07-capture-laundry-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">EventModeling</div>
+<p class="nm-column__pill-popover-text">EventModeling owns commands, events, and views that express business change and business state.</p>
+<p class="nm-column__pill-popover-text">This column is in EventModeling because CaptureLaundryLocation is represented as a business command or business view.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-07-capture-laundry-location-lens-aem">AEM</button>
+<div id="nm-pill-popover-07-capture-laundry-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">AEM</div>
+<p class="nm-column__pill-popover-text">AEM lens focuses on business commands, events, and views.</p>
+<p class="nm-column__pill-popover-text">This column appears in the AEM lens because CaptureLaundryLocation is represented through Event Modeling.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-07-capture-laundry-location-role-user">User</button>
+<div id="nm-pill-popover-07-capture-laundry-location-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because CaptureLaundryLocation depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">COMMAND</span>
 </div>
 <div class="nm-column__eyebrow">Step 07 · 07-capture-laundry-location</div>
 <h2 class="nm-column__title">CaptureLaundryLocation</h2>
@@ -881,22 +1208,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Business</span>
-<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
-<span class="nm-column__badge nm-column__badge--lens">AEM</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
-</div>
-<div class="nm-column__technical">Surface · CommandSlice.Capture Laundry Location</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
-<li>The entered location draft is now expressed as a command.</li>
-<li>The user action is represented in business terms, not only as screen state.</li>
-<li>A successful command is expected to produce LaundryLocationCaptured.</li>
-</ul>
-</div>
+<div class="nm-column__body nm-column__body--aem">
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
 <section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
 <article class="slice-card slice-card--command">
@@ -1090,10 +1402,36 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">VIEW</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-08-current-laundry-session-location-group-business">Business</button>
+<div id="nm-pill-popover-08-current-laundry-session-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Business</div>
+<p class="nm-column__pill-popover-text">Business covers commands, events, and views that express the business truth.</p>
+<p class="nm-column__pill-popover-text">This column is in Business because CurrentLaundrySession is expressed in Event Modeling terms rather than only as UI state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-08-current-laundry-session-location-context-eventmodeling">EventModeling</button>
+<div id="nm-pill-popover-08-current-laundry-session-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">EventModeling</div>
+<p class="nm-column__pill-popover-text">EventModeling owns commands, events, and views that express business change and business state.</p>
+<p class="nm-column__pill-popover-text">This column is in EventModeling because CurrentLaundrySession is represented as a business command or business view.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-08-current-laundry-session-location-lens-aem">AEM</button>
+<div id="nm-pill-popover-08-current-laundry-session-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">AEM</div>
+<p class="nm-column__pill-popover-text">AEM lens focuses on business commands, events, and views.</p>
+<p class="nm-column__pill-popover-text">This column appears in the AEM lens because CurrentLaundrySession is represented through Event Modeling.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">VIEW</span>
 </div>
 <div class="nm-column__eyebrow">Step 08 · 08-current-laundry-session-location</div>
 <h2 class="nm-column__title">CurrentLaundrySession</h2>
@@ -1216,21 +1554,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Business</span>
-<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
-<span class="nm-column__badge nm-column__badge--lens">AEM</span>
-</div>
-<div class="nm-column__technical">Surface · ViewSlice.Current Laundry Session</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
-<li>The current session view now carries the active location.</li>
-<li>No visible laundry entries exist yet.</li>
-<li>The app can enter the ready-to-log entry form with the business view now established.</li>
-</ul>
-</div>
+<div class="nm-column__body nm-column__body--aem">
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
 <section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
 <article class="slice-card slice-card--view">
@@ -1383,10 +1707,44 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">SCREEN</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-09-entry-form-ready-group-interaction">Interaction</button>
+<div id="nm-pill-popover-09-entry-form-ready-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Interaction</div>
+<p class="nm-column__pill-popover-text">Interaction covers user-visible screens and UI progression through the path.</p>
+<p class="nm-column__pill-popover-text">This column is in Interaction because Entry Form Ready is represented as a user-visible screen or interaction step.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-09-entry-form-ready-context-screenpath">ScreenPath</button>
+<div id="nm-pill-popover-09-entry-form-ready-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ScreenPath</div>
+<p class="nm-column__pill-popover-text">ScreenPath owns the ordered user-visible screen states in the path.</p>
+<p class="nm-column__pill-popover-text">This column is in ScreenPath because Entry Form Ready is a user-visible screen or interaction state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-09-entry-form-ready-lens-screen">Screen</button>
+<div id="nm-pill-popover-09-entry-form-ready-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Screen</div>
+<p class="nm-column__pill-popover-text">Screen lens focuses on user-visible UI progression.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Screen lens because Entry Form Ready contributes to the user-visible path.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-09-entry-form-ready-role-user">User</button>
+<div id="nm-pill-popover-09-entry-form-ready-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because Entry Form Ready depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 09 · 09-entry-form-ready</div>
 <h2 class="nm-column__title">Entry Form Ready</h2>
@@ -1509,28 +1867,73 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Interaction</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
-<span class="nm-column__badge nm-column__badge--lens">Screen</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.EntryForm - Ready At Location</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.EntryForm - Ready At Location</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Ready At Location</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">INTERACTION</span>
+<h3 class="nm-column__detail-title">Entry Form Ready</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The app enters the main entry surface after the location is captured.</p>
+<ul class="nm-column__detail-list">
 <li>The main entry screen replaces the location-only screen.</li>
 <li>Machine, quantity, price, and payment controls become visible.</li>
 <li>Log Expense is still blocked until the required entry choices are complete.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="10-washer-draft" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="10-washer-draft" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">SCREEN</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-10-washer-draft-group-interaction">Interaction</button>
+<div id="nm-pill-popover-10-washer-draft-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Interaction</div>
+<p class="nm-column__pill-popover-text">Interaction covers user-visible screens and UI progression through the path.</p>
+<p class="nm-column__pill-popover-text">This column is in Interaction because Washer Draft is represented as a user-visible screen or interaction step.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-10-washer-draft-context-screenpath">ScreenPath</button>
+<div id="nm-pill-popover-10-washer-draft-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ScreenPath</div>
+<p class="nm-column__pill-popover-text">ScreenPath owns the ordered user-visible screen states in the path.</p>
+<p class="nm-column__pill-popover-text">This column is in ScreenPath because Washer Draft is a user-visible screen or interaction state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-10-washer-draft-lens-screen">Screen</button>
+<div id="nm-pill-popover-10-washer-draft-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Screen</div>
+<p class="nm-column__pill-popover-text">Screen lens focuses on user-visible UI progression.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Screen lens because Washer Draft contributes to the user-visible path.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-10-washer-draft-role-user">User</button>
+<div id="nm-pill-popover-10-washer-draft-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because Washer Draft depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 10 · 10-washer-draft</div>
 <h2 class="nm-column__title">Washer Draft</h2>
@@ -1656,28 +2059,73 @@ Log Expense
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Interaction</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
-<span class="nm-column__badge nm-column__badge--lens">Screen</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.EntryForm - Washer Draft</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.EntryForm - Washer Draft</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Washer Draft</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">INTERACTION</span>
+<h3 class="nm-column__detail-title">Washer Draft</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The first expense draft is composed on the main screen.</p>
+<ul class="nm-column__detail-list">
 <li>Washer becomes the selected machine.</li>
 <li>Card payment details are expanded.</li>
 <li>The draft is complete enough for Log Expense to become available.</li>
 </ul>
 </div>
+</section>
+</div>
 </div>
 </section>
-<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">COMMAND</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-11-log-laundry-expense-group-business">Business</button>
+<div id="nm-pill-popover-11-log-laundry-expense-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Business</div>
+<p class="nm-column__pill-popover-text">Business covers commands, events, and views that express the business truth.</p>
+<p class="nm-column__pill-popover-text">This column is in Business because LogLaundryExpense is expressed in Event Modeling terms rather than only as UI state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-11-log-laundry-expense-context-eventmodeling">EventModeling</button>
+<div id="nm-pill-popover-11-log-laundry-expense-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">EventModeling</div>
+<p class="nm-column__pill-popover-text">EventModeling owns commands, events, and views that express business change and business state.</p>
+<p class="nm-column__pill-popover-text">This column is in EventModeling because LogLaundryExpense is represented as a business command or business view.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-11-log-laundry-expense-lens-aem">AEM</button>
+<div id="nm-pill-popover-11-log-laundry-expense-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">AEM</div>
+<p class="nm-column__pill-popover-text">AEM lens focuses on business commands, events, and views.</p>
+<p class="nm-column__pill-popover-text">This column appears in the AEM lens because LogLaundryExpense is represented through Event Modeling.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-11-log-laundry-expense-role-user">User</button>
+<div id="nm-pill-popover-11-log-laundry-expense-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because LogLaundryExpense depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">COMMAND</span>
 </div>
 <div class="nm-column__eyebrow">Step 11 · 11-log-laundry-expense</div>
 <h2 class="nm-column__title">LogLaundryExpense</h2>
@@ -1803,22 +2251,7 @@ Log Expense
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Business</span>
-<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
-<span class="nm-column__badge nm-column__badge--lens">AEM</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
-</div>
-<div class="nm-column__technical">Surface · CommandSlice.Log Washer Expense</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
-<li>The selected machine, quantity, price, and payment are now represented as command data.</li>
-<li>The washer draft is pressure-tested from a business-event perspective.</li>
-<li>A successful command is expected to produce LaundryExpenseLogged.</li>
-</ul>
-</div>
+<div class="nm-column__body nm-column__body--aem">
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
 <section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
 <article class="slice-card slice-card--command">
@@ -2084,10 +2517,36 @@ Log Expense
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">VIEW</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-group-business">Business</button>
+<div id="nm-pill-popover-12-current-laundry-session-washer-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Business</div>
+<p class="nm-column__pill-popover-text">Business covers commands, events, and views that express the business truth.</p>
+<p class="nm-column__pill-popover-text">This column is in Business because CurrentLaundrySession is expressed in Event Modeling terms rather than only as UI state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-context-eventmodeling">EventModeling</button>
+<div id="nm-pill-popover-12-current-laundry-session-washer-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">EventModeling</div>
+<p class="nm-column__pill-popover-text">EventModeling owns commands, events, and views that express business change and business state.</p>
+<p class="nm-column__pill-popover-text">This column is in EventModeling because CurrentLaundrySession is represented as a business command or business view.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-lens-aem">AEM</button>
+<div id="nm-pill-popover-12-current-laundry-session-washer-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">AEM</div>
+<p class="nm-column__pill-popover-text">AEM lens focuses on business commands, events, and views.</p>
+<p class="nm-column__pill-popover-text">This column appears in the AEM lens because CurrentLaundrySession is represented through Event Modeling.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">VIEW</span>
 </div>
 <div class="nm-column__eyebrow">Step 12 · 12-current-laundry-session-washer</div>
 <h2 class="nm-column__title">CurrentLaundrySession</h2>
@@ -2222,21 +2681,7 @@ Log Expense
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Business</span>
-<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
-<span class="nm-column__badge nm-column__badge--lens">AEM</span>
-</div>
-<div class="nm-column__technical">Surface · ViewSlice.Current Laundry Session</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
-<li>The current session view now includes the first visible washer entry.</li>
-<li>The running total changes to reflect the first expense.</li>
-<li>The app is now ready for the next quick entry.</li>
-</ul>
-</div>
+<div class="nm-column__body nm-column__body--aem">
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
 <section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
 <article class="slice-card slice-card--view">
@@ -2401,10 +2846,44 @@ Log Expense
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="13-logged-success" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="13-logged-success" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__header">
-<div class="nm-column__topline">
-<span class="nm-column__kind">SCREEN</span>
+<div class="nm-column__classification-row">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
+<button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-13-logged-success-group-interaction">Interaction</button>
+<div id="nm-pill-popover-13-logged-success-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div class="nm-column__pill-popover-title">Interaction</div>
+<p class="nm-column__pill-popover-text">Interaction covers user-visible screens and UI progression through the path.</p>
+<p class="nm-column__pill-popover-text">This column is in Interaction because Logged Success is represented as a user-visible screen or interaction step.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
+<button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-13-logged-success-context-screenpath">ScreenPath</button>
+<div id="nm-pill-popover-13-logged-success-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div class="nm-column__pill-popover-title">ScreenPath</div>
+<p class="nm-column__pill-popover-text">ScreenPath owns the ordered user-visible screen states in the path.</p>
+<p class="nm-column__pill-popover-text">This column is in ScreenPath because Logged Success is a user-visible screen or interaction state.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
+<button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-13-logged-success-lens-screen">Screen</button>
+<div id="nm-pill-popover-13-logged-success-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div class="nm-column__pill-popover-title">Screen</div>
+<p class="nm-column__pill-popover-text">Screen lens focuses on user-visible UI progression.</p>
+<p class="nm-column__pill-popover-text">This column appears in the Screen lens because Logged Success contributes to the user-visible path.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-13-logged-success-role-user">User</button>
+<div id="nm-pill-popover-13-logged-success-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because Logged Success depends on or expresses a direct user action.</p>
+</div>
+</div>
+</div>
+<span class="nm-column__kind" data-testid="nm-column-kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 13 · 13-logged-success</div>
 <h2 class="nm-column__title">Logged Success</h2>
@@ -2539,21 +3018,32 @@ Log Expense
 </div>
 </div>
 </div>
-<div class="nm-column__body">
-<div class="nm-column__meta" data-testid="nm-column-meta">
-<span class="nm-column__badge nm-column__badge--group">Interaction</span>
-<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
-<span class="nm-column__badge nm-column__badge--lens">Screen</span>
-<span class="nm-column__badge nm-column__badge--role">User</span>
+<div class="nm-column__body nm-column__body--structured">
+<div class="nm-column__detail-boxes">
+<section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">SCREEN</span>
+<h3 class="nm-column__detail-title">Screen.EntryForm - Logged Success</h3>
 </div>
-<div class="nm-column__technical">Surface · Screen.EntryForm - Logged Success</div>
-<div class="nm-column__changes" data-testid="nm-column-changes">
-<div class="nm-column__changes-label">What Changed</div>
-<ul class="nm-column__changes-list">
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Logged Success</div>
+</div>
+</section>
+<section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
+<div class="nm-column__detail-topline">
+<span class="nm-column__detail-kind">INTERACTION</span>
+<h3 class="nm-column__detail-title">Logged Success</h3>
+</div>
+<div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
+<p class="nm-column__detail-note">The first entry is logged and the surface is ready for the next quick entry.</p>
+<ul class="nm-column__detail-list">
 <li>A logged-success confirmation appears.</li>
 <li>Session total updates to the new amount.</li>
 <li>Today&#39;s entries now shows logged items for continued quick entry.</li>
 </ul>
+</div>
+</section>
 </div>
 </div>
 </section>
@@ -2808,9 +3298,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!flow || !viewport || !scrollbar || !scrollbarContent) { return; }
     flow.style.paddingRight = `${baseFlowPaddingRight}px`;
     currentStepMetrics = measureStepMetrics();
-    const nativeMaxScroll = Math.max(0, flow.scrollWidth - viewport.clientWidth);
+    const nativeMaxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);
     flow.style.paddingRight = `${baseFlowPaddingRight + extraTrailingSpace}px`;
+    const actualMaxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const clampedTargets = currentStepMetrics.targets.map((target) => Math.min(target, actualMaxScroll));
+    const dedupedTargets = clampedTargets.filter((target, index, array) => index === 0 || target > array[index - 1]);
+    currentStepMetrics = {
+      targets: dedupedTargets.length > 0 ? dedupedTargets : [0],
+      logicalMaxTarget: dedupedTargets.length > 0 ? dedupedTargets[dedupedTargets.length - 1] : 0
+    };
     scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;
     if (!syncingScroll) { scrollbar.scrollLeft = clampLeft(viewport.scrollLeft); }
     updateButtonState();
@@ -3021,8 +3518,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330112316268";
-  const currentArtifactUpdatedAt = "2026-03-30T11:23:16Z";
+  const currentArtifactVersion = "nm-path::20260330130610336";
+  const currentArtifactUpdatedAt = "2026-03-30T13:06:10Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

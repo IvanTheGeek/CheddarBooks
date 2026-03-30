@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -56,7 +57,9 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
     const maxStartIndex =
       maxStartIndexCandidate >= 0 ? maxStartIndexCandidate : Math.max(0, normalizedTargets.length - 1);
     const logicalTargets = normalizedTargets.slice(0, maxStartIndex + 1);
-    const logicalMaxTarget = logicalTargets.length > 0 ? logicalTargets[logicalTargets.length - 1] : 0;
+    const viewportMaxScrollLeft = Math.max(0, Math.round((viewport?.scrollWidth ?? 0) - (viewport?.clientWidth ?? 0)));
+    const logicalMaxTarget =
+      logicalTargets.length > 0 ? Math.min(logicalTargets[logicalTargets.length - 1], viewportMaxScrollLeft) : 0;
     const viewportRect = viewport?.getBoundingClientRect();
     const leadingVisibleColumn =
       columns.find((column) => {
@@ -161,6 +164,12 @@ async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> 
   expect(statusText).not.toMatch(/\b(?:EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT)\b/);
 }
 
+function popoverForPill(pill: Locator): Locator {
+  return pill
+    .locator('xpath=ancestor::div[@data-testid="nm-column-pill-wrap"][1]')
+    .locator('[data-testid="nm-column-pill-popover"]');
+}
+
 test.describe('PATH1 NM workspace artifact', () => {
   test('next and end navigation move by whole logical columns and keep the rail synchronized', async ({ page }) => {
     await page.goto(nmPathHttpPath);
@@ -199,7 +208,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(220);
     expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(236);
     expect(thumbnailMetrics.activatorHeight).toBe(thumbnailMetrics.frameHeight);
-    expect(thumbnailMetrics.columnHeight).toBeLessThan(560);
+    expect(thumbnailMetrics.columnHeight).toBeLessThan(720);
     expect(thumbnailMetrics.renderingWidth).toBeLessThan(220);
 
     await clickNmSurfaceMode(page, 'full');
@@ -209,7 +218,7 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     expect(fullMetrics.frameHeight).toBeGreaterThan(thumbnailMetrics.frameHeight);
     expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(312);
-    expect(fullMetrics.columnHeight).toBeLessThan(700);
+    expect(fullMetrics.columnHeight).toBeLessThan(840);
 
     await page.reload();
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
@@ -257,7 +266,9 @@ test.describe('PATH1 NM workspace artifact', () => {
     await clickNmViewMode(page, 'summary');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'summary');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeHidden();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"]')).toBeHidden();
+    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
+    await expect(runtimeColumn.locator('[data-testid="nm-column-screen-box"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
+    await expect(runtimeColumn.locator('[data-testid="nm-surface-open"]')).toBeVisible();
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
     await page.locator('[data-testid="nm-path-scenario-summary"]').click();
@@ -266,7 +277,8 @@ test.describe('PATH1 NM workspace artifact', () => {
     await clickNmViewMode(page, 'detailed');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'detailed');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeVisible();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"]')).toBeVisible();
+    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"] [data-testid="nm-column-detail-copy"]')).toBeVisible();
+    await expect(runtimeColumn.locator('[data-testid="nm-column-screen-box"] [data-testid="nm-column-detail-copy"]')).toBeVisible();
     await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
@@ -280,6 +292,53 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.locator('[data-testid="nm-path-lens-toggle"][data-lens-key="aem"]')).not.toHaveClass(/is-active/);
     await expectNmColumnRemovedFromLayout(page, '01-app-started');
     await expectNmColumnRemovedFromLayout(page, '07-capture-laundry-location');
+  });
+
+  test('classification pills move above the step line, surface kinds are distinct, and contextual popovers explain the current column', async ({ page }) => {
+    await page.goto(nmPathHttpPath);
+
+    const lifecycleColumn = page.locator('[data-testid="nm-path-column"][data-column-key="01-app-started"]');
+    const classificationRow = lifecycleColumn.locator('[data-testid="nm-column-meta"]');
+    const stepLine = lifecycleColumn.locator('.nm-column__eyebrow');
+
+    const classificationBox = await classificationRow.boundingBox();
+    const stepBox = await stepLine.boundingBox();
+
+    expect(classificationBox).not.toBeNull();
+    expect(stepBox).not.toBeNull();
+    expect((classificationBox?.y ?? 0) + (classificationBox?.height ?? 0)).toBeLessThan((stepBox?.y ?? 0) + 1);
+
+    await expect(lifecycleColumn.getByTestId('nm-column-kind')).toHaveText('BOOT');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-kind"]')).toHaveText('SCREEN');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-kind"]')).toHaveText('COMMAND');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-column-kind"]')).toHaveText('VIEW');
+
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-changes"][data-detail-kind="orchestration"]')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-changes"][data-detail-kind="interaction"]')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--command')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--event')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-aem-detail"] .slice-block--view')).toBeVisible();
+
+    const lifecycleContextPill = lifecycleColumn.locator('[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]');
+    const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
+    await lifecycleContextPill.hover();
+    await expect(lifecycleContextPopover).toBeVisible();
+    await expect(lifecycleContextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
+    await expect(lifecycleContextPopover).toContainText('AppStarted marks an app lifecycle phase becoming visible.');
+
+    const runtimeContextPill = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="RuntimeOrchestration"]');
+    const runtimeContextPopover = popoverForPill(runtimeContextPill);
+    await runtimeContextPill.hover();
+    await expect(runtimeContextPopover).toBeVisible();
+    await expect(runtimeContextPopover).toContainText('RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.');
+    await expect(runtimeContextPopover).toContainText('Runtime Checks coordinates checks, route choice, or state handoff.');
+
+    const userRolePill = page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-pill"][data-pill-type="role"][data-pill-label="User"]');
+    const userRolePopover = popoverForPill(userRolePill);
+    await userRolePill.click();
+    await expect(userRolePopover).toBeVisible();
+    await expect(userRolePopover).toContainText('User means the human is acting through the UI at this point in the path.');
+    await expect(userRolePopover).toContainText('Need Location depends on or expresses a direct user action.');
   });
 
   test('surface thumbnails open the overlay and the tracked file artifact still loads directly from disk', async ({ page }) => {

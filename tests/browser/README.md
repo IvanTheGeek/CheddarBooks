@@ -32,6 +32,7 @@ Working rule:
 - `Expecto` remains the primary runner for F# model/renderer truth
 - this workspace is the formal browser harness for DOM/layout/interaction truth
 - test the tracked `workspace/` artifact first, not scratch files under `tmp/`
+- the checked-in npm scripts normalize both `FORCE_COLOR` and `NO_COLOR` before launching Playwright so Node does not emit repeated color-env warnings in the Codex desktop environment
 
 ## Playwright MCP Rule
 

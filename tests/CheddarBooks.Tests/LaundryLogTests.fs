@@ -629,19 +629,35 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "AEM" "Expected the AEM lens toggle."
                   Expect.stringContains htmlDocument "Thumbnail" "Expected the thumbnail surface mode control."
                   Expect.stringContains htmlDocument "Full" "Expected the full surface mode control."
-                  Expect.stringContains htmlDocument "Context · ApplicationLifecycle" "Expected lifecycle bounded-context metadata."
-                  Expect.stringContains htmlDocument "Context · RuntimeOrchestration" "Expected runtime bounded-context metadata."
-                  Expect.stringContains htmlDocument "Context · ScreenPath" "Expected screen-path bounded-context metadata."
-                  Expect.stringContains htmlDocument "Context · EventModeling" "Expected Event Modeling bounded-context metadata."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-pill\"" "Expected stable browser-test hooks for NM classification pills."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-pill-popover\"" "Expected stable browser-test hooks for contextual pill explanations."
+                  Expect.stringContains htmlDocument ">ApplicationLifecycle</button>" "Expected lifecycle bounded-context metadata in the header row."
+                  Expect.stringContains htmlDocument ">RuntimeOrchestration</button>" "Expected runtime bounded-context metadata in the header row."
+                  Expect.stringContains htmlDocument ">ScreenPath</button>" "Expected screen-path bounded-context metadata in the header row."
+                  Expect.stringContains htmlDocument ">EventModeling</button>" "Expected Event Modeling bounded-context metadata in the header row."
                   Expect.stringContains htmlDocument "App Runtime" "Expected the runtime context group badge."
                   Expect.stringContains htmlDocument "Interaction" "Expected the interaction context group badge."
                   Expect.stringContains htmlDocument "Business" "Expected the business context group badge."
+                  Expect.isFalse (htmlDocument.Contains("Context · ApplicationLifecycle")) "Expected the old duplicated lower context pill text to be removed."
+                  Expect.isFalse (htmlDocument.Contains("Context · RuntimeOrchestration")) "Expected the old duplicated lower runtime context text to be removed."
+                  Expect.isFalse (htmlDocument.Contains("Context · ScreenPath")) "Expected the old duplicated lower screen-path context text to be removed."
+                  Expect.isFalse (htmlDocument.Contains("Context · EventModeling")) "Expected the old duplicated lower Event Modeling context text to be removed."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\">BOOT<" "Expected lifecycle/runtime columns to use BOOT as the surface kind."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\">SCREEN<" "Expected screen-path columns to use SCREEN as the surface kind."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\">COMMAND<" "Expected command columns to use COMMAND as the surface kind."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\">VIEW<" "Expected view columns to use VIEW as the surface kind."
+                  Expect.isFalse (htmlDocument.Contains("data-testid=\"nm-column-kind\">LIFECYCLE<")) "Expected lens words to stop appearing as the surface kind."
+                  Expect.isFalse (htmlDocument.Contains("data-testid=\"nm-column-kind\">RUNTIME<")) "Expected runtime lens words to stop appearing as the surface kind."
+                  Expect.stringContains htmlDocument "TRANSITION" "Expected lifecycle columns to use the TRANSITION internal box label."
+                  Expect.stringContains htmlDocument "ORCHESTRATION" "Expected runtime columns to use the ORCHESTRATION internal box label."
+                  Expect.stringContains htmlDocument "INTERACTION" "Expected screen-path columns to use the INTERACTION internal box label."
                   Expect.stringContains htmlDocument "COMMAND SLICE" "Expected embedded AEM command slices in the NM path."
                   Expect.stringContains htmlDocument "VIEW SLICE" "Expected embedded AEM view slices in the NM path."
-                  Expect.stringContains htmlDocument "The entered location draft is now expressed as a command." "Expected the AEM business change summary."
-                  Expect.stringContains htmlDocument "The current session view now includes the first visible washer entry." "Expected the post-command projection change summary."
-                  Expect.stringContains htmlDocument "Surface · CommandSlice.Capture Laundry Location" "Expected the technical surface label for the first embedded command slice."
-                  Expect.stringContains htmlDocument "Surface · ViewSlice.Current Laundry Session" "Expected the technical surface label for embedded view slices."
+                  Expect.stringContains htmlDocument ".nm-column__aem-detail .slice-card__slot--screen { display: none; }" "Expected the linked app surface to replace the embedded AEM screen slot."
+                  Expect.stringContains htmlDocument "The business command for location capture becomes explicit in the NM flow." "Expected the AEM command column note above the slice body."
+                  Expect.stringContains htmlDocument "The first business projection after location capture is now explicit." "Expected the AEM view column note above the slice body."
+                  Expect.isFalse (htmlDocument.Contains("Surface · CommandSlice.Capture Laundry Location")) "Expected AEM columns to stop using the generic NM technical label block."
+                  Expect.isFalse (htmlDocument.Contains("Surface · ViewSlice.Current Laundry Session")) "Expected AEM view columns to stop using the generic NM technical label block."
                   Expect.stringContains htmlDocument "data-view-mode=\"detailed\"" "Expected Detailed to be the default NM working view."
                   Expect.stringContains htmlDocument "data-surface-mode=\"thumbnail\"" "Expected Thumbnail to be the default NM surface presentation."
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-update-status\"" "Expected a stable browser-test hook for the NM update-status surface."
@@ -675,7 +691,13 @@ module LaundryLogTests =
                       let currentIndex = htmlDocument.IndexOf(marker)
                       Expect.isGreaterThanOrEqual currentIndex 0 $"Expected the NM column '{columnKey}' in the rendered HTML."
                       Expect.isGreaterThan currentIndex priorIndex $"Expected '{columnKey}' to appear after the previous NM column."
-                      priorIndex <- currentIndex))
+                      priorIndex <- currentIndex)
+
+                  let firstHeaderMetaIndex = htmlDocument.IndexOf("data-testid=\"nm-column-meta\"")
+                  let firstStepIndex = htmlDocument.IndexOf("Step 01 · 01-app-started")
+                  Expect.isGreaterThanOrEqual firstHeaderMetaIndex 0 "Expected the NM classification row to be rendered."
+                  Expect.isGreaterThanOrEqual firstStepIndex 0 "Expected the first NM step label."
+                  Expect.isLessThan firstHeaderMetaIndex firstStepIndex "Expected the classification row to appear above the step/key line.")
 
               testCase "NM path renderer emits its sidecar update manifest script" (fun () ->
                   let manifestScript =

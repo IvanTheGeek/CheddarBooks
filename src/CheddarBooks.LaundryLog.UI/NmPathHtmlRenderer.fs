@@ -34,6 +34,13 @@ type NmContextKind =
 
 [<RequireQualifiedAccess>]
 module NmContextKind =
+    let domKey =
+        function
+        | ApplicationLifecycle -> "application-lifecycle"
+        | RuntimeOrchestration -> "runtime-orchestration"
+        | ScreenPath -> "screen-path"
+        | EventModeling -> "event-modeling"
+
     let label =
         function
         | ApplicationLifecycle -> "ApplicationLifecycle"
@@ -344,6 +351,7 @@ module NmPathHtmlExamples =
 module NmPathHtmlRenderer =
     let private htmlEncode (value: string) = WebUtility.HtmlEncode value
     let private jsonString (value: string) = JsonSerializer.Serialize value
+    let private domSlug (value: string) = value.Trim().ToLowerInvariant().Replace(" ", "-")
 
     let private appendLine (builder: StringBuilder) (value: string) =
         builder.AppendLine(value) |> ignore
@@ -427,11 +435,98 @@ module NmPathHtmlRenderer =
 
     let private columnKindLabel =
         function
-        | { Surface = NmBootSurface _; PrimaryContext = NmContextKind.ApplicationLifecycle } -> "LIFECYCLE"
-        | { Surface = NmBootSurface _ } -> "RUNTIME"
+        | { Surface = NmBootSurface _ } -> "BOOT"
         | { Surface = NmAppScreenSurface _ } -> "SCREEN"
         | { Surface = NmAemSliceSurface (_, PathSliceCard.CommandSlice _) } -> "COMMAND"
         | { Surface = NmAemSliceSurface (_, PathSliceCard.ViewSlice _) } -> "VIEW"
+
+    let private nonAemDetailKindLabel =
+        function
+        | { PrimaryContext = NmContextKind.ApplicationLifecycle } -> "TRANSITION"
+        | { PrimaryContext = NmContextKind.RuntimeOrchestration } -> "ORCHESTRATION"
+        | { PrimaryContext = NmContextKind.ScreenPath } -> "INTERACTION"
+        | { PrimaryContext = NmContextKind.EventModeling } -> "STATE"
+
+    let private screenBoxTitle (columnState: NmColumnState) =
+        columnState.TechnicalSurfaceLabel |> Option.defaultValue columnState.ColumnTitle
+
+    let private screenBoxNote =
+        function
+        | { PrimaryContext = NmContextKind.ApplicationLifecycle } ->
+            "The visible boot surface linked to this lifecycle step."
+        | { PrimaryContext = NmContextKind.RuntimeOrchestration } ->
+            "The visible boot surface linked to this runtime orchestration step."
+        | { PrimaryContext = NmContextKind.ScreenPath } ->
+            "The user-visible screen surface linked to this path step."
+        | { PrimaryContext = NmContextKind.EventModeling } ->
+            "The linked app surface that frames this Event Modeling slice."
+
+    let private groupMeaning =
+        function
+        | ContextGroupKind.AppRuntime -> "App Runtime covers startup, lifecycle, route choice, and other app/system mechanics."
+        | ContextGroupKind.Interaction -> "Interaction covers user-visible screens and UI progression through the path."
+        | ContextGroupKind.Business -> "Business covers commands, events, and views that express the business truth."
+
+    let private groupWhyThisColumn (columnState: NmColumnState) =
+        match columnState.ContextGroup with
+        | ContextGroupKind.AppRuntime ->
+            $"This column is in App Runtime because {columnState.ColumnTitle} is driven by app/system startup or route mechanics."
+        | ContextGroupKind.Interaction ->
+            $"This column is in Interaction because {columnState.ColumnTitle} is represented as a user-visible screen or interaction step."
+        | ContextGroupKind.Business ->
+            $"This column is in Business because {columnState.ColumnTitle} is expressed in Event Modeling terms rather than only as UI state."
+
+    let private contextMeaning =
+        function
+        | NmContextKind.ApplicationLifecycle ->
+            "ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend."
+        | NmContextKind.RuntimeOrchestration ->
+            "RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow."
+        | NmContextKind.ScreenPath ->
+            "ScreenPath owns the ordered user-visible screen states in the path."
+        | NmContextKind.EventModeling ->
+            "EventModeling owns commands, events, and views that express business change and business state."
+
+    let private contextWhyThisColumn (columnState: NmColumnState) =
+        match columnState.PrimaryContext with
+        | NmContextKind.ApplicationLifecycle ->
+            $"This column is in ApplicationLifecycle because {columnState.ColumnTitle} marks an app lifecycle phase becoming visible."
+        | NmContextKind.RuntimeOrchestration ->
+            $"This column is in RuntimeOrchestration because {columnState.ColumnTitle} coordinates checks, route choice, or state handoff."
+        | NmContextKind.ScreenPath ->
+            $"This column is in ScreenPath because {columnState.ColumnTitle} is a user-visible screen or interaction state."
+        | NmContextKind.EventModeling ->
+            $"This column is in EventModeling because {columnState.ColumnTitle} is represented as a business command or business view."
+
+    let private lensMeaning =
+        function
+        | NmLensKind.Lifecycle -> "Lifecycle lens focuses on app phase changes."
+        | NmLensKind.Runtime -> "Runtime lens focuses on orchestration and app mechanics."
+        | NmLensKind.Screen -> "Screen lens focuses on user-visible UI progression."
+        | NmLensKind.Aem -> "AEM lens focuses on business commands, events, and views."
+
+    let private lensWhyThisColumn (columnState: NmColumnState) =
+        function
+        | NmLensKind.Lifecycle ->
+            $"This column appears in the Lifecycle lens because {columnState.ColumnTitle} contributes to the app lifecycle story."
+        | NmLensKind.Runtime ->
+            $"This column appears in the Runtime lens because {columnState.ColumnTitle} contributes to app/runtime coordination."
+        | NmLensKind.Screen ->
+            $"This column appears in the Screen lens because {columnState.ColumnTitle} contributes to the user-visible path."
+        | NmLensKind.Aem ->
+            $"This column appears in the AEM lens because {columnState.ColumnTitle} is represented through Event Modeling."
+
+    let private roleMeaning =
+        function
+        | "System" -> "System means the app/runtime is acting at this point in the path."
+        | "User" -> "User means the human is acting through the UI at this point in the path."
+        | roleText -> $"{roleText} is the acting party represented in this column."
+
+    let private roleWhyThisColumn (columnState: NmColumnState) =
+        function
+        | "System" -> $"This column is tagged System because {columnState.ColumnTitle} happens through app/runtime work rather than direct user input."
+        | "User" -> $"This column is tagged User because {columnState.ColumnTitle} depends on or expresses a direct user action."
+        | roleText -> $"This column is tagged {roleText} because that actor is the relevant participant in {columnState.ColumnTitle}."
 
     let private renderSurfaceFragment =
         function
@@ -453,16 +548,139 @@ module NmPathHtmlRenderer =
         let nativeWidth, nativeHeight = surfaceNativeSize surfaceState
         $" style=\"--nm-surface-native-width: {nativeWidth}px; --nm-surface-native-height: {nativeHeight}px;\""
 
-    let private renderLenses (builder: StringBuilder) (columnState: NmColumnState) =
+    let private renderBadgePopover (builder: StringBuilder) columnKey pillType label meaning whyThisColumn modifierClass =
+        let popoverId = $"nm-pill-popover-{columnKey}-{pillType}-{domSlug label}"
+
+        appendLine builder $"<div class=\"nm-column__pill-wrap\" data-testid=\"nm-column-pill-wrap\" data-pill-type=\"{htmlEncode pillType}\">"
+        appendLine
+            builder
+            $"<button class=\"nm-column__badge {modifierClass}\" type=\"button\" data-testid=\"nm-column-pill\" data-pill-type=\"{htmlEncode pillType}\" data-pill-label=\"{htmlEncode label}\" aria-describedby=\"{htmlEncode popoverId}\">{htmlEncode label}</button>"
+        appendLine
+            builder
+            $"<div id=\"{htmlEncode popoverId}\" class=\"nm-column__pill-popover\" data-testid=\"nm-column-pill-popover\" data-pill-type=\"{htmlEncode pillType}\" role=\"tooltip\">"
+        appendLine builder $"<div class=\"nm-column__pill-popover-title\">{htmlEncode label}</div>"
+        appendLine builder $"<p class=\"nm-column__pill-popover-text\">{htmlEncode meaning}</p>"
+        appendLine builder $"<p class=\"nm-column__pill-popover-text\">{htmlEncode whyThisColumn}</p>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderClassificationRow (builder: StringBuilder) (columnState: NmColumnState) =
+        appendLine builder "<div class=\"nm-column__classification-row\">"
+        appendLine builder "<div class=\"nm-column__meta\" data-testid=\"nm-column-meta\">"
+
+        renderBadgePopover
+            builder
+            columnState.ColumnKey
+            "group"
+            (ContextGroupKind.label columnState.ContextGroup)
+            (groupMeaning columnState.ContextGroup)
+            (groupWhyThisColumn columnState)
+            "nm-column__badge--group"
+
+        renderBadgePopover
+            builder
+            columnState.ColumnKey
+            "context"
+            (NmContextKind.label columnState.PrimaryContext)
+            (contextMeaning columnState.PrimaryContext)
+            (contextWhyThisColumn columnState)
+            "nm-column__badge--context"
+
         columnState.VisibleInLenses
         |> List.iter (fun lensKind ->
-            appendLine builder $"<span class=\"nm-column__badge nm-column__badge--lens\">{htmlEncode (NmLensKind.label lensKind)}</span>")
+            renderBadgePopover
+                builder
+                columnState.ColumnKey
+                "lens"
+                (NmLensKind.label lensKind)
+                (lensMeaning lensKind)
+                (lensWhyThisColumn columnState lensKind)
+                "nm-column__badge--lens")
+
+        match columnState.ActorRoleBadge with
+        | Some roleBadge ->
+            renderBadgePopover
+                builder
+                columnState.ColumnKey
+                "role"
+                roleBadge
+                (roleMeaning roleBadge)
+                (roleWhyThisColumn columnState roleBadge)
+                "nm-column__badge--role"
+        | None -> ()
+
+        appendLine builder "</div>"
+        appendLine builder $"<span class=\"nm-column__kind\" data-testid=\"nm-column-kind\">{htmlEncode (columnKindLabel columnState)}</span>"
+        appendLine builder "</div>"
 
     let private renderEmbeddedAemCard (builder: StringBuilder) (sliceCard: PathSliceCard) =
         appendLine builder "<div class=\"nm-column__aem-detail\" data-testid=\"nm-aem-detail\">"
         appendLine builder "<section class=\"path-document__row nm-column__aem-row\" data-base-columns=\"1\" style=\"--current-slice-columns: 1;\">"
         appendLine builder (SliceHtmlRenderer.renderSliceCardHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") sliceCard)
         appendLine builder "</section>"
+        appendLine builder "</div>"
+
+    let private renderStructuredDetailBox
+        (builder: StringBuilder)
+        detailKind
+        detailKindDomKey
+        titleText
+        bodyText
+        detailLines
+        technicalLabel
+        dataTestId
+        =
+        appendLine
+            builder
+            $"<section class=\"nm-column__detail-box nm-column__detail-box--{htmlEncode detailKindDomKey}\" data-testid=\"{htmlEncode dataTestId}\" data-detail-kind=\"{htmlEncode detailKindDomKey}\">"
+        appendLine builder "<div class=\"nm-column__detail-topline\">"
+        appendLine builder $"<span class=\"nm-column__detail-kind\">{htmlEncode detailKind}</span>"
+        appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode titleText}</h3>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
+
+        match bodyText with
+        | Some noteText -> appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode noteText}</p>"
+        | None -> ()
+
+        match technicalLabel with
+        | Some surfaceLabel -> appendLine builder $"<div class=\"nm-column__technical\" data-testid=\"nm-column-technical\">Surface · {htmlEncode surfaceLabel}</div>"
+        | None -> ()
+
+        if not (List.isEmpty detailLines) then
+            appendLine builder "<ul class=\"nm-column__detail-list\">"
+
+            detailLines
+            |> List.iter (fun lineText -> appendLine builder $"<li>{htmlEncode lineText}</li>")
+
+            appendLine builder "</ul>"
+
+        appendLine builder "</div>"
+        appendLine builder "</section>"
+
+    let private renderNonAemBoxes (builder: StringBuilder) (columnState: NmColumnState) =
+        appendLine builder "<div class=\"nm-column__detail-boxes\">"
+
+        renderStructuredDetailBox
+            builder
+            "SCREEN"
+            "screen"
+            (screenBoxTitle columnState)
+            (Some(screenBoxNote columnState))
+            []
+            columnState.TechnicalSurfaceLabel
+            "nm-column-screen-box"
+
+        renderStructuredDetailBox
+            builder
+            (nonAemDetailKindLabel columnState)
+            (nonAemDetailKindLabel columnState |> domSlug)
+            columnState.ColumnTitle
+            columnState.ColumnNote
+            columnState.ChangeItems
+            None
+            "nm-column-changes"
+
         appendLine builder "</div>"
 
     let private renderColumnSurfaceSlot (builder: StringBuilder) (columnState: NmColumnState) =
@@ -483,14 +701,13 @@ module NmPathHtmlRenderer =
     let private renderColumn (builder: StringBuilder) (index: int) (columnState: NmColumnState) =
         let stepNumberText = (index + 1).ToString("00")
         let groupDomKey = ContextGroupKind.domKey columnState.ContextGroup
+        let contextDomKey = NmContextKind.domKey columnState.PrimaryContext
 
         appendLine
             builder
-            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey}\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
+            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey} nm-column--context-{htmlEncode contextDomKey}\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-context-key=\"{htmlEncode contextDomKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
         appendLine builder "<div class=\"nm-column__header\">"
-        appendLine builder "<div class=\"nm-column__topline\">"
-        appendLine builder $"<span class=\"nm-column__kind\">{htmlEncode (columnKindLabel columnState)}</span>"
-        appendLine builder "</div>"
+        renderClassificationRow builder columnState
         appendLine builder $"<div class=\"nm-column__eyebrow\">Step {stepNumberText} · {htmlEncode columnState.ColumnKey}</div>"
         appendLine builder $"<h2 class=\"nm-column__title\">{htmlEncode columnState.ColumnTitle}</h2>"
 
@@ -504,38 +721,16 @@ module NmPathHtmlRenderer =
         renderColumnSurfaceSlot builder columnState
         appendLine builder "</div>"
 
-        appendLine builder "<div class=\"nm-column__body\">"
-        appendLine builder "<div class=\"nm-column__meta\" data-testid=\"nm-column-meta\">"
-        appendLine builder $"<span class=\"nm-column__badge nm-column__badge--group\">{htmlEncode (ContextGroupKind.label columnState.ContextGroup)}</span>"
-        appendLine builder $"<span class=\"nm-column__badge nm-column__badge--context\">Context · {htmlEncode (NmContextKind.label columnState.PrimaryContext)}</span>"
-        renderLenses builder columnState
-
-        match columnState.ActorRoleBadge with
-        | Some roleBadge -> appendLine builder $"<span class=\"nm-column__badge nm-column__badge--role\">{htmlEncode roleBadge}</span>"
-        | None -> ()
-
-        appendLine builder "</div>"
-
-        match columnState.TechnicalSurfaceLabel with
-        | Some surfaceLabel -> appendLine builder $"<div class=\"nm-column__technical\">Surface · {htmlEncode surfaceLabel}</div>"
-        | None -> ()
-
-        appendLine builder "<div class=\"nm-column__changes\" data-testid=\"nm-column-changes\">"
-        appendLine builder "<div class=\"nm-column__changes-label\">What Changed</div>"
-        appendLine builder "<ul class=\"nm-column__changes-list\">"
-
-        columnState.ChangeItems
-        |> List.iter (fun changeItem ->
-            appendLine builder $"<li>{htmlEncode changeItem}</li>")
-
-        appendLine builder "</ul>"
-        appendLine builder "</div>"
-
         match columnState.Surface with
-        | NmAemSliceSurface (_, sliceCard) -> renderEmbeddedAemCard builder sliceCard
-        | _ -> ()
+        | NmAemSliceSurface (_, sliceCard) ->
+            appendLine builder "<div class=\"nm-column__body nm-column__body--aem\">"
+            renderEmbeddedAemCard builder sliceCard
+            appendLine builder "</div>"
+        | _ ->
+            appendLine builder "<div class=\"nm-column__body nm-column__body--structured\">"
+            renderNonAemBoxes builder columnState
+            appendLine builder "</div>"
 
-        appendLine builder "</div>"
         appendLine builder "</section>"
 
     let private renderStyles (builder: StringBuilder) =
@@ -573,7 +768,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-path-document__update-status[data-state=\"available\"] { color: #9a3412; font-weight: 700; }"
         appendLine builder ".nm-path-document__update-status[data-state=\"error\"] { color: #b91c1c; }"
         appendLine builder ".nm-path-document__update-status[data-state=\"auto\"] { color: #0e5883; font-weight: 700; }"
-        appendLine builder ".nm-path-document[data-view-mode=\"summary\"] .nm-path-document__context-panel, .nm-path-document[data-view-mode=\"summary\"] .nm-column__note, .nm-path-document[data-view-mode=\"summary\"] .nm-column__meta, .nm-path-document[data-view-mode=\"summary\"] .nm-column__technical, .nm-path-document[data-view-mode=\"summary\"] .nm-column__changes, .nm-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .nm-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
+        appendLine builder ".nm-path-document[data-view-mode=\"summary\"] .nm-path-document__context-panel, .nm-path-document[data-view-mode=\"summary\"] .nm-column__note, .nm-path-document[data-view-mode=\"summary\"] .nm-column__meta, .nm-path-document[data-view-mode=\"summary\"] .nm-column__detail-copy, .nm-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .nm-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
         appendLine builder ".nm-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }"
         appendLine builder ".nm-path-nav-button { width: 42px; height: 42px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(255, 183, 77, 0.32); }"
         appendLine builder ".nm-path-nav-button:hover:not(:disabled) { filter: brightness(0.98); }"
@@ -590,14 +785,18 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }"
         appendLine builder ".nm-path-flow-viewport::-webkit-scrollbar { display: none; }"
         appendLine builder ".nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }"
-        appendLine builder ".nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; }"
+        appendLine builder ".nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; overflow: visible; }"
         appendLine builder ".nm-column[hidden] { display: none !important; }"
         appendLine builder ".nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }"
         appendLine builder ".nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }"
         appendLine builder ".nm-column--business { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); }"
+        appendLine builder ".nm-column--context-application-lifecycle { background: linear-gradient(180deg, #e7effc 0%, #f8fbff 100%); border-color: #19395c; }"
+        appendLine builder ".nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }"
+        appendLine builder ".nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }"
+        appendLine builder ".nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }"
         appendLine builder ".nm-column__header { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".nm-column__topline { display: flex; align-items: flex-start; justify-content: flex-end; gap: 10px; }"
-        appendLine builder ".nm-column__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }"
+        appendLine builder ".nm-column__classification-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; }"
+        appendLine builder ".nm-column__kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; color: #1e293b; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; margin-top: 2px; }"
         appendLine builder ".nm-column__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }"
         appendLine builder ".nm-column__title { margin: 0; font-size: 0.84rem; line-height: 1.05; font-weight: 700; color: #0f172a; }"
         appendLine builder ".nm-column__note { margin: 0; font-size: 0.7rem; line-height: 1.22; color: #556b85; min-height: 2.35em; }"
@@ -608,16 +807,35 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; }"
         appendLine builder ".nm-column__surface-rendering { position: absolute; top: 0; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; }"
         appendLine builder ".nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }"
-        appendLine builder ".nm-column__body { display: flex; flex-direction: column; gap: 8px; min-height: 0; }"
-        appendLine builder ".nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }"
-        appendLine builder ".nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4a647f; white-space: nowrap; }"
+        appendLine builder ".nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }"
+        appendLine builder ".nm-column__body--aem { gap: 6px; }"
+        appendLine builder ".nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }"
+        appendLine builder ".nm-column__pill-wrap { position: relative; display: inline-flex; max-width: 100%; }"
+        appendLine builder ".nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }"
         appendLine builder ".nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }"
+        appendLine builder ".nm-column__badge--interactive { appearance: none; -webkit-appearance: none; }"
+        appendLine builder ".nm-column__badge--interactive:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
         appendLine builder ".nm-column__badge--role { text-transform: none; }"
-        appendLine builder ".nm-column__technical { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }"
-        appendLine builder ".nm-column__changes { display: grid; gap: 0.25rem; padding: 0.55rem 0.7rem; border-radius: 0.85rem; background: rgba(255, 255, 255, 0.72); border: 1px solid #dce5ef; }"
-        appendLine builder ".nm-column__changes-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
-        appendLine builder ".nm-column__changes-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.16rem; color: #475569; font-size: 0.7rem; line-height: 1.25; }"
+        appendLine builder ".nm-column__pill-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease; }"
+        appendLine builder ".nm-column__pill-wrap:hover .nm-column__pill-popover, .nm-column__pill-wrap:focus-within .nm-column__pill-popover { opacity: 1; transform: translateY(0); pointer-events: auto; }"
+        appendLine builder ".nm-column__pill-popover-title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }"
+        appendLine builder ".nm-column__pill-popover-text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }"
+        appendLine builder ".nm-column__detail-boxes { display: grid; gap: 8px; }"
+        appendLine builder ".nm-column__detail-box { display: grid; gap: 5px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; background: rgba(255, 255, 255, 0.82); }"
+        appendLine builder ".nm-column__detail-box--screen { border-color: #c8dcff; background: rgba(255, 255, 255, 0.82); }"
+        appendLine builder ".nm-column__detail-box--transition { border-color: #89b6e8; background: rgba(82, 155, 246, 0.14); }"
+        appendLine builder ".nm-column__detail-box--orchestration { border-color: #8ac3dd; background: rgba(84, 165, 200, 0.14); }"
+        appendLine builder ".nm-column__detail-box--interaction { border-color: #8ad1a1; background: rgba(93, 194, 120, 0.16); }"
+        appendLine builder ".nm-column__detail-topline { display: grid; gap: 5px; }"
+        appendLine builder ".nm-column__detail-kind { justify-self: end; display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1e293b; }"
+        appendLine builder ".nm-column__detail-title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; color: #0f172a; }"
+        appendLine builder ".nm-column__detail-copy { display: grid; gap: 0.28rem; }"
+        appendLine builder ".nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }"
+        appendLine builder ".nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }"
+        appendLine builder ".nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }"
         appendLine builder ".nm-column__aem-detail { display: flex; flex-direction: column; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__slot--screen { display: none; }"
+        appendLine builder ".nm-column__aem-detail .slice-card { padding-top: 2px; }"
         appendLine builder ".nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }"
         appendLine builder ".nm-column__aem-row .slice-card { width: 100%; }"
         appendLine builder ".nm-column__aem-row .slice-card__title { font-size: 0.78rem; }"
@@ -788,9 +1006,16 @@ module NmPathHtmlRenderer =
         appendLine builder "    if (!flow || !viewport || !scrollbar || !scrollbarContent) { return; }"
         appendLine builder "    flow.style.paddingRight = `${baseFlowPaddingRight}px`;"
         appendLine builder "    currentStepMetrics = measureStepMetrics();"
-        appendLine builder "    const nativeMaxScroll = Math.max(0, flow.scrollWidth - viewport.clientWidth);"
+        appendLine builder "    const nativeMaxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);"
         appendLine builder "    const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);"
         appendLine builder "    flow.style.paddingRight = `${baseFlowPaddingRight + extraTrailingSpace}px`;"
+        appendLine builder "    const actualMaxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);"
+        appendLine builder "    const clampedTargets = currentStepMetrics.targets.map((target) => Math.min(target, actualMaxScroll));"
+        appendLine builder "    const dedupedTargets = clampedTargets.filter((target, index, array) => index === 0 || target > array[index - 1]);"
+        appendLine builder "    currentStepMetrics = {"
+        appendLine builder "      targets: dedupedTargets.length > 0 ? dedupedTargets : [0],"
+        appendLine builder "      logicalMaxTarget: dedupedTargets.length > 0 ? dedupedTargets[dedupedTargets.length - 1] : 0"
+        appendLine builder "    };"
         appendLine builder "    scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;"
         appendLine builder "    if (!syncingScroll) { scrollbar.scrollLeft = clampLeft(viewport.scrollLeft); }"
         appendLine builder "    updateButtonState();"
