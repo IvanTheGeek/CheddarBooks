@@ -29,3 +29,16 @@ Working rule:
 - `Expecto` remains the primary runner for F# model/renderer truth
 - this workspace is the formal browser harness for DOM/layout/interaction truth
 - test the tracked `workspace/` artifact first, not scratch files under `tmp/`
+
+## Playwright MCP Rule
+
+For interactive Playwright MCP browser work:
+
+- do not open the tracked artifact with `file://` first
+- the MCP browser sandbox blocks `file:` URLs
+- serve the tracked workspace HTML tree over local HTTP and target `http://127.0.0.1/...` instead
+
+Short rule:
+
+- manual review may still use `file://` when helpful
+- formal Playwright browser work should use local HTTP

@@ -104,6 +104,7 @@ For local F# Interactive artifact generation:
 - for the tracked LaundryLog workspace HTML, use [`../scripts/laundrylog/refresh-workspace-html.sh`](../scripts/laundrylog/refresh-workspace-html.sh) as the usual refresh path
 - for formal browser verification of tracked LaundryLog HTML behavior, use the Playwright workspace under [`../tests/browser/README.md`](../tests/browser/README.md)
 - keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
+- when using Playwright MCP for tracked local HTML, do not target `file://` first; the MCP browser sandbox blocks `file:` URLs, so serve the tracked workspace HTML over local HTTP and point MCP there
 
 ## Verification Discipline
 

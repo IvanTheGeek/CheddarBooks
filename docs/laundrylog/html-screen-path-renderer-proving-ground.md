@@ -222,6 +222,7 @@ Current working rule:
 - the tracked `workspace/` HTML is the browser-test target
 - `file://` loading is still kept as a secondary smoke path
 - the formal browser suite should primarily serve the tracked workspace artifact over a tiny local HTTP server instead of relying only on `file://`
+- Playwright MCP should follow the same rule, because its browser sandbox blocks `file:` URLs even though manual local browser review may still open the artifact directly from disk
 
 ## Horizontal Navigation Guidance
 
