@@ -565,8 +565,9 @@ module NmPathHtmlRenderer =
         appendLine builder "</div>"
 
     let private renderClassificationRow (builder: StringBuilder) (columnState: NmColumnState) =
-        appendLine builder "<div class=\"nm-column__classification-row\">"
-        appendLine builder "<div class=\"nm-column__meta\" data-testid=\"nm-column-meta\">"
+        appendLine builder "<div class=\"nm-column__classification\">"
+        appendLine builder "<div class=\"nm-column__classification-row nm-column__classification-row--primary\">"
+        appendLine builder "<div class=\"nm-column__meta nm-column__meta--primary\" data-testid=\"nm-column-meta\">"
 
         renderBadgePopover
             builder
@@ -585,6 +586,13 @@ module NmPathHtmlRenderer =
             (contextMeaning columnState.PrimaryContext)
             (contextWhyThisColumn columnState)
             "nm-column__badge--context"
+
+        appendLine builder "</div>"
+        appendLine builder $"<span class=\"nm-column__kind\" data-testid=\"nm-column-kind\">{htmlEncode (columnKindLabel columnState)}</span>"
+        appendLine builder "</div>"
+
+        appendLine builder "<div class=\"nm-column__classification-row nm-column__classification-row--secondary\">"
+        appendLine builder "<div class=\"nm-column__meta nm-column__meta--secondary\">"
 
         columnState.VisibleInLenses
         |> List.iter (fun lensKind ->
@@ -610,7 +618,7 @@ module NmPathHtmlRenderer =
         | None -> ()
 
         appendLine builder "</div>"
-        appendLine builder $"<span class=\"nm-column__kind\" data-testid=\"nm-column-kind\">{htmlEncode (columnKindLabel columnState)}</span>"
+        appendLine builder "</div>"
         appendLine builder "</div>"
 
     let private renderEmbeddedAemCard (builder: StringBuilder) (sliceCard: PathSliceCard) =
@@ -658,18 +666,48 @@ module NmPathHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "</section>"
 
+    let private renderColumnSurfacePreview (builder: StringBuilder) (columnState: NmColumnState) =
+        let surfaceSizing = surfaceSizingStyle columnState.Surface
+
+        appendLine builder "<div class=\"nm-column__surface-preview-stage\">"
+        appendLine
+            builder
+            $"<div class=\"nm-column__surface-button\" data-testid=\"nm-surface-open\" data-action=\"open-surface-overlay\" data-surface-label=\"{htmlEncode columnState.ColumnTitle}\" role=\"button\" tabindex=\"0\" aria-label=\"Expand {htmlEncode columnState.ColumnTitle} surface\">"
+        appendLine builder $"<div class=\"nm-column__surface-frame\"{surfaceSizing}>"
+        appendLine builder "<div class=\"nm-column__surface-preview\">"
+        appendLine builder "<div class=\"nm-column__surface-rendering\">"
+        appendLine builder (renderSurfaceFragment columnState.Surface)
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderScreenDetailBox (builder: StringBuilder) (columnState: NmColumnState) =
+        appendLine
+            builder
+            "<section class=\"nm-column__detail-box nm-column__detail-box--screen\" data-testid=\"nm-column-screen-box\" data-detail-kind=\"screen\">"
+        appendLine builder "<div class=\"nm-column__detail-topline\">"
+        appendLine builder "<span class=\"nm-column__detail-kind\">SCREEN</span>"
+        appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode (screenBoxTitle columnState)}</h3>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
+        appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (screenBoxNote columnState)}</p>"
+
+        match columnState.TechnicalSurfaceLabel with
+        | Some surfaceLabel ->
+            appendLine
+                builder
+                $"<div class=\"nm-column__technical\" data-testid=\"nm-column-technical\">Surface · {htmlEncode surfaceLabel}</div>"
+        | None -> ()
+
+        appendLine builder "</div>"
+        renderColumnSurfacePreview builder columnState
+        appendLine builder "</section>"
+
     let private renderNonAemBoxes (builder: StringBuilder) (columnState: NmColumnState) =
         appendLine builder "<div class=\"nm-column__detail-boxes\">"
-
-        renderStructuredDetailBox
-            builder
-            "SCREEN"
-            "screen"
-            (screenBoxTitle columnState)
-            (Some(screenBoxNote columnState))
-            []
-            columnState.TechnicalSurfaceLabel
-            "nm-column-screen-box"
+        renderScreenDetailBox builder columnState
 
         renderStructuredDetailBox
             builder
@@ -681,21 +719,6 @@ module NmPathHtmlRenderer =
             None
             "nm-column-changes"
 
-        appendLine builder "</div>"
-
-    let private renderColumnSurfaceSlot (builder: StringBuilder) (columnState: NmColumnState) =
-        let surfaceSizing = surfaceSizingStyle columnState.Surface
-
-        appendLine
-            builder
-            $"<div class=\"nm-column__surface-button\" data-testid=\"nm-surface-open\" data-action=\"open-surface-overlay\" data-surface-label=\"{htmlEncode columnState.ColumnTitle}\" role=\"button\" tabindex=\"0\" aria-label=\"Expand {htmlEncode columnState.ColumnTitle} surface\">"
-        appendLine builder $"<div class=\"nm-column__surface-frame\"{surfaceSizing}>"
-        appendLine builder "<div class=\"nm-column__surface-preview\">"
-        appendLine builder "<div class=\"nm-column__surface-rendering\">"
-        appendLine builder (renderSurfaceFragment columnState.Surface)
-        appendLine builder "</div>"
-        appendLine builder "</div>"
-        appendLine builder "</div>"
         appendLine builder "</div>"
 
     let private renderColumn (builder: StringBuilder) (index: int) (columnState: NmColumnState) =
@@ -717,13 +740,10 @@ module NmPathHtmlRenderer =
 
         appendLine builder "</div>"
 
-        appendLine builder "<div class=\"nm-column__surface-slot\">"
-        renderColumnSurfaceSlot builder columnState
-        appendLine builder "</div>"
-
         match columnState.Surface with
         | NmAemSliceSurface (_, sliceCard) ->
             appendLine builder "<div class=\"nm-column__body nm-column__body--aem\">"
+            renderScreenDetailBox builder columnState
             renderEmbeddedAemCard builder sliceCard
             appendLine builder "</div>"
         | _ ->
@@ -737,9 +757,9 @@ module NmPathHtmlRenderer =
         appendLine builder "<style>"
         appendLine builder "html, body { height: 100%; overflow: hidden; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".nm-path-document { --nm-column-width: 316px; --nm-surface-scale: 0.34; --nm-surface-slot-height: 228px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }"
-        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] { --nm-surface-scale: 0.34; --nm-surface-slot-height: 228px; }"
-        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] { --nm-surface-scale: 0.48; --nm-surface-slot-height: 320px; }"
+        appendLine builder ".nm-path-document { --nm-column-width: 292px; --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] { --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] { --nm-surface-scale: 0.24; --nm-surface-slot-height: 176px; --nm-surface-frame-width: 228px; }"
         appendLine builder ".nm-path-document__header { display: flex; flex-direction: column; gap: 6px; }"
         appendLine builder ".nm-path-document__topline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; }"
         appendLine builder ".nm-path-document__title-zone { min-width: 0; display: flex; flex-direction: column; gap: 4px; }"
@@ -785,7 +805,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }"
         appendLine builder ".nm-path-flow-viewport::-webkit-scrollbar { display: none; }"
         appendLine builder ".nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }"
-        appendLine builder ".nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; overflow: visible; }"
+        appendLine builder ".nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; }"
         appendLine builder ".nm-column[hidden] { display: none !important; }"
         appendLine builder ".nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }"
         appendLine builder ".nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }"
@@ -794,24 +814,28 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }"
         appendLine builder ".nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }"
         appendLine builder ".nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }"
-        appendLine builder ".nm-column__header { display: flex; flex-direction: column; gap: 4px; }"
-        appendLine builder ".nm-column__classification-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: start; }"
+        appendLine builder ".nm-column__header { display: flex; flex-direction: column; gap: 5px; }"
+        appendLine builder ".nm-column__classification { display: grid; gap: 4px; }"
+        appendLine builder ".nm-column__classification-row { display: grid; align-items: start; }"
+        appendLine builder ".nm-column__classification-row--primary { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }"
+        appendLine builder ".nm-column__classification-row--secondary { grid-template-columns: minmax(0, 1fr); }"
         appendLine builder ".nm-column__kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; color: #1e293b; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; white-space: nowrap; margin-top: 2px; }"
         appendLine builder ".nm-column__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }"
         appendLine builder ".nm-column__title { margin: 0; font-size: 0.84rem; line-height: 1.05; font-weight: 700; color: #0f172a; }"
-        appendLine builder ".nm-column__note { margin: 0; font-size: 0.7rem; line-height: 1.22; color: #556b85; min-height: 2.35em; }"
-        appendLine builder ".nm-column__surface-slot { display: flex; flex-direction: column; }"
-        appendLine builder ".nm-column__surface-button { display: block; border: 0; background: transparent; padding: 0; cursor: zoom-in; text-align: left; border-radius: 18px; }"
+        appendLine builder ".nm-column__note { margin: 0; font-size: 0.7rem; line-height: 1.24; color: #556b85; min-height: 0; }"
+        appendLine builder ".nm-column__surface-preview-stage { display: flex; justify-content: center; padding-top: 0.3rem; }"
+        appendLine builder ".nm-column__surface-button { display: flex; justify-content: center; width: 100%; border: 0; background: transparent; padding: 0; cursor: zoom-in; text-align: left; border-radius: 18px; }"
         appendLine builder ".nm-column__surface-button:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
-        appendLine builder ".nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.35); background: rgba(255, 255, 255, 0.8); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding: 8px; }"
-        appendLine builder ".nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; }"
-        appendLine builder ".nm-column__surface-rendering { position: absolute; top: 0; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; }"
+        appendLine builder ".nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; width: min(100%, var(--nm-surface-frame-width)); border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.3); background: linear-gradient(180deg, #f6f9fd 0%, #eef3f9 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding: 6px; }"
+        appendLine builder ".nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 10px; display: flex; justify-content: center; align-items: flex-start; }"
+        appendLine builder ".nm-column__surface-rendering { position: absolute; top: 8px; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; filter: drop-shadow(0 5px 12px rgba(15, 23, 42, 0.16)); }"
         appendLine builder ".nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }"
         appendLine builder ".nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }"
-        appendLine builder ".nm-column__body--aem { gap: 6px; }"
+        appendLine builder ".nm-column__body--aem { gap: 10px; }"
         appendLine builder ".nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }"
+        appendLine builder ".nm-column__meta--secondary { gap: 0.32rem; }"
         appendLine builder ".nm-column__pill-wrap { position: relative; display: inline-flex; max-width: 100%; }"
-        appendLine builder ".nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }"
+        appendLine builder ".nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.01em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }"
         appendLine builder ".nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }"
         appendLine builder ".nm-column__badge--interactive { appearance: none; -webkit-appearance: none; }"
         appendLine builder ".nm-column__badge--interactive:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
@@ -820,9 +844,9 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__pill-wrap:hover .nm-column__pill-popover, .nm-column__pill-wrap:focus-within .nm-column__pill-popover { opacity: 1; transform: translateY(0); pointer-events: auto; }"
         appendLine builder ".nm-column__pill-popover-title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }"
         appendLine builder ".nm-column__pill-popover-text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }"
-        appendLine builder ".nm-column__detail-boxes { display: grid; gap: 8px; }"
-        appendLine builder ".nm-column__detail-box { display: grid; gap: 5px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; background: rgba(255, 255, 255, 0.82); }"
-        appendLine builder ".nm-column__detail-box--screen { border-color: #c8dcff; background: rgba(255, 255, 255, 0.82); }"
+        appendLine builder ".nm-column__detail-boxes { display: grid; gap: 10px; }"
+        appendLine builder ".nm-column__detail-box { display: grid; gap: 7px; border-radius: 18px; padding: 10px 11px; border: 2px solid; min-height: 0; overflow: visible; background: rgba(255, 255, 255, 0.86); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72); }"
+        appendLine builder ".nm-column__detail-box--screen { border-color: #c8dcff; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); }"
         appendLine builder ".nm-column__detail-box--transition { border-color: #89b6e8; background: rgba(82, 155, 246, 0.14); }"
         appendLine builder ".nm-column__detail-box--orchestration { border-color: #8ac3dd; background: rgba(84, 165, 200, 0.14); }"
         appendLine builder ".nm-column__detail-box--interaction { border-color: #8ad1a1; background: rgba(93, 194, 120, 0.16); }"
@@ -833,7 +857,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }"
         appendLine builder ".nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }"
         appendLine builder ".nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }"
-        appendLine builder ".nm-column__aem-detail { display: flex; flex-direction: column; }"
+        appendLine builder ".nm-column__aem-detail { display: flex; flex-direction: column; border-radius: 18px; padding: 2px 0 0; }"
         appendLine builder ".nm-column__aem-detail .slice-card__slot--screen { display: none; }"
         appendLine builder ".nm-column__aem-detail .slice-card { padding-top: 2px; }"
         appendLine builder ".nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }"
@@ -863,7 +887,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".ll-boot-state__check--pending { background: #f8fafc; color: #94a3b8; }"
         appendLine builder ".ll-boot-state__check--active { background: #fff7ed; border-color: #fdba74; color: #9a3412; }"
         appendLine builder ".ll-boot-state__check--complete { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }"
-        appendLine builder "@media (max-width: 980px) { .nm-path-document { padding-left: 12px; padding-right: 12px; } .nm-path-document__topline { grid-template-columns: 1fr; } .nm-path-document__header-controls { justify-content: flex-start; } .nm-path-document__context-title { max-width: 72vw; } .nm-path-flow { grid-auto-columns: minmax(292px, 84vw); } }"
+        appendLine builder "@media (max-width: 980px) { .nm-path-document { padding-left: 12px; padding-right: 12px; } .nm-path-document__topline { grid-template-columns: 1fr; } .nm-path-document__header-controls { justify-content: flex-start; } .nm-path-document__context-title { max-width: 72vw; } .nm-path-flow { grid-auto-columns: minmax(280px, 84vw); } }"
         appendLine builder "</style>"
 
     let private renderScript (builder: StringBuilder) (pathState: NmPathState) (updateState: NmPathUpdateState option) =

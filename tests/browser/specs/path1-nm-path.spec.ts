@@ -20,6 +20,7 @@ const nmPathFileUrl = pathToFileURL(
 
 type NmPathMetrics = {
   logicalTargets: number[];
+  logicalStartKeys: string[];
   logicalMaxTarget: number;
   visibleColumnKeys: string[];
   leadingVisibleColumnKey: string | null;
@@ -29,6 +30,7 @@ type NmPathMetrics = {
 
 type NmPreviewMetrics = {
   columnHeight: number;
+  frameWidth: number;
   frameHeight: number;
   activatorHeight: number;
   renderingWidth: number;
@@ -57,6 +59,7 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
     const maxStartIndex =
       maxStartIndexCandidate >= 0 ? maxStartIndexCandidate : Math.max(0, normalizedTargets.length - 1);
     const logicalTargets = normalizedTargets.slice(0, maxStartIndex + 1);
+    const logicalStartKeys = columns.slice(0, maxStartIndex + 1).map((column) => column.dataset.columnKey || '');
     const viewportMaxScrollLeft = Math.max(0, Math.round((viewport?.scrollWidth ?? 0) - (viewport?.clientWidth ?? 0)));
     const logicalMaxTarget =
       logicalTargets.length > 0 ? Math.min(logicalTargets[logicalTargets.length - 1], viewportMaxScrollLeft) : 0;
@@ -81,6 +84,7 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
 
     return {
       logicalTargets,
+      logicalStartKeys,
       logicalMaxTarget,
       visibleColumnKeys: columns.map((column) => column.dataset.columnKey || ''),
       leadingVisibleColumnKey: leadingVisibleColumn?.dataset.columnKey || null,
@@ -142,6 +146,7 @@ async function readPreviewMetrics(page: Page, columnKey: string): Promise<NmPrev
 
     return {
       columnHeight: Math.round(columnRect.height),
+      frameWidth: Math.round(frameRect?.width ?? 0),
       frameHeight: Math.round(frameRect?.height ?? 0),
       activatorHeight: Math.round(activatorRect?.height ?? 0),
       renderingWidth: Math.round(renderingRect?.width ?? 0),
@@ -179,18 +184,18 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     const initialMetrics = await readNmPathMetrics(page);
 
-    expect(initialMetrics.leadingVisibleColumnKey).toBe('01-app-started');
+    expect(initialMetrics.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[0]);
     expect(initialMetrics.logicalTargets.length).toBeGreaterThan(1);
 
     await page.getByTestId('nm-path-nav-next').click();
     const afterNext = await waitForNmScrollTarget(page, initialMetrics.logicalTargets[1]);
 
-    expect(afterNext.leadingVisibleColumnKey).toBe('02-runtime-checks');
+    expect(afterNext.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[1]);
 
     await page.getByTestId('nm-path-nav-end').click();
     const atEnd = await waitForNmScrollTarget(page, initialMetrics.logicalMaxTarget);
 
-    expect(atEnd.leadingVisibleColumnKey).toBe('10-washer-draft');
+    expect(atEnd.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[initialMetrics.logicalStartKeys.length - 1]);
     await expect(page.getByTestId('nm-path-nav-next')).toBeDisabled();
     await expect(page.getByTestId('nm-path-nav-end')).toBeDisabled();
 
@@ -205,20 +210,24 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     const thumbnailMetrics = await readPreviewMetrics(page, '09-entry-form-ready');
 
-    expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(220);
-    expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(236);
+    expect(thumbnailMetrics.frameWidth).toBeGreaterThanOrEqual(168);
+    expect(thumbnailMetrics.frameWidth).toBeLessThanOrEqual(182);
+    expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(120);
+    expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(132);
     expect(thumbnailMetrics.activatorHeight).toBe(thumbnailMetrics.frameHeight);
-    expect(thumbnailMetrics.columnHeight).toBeLessThan(720);
-    expect(thumbnailMetrics.renderingWidth).toBeLessThan(220);
+    expect(thumbnailMetrics.columnHeight).toBeLessThan(680);
+    expect(thumbnailMetrics.renderingWidth).toBeLessThan(90);
 
     await clickNmSurfaceMode(page, 'full');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
 
     const fullMetrics = await readPreviewMetrics(page, '09-entry-form-ready');
 
+    expect(fullMetrics.frameWidth).toBeGreaterThan(thumbnailMetrics.frameWidth);
     expect(fullMetrics.frameHeight).toBeGreaterThan(thumbnailMetrics.frameHeight);
-    expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(312);
-    expect(fullMetrics.columnHeight).toBeLessThan(840);
+    expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(170);
+    expect(fullMetrics.columnHeight).toBeLessThan(760);
+    expect(fullMetrics.renderingWidth).toBeGreaterThan(thumbnailMetrics.renderingWidth);
 
     await page.reload();
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
