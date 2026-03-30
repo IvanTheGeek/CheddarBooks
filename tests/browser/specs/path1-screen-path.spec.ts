@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -105,6 +105,18 @@ async function clickLens(page, lensKey: string): Promise<void> {
 
 async function clickViewMode(page, viewMode: string): Promise<void> {
   await page.locator(`[data-testid="path-view-toggle"][data-view-mode="${viewMode}"]`).click();
+}
+
+async function expectUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
+  const updateStatus = page.getByTestId('path-update-status');
+  await expect(updateStatus).toBeVisible();
+
+  await expect
+    .poll(async () => ((await updateStatus.textContent()) || '').trim())
+    .toMatch(/^(?:[A-Z ]+ \| )?UPDATED AT: .+ \| (?:just now|\d+ (?:minute|minutes|hour|hours|day|days) ago)$/);
+
+  const statusText = ((await updateStatus.textContent()) || '').trim();
+  expect(statusText).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
 }
 
 async function readBootStatuses(page, stepKey: string): Promise<string[]> {
@@ -272,6 +284,11 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await expect(scenarioPanel).toBeVisible();
     await expect(page.getByText('No saved location is available yet.')).toBeVisible();
     await expect(page.getByText('Startup/runtime checks must finish before the first usable screen appears.')).toBeVisible();
+  });
+
+  test('update status shows local time with a live relative-age format instead of the raw UTC timestamp', async ({ page }) => {
+    await page.goto(path1HttpPath);
+    await expectUpdateStatusToUseLocalDisplay(page);
   });
 
   test('startup splash steps stay headerless while checkpoint states progress in order', async ({ page }) => {

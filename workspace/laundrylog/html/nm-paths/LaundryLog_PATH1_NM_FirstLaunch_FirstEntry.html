@@ -390,7 +390,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <button class="nm-path-update-toggle" type="button" data-testid="nm-path-update-toggle" data-update-mode="auto" aria-pressed="false">Auto Refresh</button>
 <button id="nm-path-refresh-now" class="nm-path-update-refresh" data-testid="nm-path-update-refresh" type="button" hidden>Refresh Now</button>
 </div>
-<div id="nm-path-update-status" class="nm-path-document__update-status" aria-live="polite"></div>
+<div id="nm-path-update-status" class="nm-path-document__update-status" data-testid="nm-path-update-status" aria-live="polite"></div>
 </section>
 </div>
 </div>
@@ -2936,10 +2936,60 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { closeOverlay(); }
   });
-  const setUpdateStatus = (message, state) => {
+  let updateStatusTimer = 0;
+  const setUpdateStatusState = (state) => {
     if (!updateStatus) { return; }
-    updateStatus.textContent = message;
     if (state) { updateStatus.dataset.state = state; } else { delete updateStatus.dataset.state; }
+  };
+  const clearUpdateStatusTimer = () => {
+    if (updateStatusTimer !== 0) {
+      window.clearInterval(updateStatusTimer);
+      updateStatusTimer = 0;
+    }
+  };
+  const setUpdateStatusMessage = (message, state) => {
+    if (!updateStatus) { return; }
+    clearUpdateStatusTimer();
+    updateStatus.textContent = message;
+    setUpdateStatusState(state);
+  };
+  const parseUpdatedAt = (updatedAtIso) => {
+    const parsed = new Date(updatedAtIso || '');
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+  const formatUpdatedAtClock = (updatedAtIso) => {
+    const parsed = parseUpdatedAt(updatedAtIso);
+    if (!parsed) { return null; }
+    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(parsed);
+  };
+  const formatUpdatedAtAge = (updatedAtIso) => {
+    const parsed = parseUpdatedAt(updatedAtIso);
+    if (!parsed) { return null; }
+    const diffMs = Math.max(0, Date.now() - parsed.getTime());
+    const totalMinutes = Math.floor(diffMs / 60000);
+    if (totalMinutes < 1) { return 'just now'; }
+    if (totalMinutes < 60) { return `${totalMinutes} minute${totalMinutes === 1 ? '' : 's'} ago`; }
+    const totalHours = Math.floor(totalMinutes / 60);
+    if (totalHours < 24) { return `${totalHours} hour${totalHours === 1 ? '' : 's'} ago`; }
+    const totalDays = Math.floor(totalHours / 24);
+    return `${totalDays} day${totalDays === 1 ? '' : 's'} ago`;
+  };
+  const setUpdateStatusTimestamp = (updatedAtIso, state, prefix) => {
+    if (!updateStatus) { return; }
+    clearUpdateStatusTimer();
+    const render = () => {
+      const formattedClock = formatUpdatedAtClock(updatedAtIso);
+      const formattedAge = formatUpdatedAtAge(updatedAtIso);
+      if (!formattedClock || !formattedAge) {
+        setUpdateStatusMessage(prefix || 'Update status unavailable.', state);
+        return;
+      }
+      const lead = prefix ? `${prefix} | ` : '';
+      updateStatus.textContent = `${lead}UPDATED AT: ${formattedClock} | ${formattedAge}`;
+      setUpdateStatusState(state);
+    };
+    render();
+    updateStatusTimer = window.setInterval(render, 30000);
   };
   const setRefreshPending = (isPending) => {
     if (!refreshButton) { return; }
@@ -2980,8 +3030,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330105810072";
-  const currentArtifactUpdatedAt = "2026-03-30T10:58:10Z";
+  const currentArtifactVersion = "nm-path::20260330110937626";
+  const currentArtifactUpdatedAt = "2026-03-30T11:09:37Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;
@@ -3011,7 +3061,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const maybeApplyPendingUpdate = () => {
     if (!pendingUpdateManifest) { return; }
     if (readStoredUpdateMode() === 'auto') {
-      setUpdateStatus(`Update detected (${pendingUpdateManifest.updatedAt || 'new build'}) — refreshing…`, 'auto');
+      setUpdateStatusTimestamp(pendingUpdateManifest.updatedAt || currentArtifactUpdatedAt, 'auto', 'UPDATE DETECTED');
       window.location.reload();
     }
   };
@@ -3021,20 +3071,20 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       const manifest = await loadUpdateManifest();
       if (!manifest || !manifest.version) {
-        setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+        setUpdateStatusMessage('Update monitor unavailable for this artifact.', 'error');
         return;
       }
       if (manifest.version !== currentArtifactVersion) {
         pendingUpdateManifest = manifest;
         setRefreshPending(true);
-        setUpdateStatus(`Update available (${manifest.updatedAt || 'new build'}).`, 'available');
+        setUpdateStatusTimestamp(manifest.updatedAt || currentArtifactUpdatedAt, 'available', 'UPDATE AVAILABLE');
         maybeApplyPendingUpdate();
       } else if (!pendingUpdateManifest) {
         setRefreshPending(false);
-        setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+        setUpdateStatusTimestamp(currentArtifactUpdatedAt, null, null);
       }
     } catch (_) {
-      setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+      setUpdateStatusMessage('Update monitor unavailable for this artifact.', 'error');
     } finally {
       updateCheckInFlight = false;
     }
@@ -3046,7 +3096,7 @@ document.addEventListener('DOMContentLoaded', function () {
     button.addEventListener('click', maybeApplyPendingUpdate);
   });
   setRefreshPending(false);
-  setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+  setUpdateStatusTimestamp(currentArtifactUpdatedAt, null, null);
   checkForArtifactUpdate();
   window.setInterval(checkForArtifactUpdate, updatePollIntervalMs);
 })();

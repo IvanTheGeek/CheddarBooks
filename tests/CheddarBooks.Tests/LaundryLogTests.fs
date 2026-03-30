@@ -577,10 +577,15 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "Notify Me" "Expected a sticky notify-only update mode."
                   Expect.stringContains htmlDocument "Auto Refresh" "Expected a sticky auto-refresh update mode."
                   Expect.stringContains htmlDocument "data-testid=\"path-update-refresh\"" "Expected a stable browser-test hook for the manual refresh button."
+                  Expect.stringContains htmlDocument "data-testid=\"path-update-status\"" "Expected a stable browser-test hook for the update-status surface."
                   Expect.stringContains htmlDocument "ll-path-update-status" "Expected a visible update-status surface."
                   Expect.stringContains htmlDocument "window.__llPathUpdateManifest" "Expected the page to read a sidecar manifest script."
                   Expect.stringContains htmlDocument ".update.js" "Expected the update monitor to target the companion update script."
                   Expect.stringContains htmlDocument "updateModeStorageKey" "Expected the update preference to be stored locally."
+                  Expect.stringContains htmlDocument "UPDATED AT:" "Expected the update status to render a local-time label."
+                  Expect.stringContains htmlDocument "Intl.DateTimeFormat" "Expected browser-side local-time formatting for the update status."
+                  Expect.stringContains htmlDocument "just now" "Expected browser-side relative-age text for freshly updated artifacts."
+                  Expect.stringContains htmlDocument "window.setInterval(render, 30000);" "Expected the update status relative-age text to refresh continuously."
                   Expect.stringContains htmlDocument "window.location.reload()" "Expected the page to support explicit refresh.")
 
               testCase "Screen path renderer emits the sidecar update manifest script" (fun () ->
@@ -636,6 +641,10 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "Surface · ViewSlice.Current Laundry Session" "Expected the technical surface label for embedded view slices."
                   Expect.stringContains htmlDocument "data-view-mode=\"detailed\"" "Expected Detailed to be the default NM working view."
                   Expect.stringContains htmlDocument "data-surface-mode=\"thumbnail\"" "Expected Thumbnail to be the default NM surface presentation."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-update-status\"" "Expected a stable browser-test hook for the NM update-status surface."
+                  Expect.stringContains htmlDocument "UPDATED AT:" "Expected the NM update status to render a local-time label."
+                  Expect.stringContains htmlDocument "Intl.DateTimeFormat" "Expected browser-side local-time formatting for the NM update status."
+                  Expect.stringContains htmlDocument "just now" "Expected browser-side relative-age text for freshly updated NM artifacts."
                   Expect.isFalse (htmlDocument.Contains(">Standard<")) "Expected the NM page to drop the Standard view mode entirely."
 
                   let orderedKeys =

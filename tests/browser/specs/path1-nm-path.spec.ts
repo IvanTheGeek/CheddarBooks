@@ -147,6 +147,18 @@ async function readPreviewMetrics(page: Page, columnKey: string): Promise<NmPrev
   });
 }
 
+async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
+  const updateStatus = page.getByTestId('nm-path-update-status');
+  await expect(updateStatus).toBeVisible();
+
+  await expect
+    .poll(async () => ((await updateStatus.textContent()) || '').trim())
+    .toMatch(/^(?:[A-Z ]+ \| )?UPDATED AT: .+ \| (?:just now|\d+ (?:minute|minutes|hour|hours|day|days) ago)$/);
+
+  const statusText = ((await updateStatus.textContent()) || '').trim();
+  expect(statusText).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
+}
+
 test.describe('PATH1 NM workspace artifact', () => {
   test('next and end navigation move by whole logical columns and keep the rail synchronized', async ({ page }) => {
     await page.goto(nmPathHttpPath);
@@ -281,5 +293,10 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.getByRole('heading', { name: 'PATH 1 NM: Fresh First Launch -> Need Location -> First Entry' })).toBeVisible();
     await expect(page.getByTestId('nm-path-nav-start')).toBeVisible();
     await expect(page.getByTestId('nm-path-view-toggle').first()).toBeVisible();
+  });
+
+  test('update status shows local time with a live relative-age format instead of the raw UTC timestamp', async ({ page }) => {
+    await page.goto(nmPathHttpPath);
+    await expectNmUpdateStatusToUseLocalDisplay(page);
   });
 });

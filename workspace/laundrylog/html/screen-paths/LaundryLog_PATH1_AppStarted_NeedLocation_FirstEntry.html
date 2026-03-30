@@ -243,7 +243,7 @@ html, body { height: 100%; overflow: hidden; }
 <button class="ll-path-update-toggle" type="button" data-testid="path-update-toggle" data-update-mode="auto" aria-pressed="false">Auto Refresh</button>
 <button id="ll-path-refresh-now" class="ll-path-update-refresh" data-testid="path-update-refresh" type="button" hidden>Refresh Now</button>
 </div>
-<div id="ll-path-update-status" class="ll-path-document__update-status" aria-live="polite"></div>
+<div id="ll-path-update-status" class="ll-path-document__update-status" data-testid="path-update-status" aria-live="polite"></div>
 </section>
 </div>
 </div>
@@ -1022,10 +1022,60 @@ Log Expense
     });
   });
   applyLensFilters(readStoredLensKeys());
-  const setUpdateStatus = (message, state) => {
+  let updateStatusTimer = 0;
+  const setUpdateStatusState = (state) => {
     if (!updateStatus) { return; }
-    updateStatus.textContent = message;
     if (state) { updateStatus.dataset.state = state; } else { delete updateStatus.dataset.state; }
+  };
+  const clearUpdateStatusTimer = () => {
+    if (updateStatusTimer !== 0) {
+      window.clearInterval(updateStatusTimer);
+      updateStatusTimer = 0;
+    }
+  };
+  const setUpdateStatusMessage = (message, state) => {
+    if (!updateStatus) { return; }
+    clearUpdateStatusTimer();
+    updateStatus.textContent = message;
+    setUpdateStatusState(state);
+  };
+  const parseUpdatedAt = (updatedAtIso) => {
+    const parsed = new Date(updatedAtIso || '');
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+  const formatUpdatedAtClock = (updatedAtIso) => {
+    const parsed = parseUpdatedAt(updatedAtIso);
+    if (!parsed) { return null; }
+    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(parsed);
+  };
+  const formatUpdatedAtAge = (updatedAtIso) => {
+    const parsed = parseUpdatedAt(updatedAtIso);
+    if (!parsed) { return null; }
+    const diffMs = Math.max(0, Date.now() - parsed.getTime());
+    const totalMinutes = Math.floor(diffMs / 60000);
+    if (totalMinutes < 1) { return 'just now'; }
+    if (totalMinutes < 60) { return `${totalMinutes} minute${totalMinutes === 1 ? '' : 's'} ago`; }
+    const totalHours = Math.floor(totalMinutes / 60);
+    if (totalHours < 24) { return `${totalHours} hour${totalHours === 1 ? '' : 's'} ago`; }
+    const totalDays = Math.floor(totalHours / 24);
+    return `${totalDays} day${totalDays === 1 ? '' : 's'} ago`;
+  };
+  const setUpdateStatusTimestamp = (updatedAtIso, state, prefix) => {
+    if (!updateStatus) { return; }
+    clearUpdateStatusTimer();
+    const render = () => {
+      const formattedClock = formatUpdatedAtClock(updatedAtIso);
+      const formattedAge = formatUpdatedAtAge(updatedAtIso);
+      if (!formattedClock || !formattedAge) {
+        setUpdateStatusMessage(prefix || 'Update status unavailable.', state);
+        return;
+      }
+      const lead = prefix ? `${prefix} | ` : '';
+      updateStatus.textContent = `${lead}UPDATED AT: ${formattedClock} | ${formattedAge}`;
+      setUpdateStatusState(state);
+    };
+    render();
+    updateStatusTimer = window.setInterval(render, 30000);
   };
   const setRefreshPending = (isPending) => {
     if (!refreshButton) { return; }
@@ -1188,8 +1238,8 @@ Log Expense
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "screen-path::20260330105810072";
-  const currentArtifactUpdatedAt = "2026-03-30T10:58:10Z";
+  const currentArtifactVersion = "screen-path::20260330110937626";
+  const currentArtifactUpdatedAt = "2026-03-30T11:09:37Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updatePollTimer = 0;
@@ -1220,7 +1270,7 @@ Log Expense
   const maybeApplyPendingUpdate = () => {
     if (!pendingUpdateManifest) { return; }
     if (readStoredUpdateMode() === 'auto') {
-      setUpdateStatus(`Update detected (${pendingUpdateManifest.updatedAt || 'new build'}) — refreshing…`, 'auto');
+      setUpdateStatusTimestamp(pendingUpdateManifest.updatedAt || currentArtifactUpdatedAt, 'auto', 'UPDATE DETECTED');
       window.location.reload();
     }
   };
@@ -1230,20 +1280,20 @@ Log Expense
     try {
       const manifest = await loadUpdateManifest();
       if (!manifest || !manifest.version) {
-        setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+        setUpdateStatusMessage('Update monitor unavailable for this artifact.', 'error');
         return;
       }
       if (manifest.version !== currentArtifactVersion) {
         pendingUpdateManifest = manifest;
         setRefreshPending(true);
-        setUpdateStatus(`Update available (${manifest.updatedAt || 'new build'}).`, 'available');
+        setUpdateStatusTimestamp(manifest.updatedAt || currentArtifactUpdatedAt, 'available', 'UPDATE AVAILABLE');
         maybeApplyPendingUpdate();
       } else if (!pendingUpdateManifest) {
         setRefreshPending(false);
-        setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+        setUpdateStatusTimestamp(currentArtifactUpdatedAt, null, null);
       }
     } catch (_) {
-      setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+      setUpdateStatusMessage('Update monitor unavailable for this artifact.', 'error');
     } finally {
       updateCheckInFlight = false;
     }
@@ -1255,7 +1305,7 @@ Log Expense
     button.addEventListener('click', maybeApplyPendingUpdate);
   });
   setRefreshPending(false);
-  setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+  setUpdateStatusTimestamp(currentArtifactUpdatedAt, null, null);
   checkForArtifactUpdate();
   updatePollTimer = window.setInterval(checkForArtifactUpdate, updatePollIntervalMs);
 })();
