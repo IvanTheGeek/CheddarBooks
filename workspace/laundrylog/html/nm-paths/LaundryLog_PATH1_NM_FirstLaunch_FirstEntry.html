@@ -2951,7 +2951,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const formatUpdatedAtClock = (updatedAtIso) => {
     const parsed = parseUpdatedAt(updatedAtIso);
     if (!parsed) { return null; }
-    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(parsed);
+    return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(parsed);
   };
   const formatUpdatedAtAge = (updatedAtIso) => {
     const parsed = parseUpdatedAt(updatedAtIso);
@@ -2976,7 +2976,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
       const lead = prefix ? `${prefix} | ` : '';
-      updateStatus.textContent = `${lead}UPDATED AT: ${formattedClock} | ${formattedAge}`;
+      updateStatus.textContent = `${lead}UPDATED: ${formattedClock} | ${formattedAge}`;
       setUpdateStatusState(state);
     };
     render();
@@ -3021,8 +3021,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330111611292";
-  const currentArtifactUpdatedAt = "2026-03-30T11:16:11Z";
+  const currentArtifactVersion = "nm-path::20260330112316268";
+  const currentArtifactUpdatedAt = "2026-03-30T11:23:16Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

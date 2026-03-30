@@ -645,8 +645,10 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "data-view-mode=\"detailed\"" "Expected Detailed to be the default NM working view."
                   Expect.stringContains htmlDocument "data-surface-mode=\"thumbnail\"" "Expected Thumbnail to be the default NM surface presentation."
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-update-status\"" "Expected a stable browser-test hook for the NM update-status surface."
-                  Expect.stringContains htmlDocument "UPDATED AT:" "Expected the NM update status to render a local-time label."
+                  Expect.stringContains htmlDocument "UPDATED:" "Expected the NM update status to render a local-time label."
+                  Expect.isFalse (htmlDocument.Contains("UPDATED AT:")) "Expected the NM update status label to drop the extra 'AT'."
                   Expect.stringContains htmlDocument "Intl.DateTimeFormat" "Expected browser-side local-time formatting for the NM update status."
+                  Expect.isFalse (htmlDocument.Contains("timeZoneName: 'short'")) "Expected the NM update clock to omit an explicit timezone suffix."
                   Expect.stringContains htmlDocument "just now" "Expected browser-side relative-age text for freshly updated NM artifacts."
                   Expect.isFalse (htmlDocument.Contains(">Standard<")) "Expected the NM page to drop the Standard view mode entirely."
 

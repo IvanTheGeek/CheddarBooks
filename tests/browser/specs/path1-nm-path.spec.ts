@@ -153,10 +153,12 @@ async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> 
 
   await expect
     .poll(async () => ((await updateStatus.textContent()) || '').trim())
-    .toMatch(/^(?:[A-Z ]+ \| )?UPDATED AT: .+ \| (?:just now|\d+ (?:minute|minutes|hour|hours|day|days) ago)$/);
+    .toMatch(/^(?:[A-Z ]+ \| )?UPDATED: .+ \| (?:just now|\d+ (?:minute|minutes|hour|hours|day|days) ago)$/);
 
   const statusText = ((await updateStatus.textContent()) || '').trim();
+  expect(statusText).not.toContain('UPDATED AT:');
   expect(statusText).not.toMatch(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
+  expect(statusText).not.toMatch(/\b(?:EST|EDT|CST|CDT|MST|MDT|PST|PDT|UTC|GMT)\b/);
 }
 
 test.describe('PATH1 NM workspace artifact', () => {
