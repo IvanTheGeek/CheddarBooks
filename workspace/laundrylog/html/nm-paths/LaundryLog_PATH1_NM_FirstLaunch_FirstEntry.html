@@ -276,10 +276,11 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }
 .nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }
 .nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }
-.nm-column__slot { min-height: 0; display: block; }
-.nm-column__slot-body { width: 100%; min-height: 0; }
+.nm-column__slot { min-height: 0; display: flex; align-items: stretch; }
+.nm-column__slot-body { width: 100%; min-height: 0; height: 100%; display: flex; align-items: stretch; }
+.nm-column__slot-body > * { width: 100%; }
 .nm-column__slot--empty { pointer-events: none; }
-.nm-column__slot--empty .nm-column__slot-body { min-height: 0; }
+.nm-column__slot--empty .nm-column__slot-body { min-height: 0; height: 100%; }
 .nm-column__header { display: flex; flex-direction: column; gap: 5px; }
 .nm-column__classification { display: grid; gap: 4px; }
 .nm-column__classification-row { display: grid; align-items: start; }
@@ -3771,13 +3772,18 @@ document.addEventListener('DOMContentLoaded', function () {
   };
   const syncSlotHeights = () => {
     if (!pathDocument) { return; }
+    slotKinds.forEach((slotKind) => {
+      pathDocument.style.setProperty(`--nm-slot-${slotKind}-height`, '0px');
+    });
+    void pathDocument.offsetHeight;
     const visibleColumns = columnElements.filter((column) => !column.hidden);
     slotKinds.forEach((slotKind) => {
       let maxHeight = 0;
       visibleColumns.forEach((column) => {
         const slotBody = column.querySelector(`[data-slot-kind="${slotKind}"] [data-slot-body]`);
         if (!slotBody) { return; }
-        const measuredHeight = Math.ceil(slotBody.getBoundingClientRect().height);
+        const slotContent = slotBody.firstElementChild;
+        const measuredHeight = Math.ceil(slotContent ? slotContent.getBoundingClientRect().height : 0);
         if (measuredHeight > maxHeight) { maxHeight = measuredHeight; }
       });
       pathDocument.style.setProperty(`--nm-slot-${slotKind}-height`, `${maxHeight}px`);
@@ -4092,8 +4098,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330155120042";
-  const currentArtifactUpdatedAt = "2026-03-30T15:51:20Z";
+  const currentArtifactVersion = "nm-path::20260330160652262";
+  const currentArtifactUpdatedAt = "2026-03-30T16:06:52Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

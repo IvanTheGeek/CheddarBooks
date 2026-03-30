@@ -186,6 +186,17 @@ async function readSlotHeights(page: Page, columnKey: string): Promise<NmSlotHei
   });
 }
 
+async function readSlotContentHeight(page: Page, columnKey: string, slotKind: string): Promise<number> {
+  return page.locator(`[data-testid="nm-path-column"][data-column-key="${columnKey}"]`).evaluate(
+    (column, targetSlotKind) => {
+      const slotBody = column.querySelector(`[data-slot-kind="${targetSlotKind}"] [data-slot-body]`) as HTMLElement | null;
+      const slotContent = slotBody?.firstElementChild as HTMLElement | null;
+      return Math.round(slotContent?.getBoundingClientRect().height ?? 0);
+    },
+    slotKind,
+  );
+}
+
 async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
   const updateStatus = page.getByTestId('nm-path-update-status');
   await expect(updateStatus).toBeVisible();
@@ -266,6 +277,25 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(first.primary).toBeGreaterThan(0);
     expect(first.secondary).toBeGreaterThan(0);
     expect(first.gwt).toBeGreaterThan(0);
+
+    const screenBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'screen')));
+    const primaryBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'primary')));
+    const secondaryBoxHeights = await Promise.all(
+      ['07-capture-laundry-location', '11-log-laundry-expense'].map((key) => readSlotContentHeight(page, key, 'secondary')),
+    );
+    const gwtBoxHeights = await Promise.all(
+      [
+        '07-capture-laundry-location',
+        '08-current-laundry-session-location',
+        '11-log-laundry-expense',
+        '12-current-laundry-session-washer',
+      ].map((key) => readSlotContentHeight(page, key, 'gwt')),
+    );
+
+    expect(new Set(screenBoxHeights).size).toBe(1);
+    expect(new Set(primaryBoxHeights).size).toBe(1);
+    expect(new Set(secondaryBoxHeights).size).toBe(1);
+    expect(new Set(gwtBoxHeights).size).toBe(1);
   });
 
   test('surface thumbnails stay small in thumbnail mode and full mode expands the live surface without breaking layout', async ({ page }) => {
@@ -277,7 +307,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(thumbnailMetrics.frameWidth).toBeLessThanOrEqual(190);
     expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(132);
     expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(144);
-    expect(thumbnailMetrics.activatorHeight).toBe(thumbnailMetrics.frameHeight);
+    expect(thumbnailMetrics.activatorHeight).toBeGreaterThanOrEqual(thumbnailMetrics.frameHeight);
     expect(thumbnailMetrics.thumbnailWidth).toBeGreaterThanOrEqual(90);
     expect(thumbnailMetrics.thumbnailWidth).toBeLessThanOrEqual(102);
     expect(thumbnailMetrics.thumbnailHeight).toBeGreaterThanOrEqual(112);
