@@ -28,6 +28,22 @@ Current slice law:
   - `VIEW`
   - `VIEW GWT`
 
+Presentation rule for humans and AI:
+
+- do not describe the NM path as a fixed linear `COMMAND -> EVENT -> VIEW` triplet
+- describe it as:
+  - a `COMMAND` slice that produces an `EVENT`
+  - later `VIEW` slice(s) that consume prior event(s) through `VIEW GWT`
+- the consumed event does not need to come from the immediately previous slice
+- multiple `VIEW` slices may consume the same prior event once it exists in the store
+
+Current startup naming read:
+
+- `Step 01-launch-app`
+  - slice title: `LaunchApp`
+  - produced event: `AppStarted`
+- later startup views such as `SplashVisible` should be described as view consumers of prior events, not as the third link in a forced one-step chain
+
 Current `PATH1 NM` carries:
 
 - `ApplicationLifecycle`

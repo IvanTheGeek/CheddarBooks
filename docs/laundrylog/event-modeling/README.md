@@ -56,6 +56,18 @@ Other concern lines will still matter and should stay able to pressure the model
 
 So these notes should stay precise in Event Modeling terms without pretending they already cover every other concern line.
 
+## Presentation Rule
+
+When describing command, event, and view relationships in LaundryLog:
+
+- do not flatten them into a fixed linear triplet such as `COMMAND -> EVENT -> VIEW`
+- describe the command slice as producing event fact(s)
+- describe the view slice as consuming prior event fact(s)
+- do not require the consumed event to come from the immediately previous slice
+- allow multiple view slices to consume the same prior event when the store already contains it
+
+This rule matters because the path and NM projections have already drifted several times when the relationship was described too linearly.
+
 ## Start Here
 
 - [`starting-point.md`](starting-point.md)

@@ -13,6 +13,13 @@ The current working clarification is:
 - a `ViewSlice` can be just the green-box `View`
 - with the right lens on, it can also include the resultant business-visible screen that the `View` supports
 
+Current dependency rule:
+
+- a `ViewSlice` is justified by prior event fact(s)
+- the consumed event does not need to come from the immediately previous slice
+- multiple `ViewSlice`s may consume the same prior event
+- the view should not be described as if it were the third fixed link in `Command -> Event -> View`
+
 This note is therefore about:
 
 - what the user can see

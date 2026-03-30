@@ -31,6 +31,22 @@ Use these layers in this order:
 4. primitive state
    the UI-ready composition used to render the current screen
 
+This is a semantic layering order, not a mandatory immediate linear chain.
+
+Do not flatten it into:
+
+- `CommandSlice -> Event -> ViewSlice -> primitive state`
+
+as if each layer must be the very next visible slice.
+
+Instead:
+
+- a `CommandSlice` produces durable event fact(s)
+- a `ViewSlice` is justified by prior event fact(s)
+- the consumed event does not need to come from the immediately previous slice
+- multiple `ViewSlice`s may consume the same prior event
+- primitive state may be composed from the current command-side draft and a view-side context that depends on earlier durable events
+
 The primitive state should not become the semantic source of truth.
 
 It is a projection layer that exists to make the current screen explicit and testable.
@@ -50,6 +66,16 @@ The `ViewSlice` can be read either:
 - or more broadly, as the `View` plus the resultant business-visible screen state
 
 That broader reading is useful here because LaundryLog is actively connecting Event Modeling work to Penpot screens and later FnUI runtime screens.
+
+The important anti-pattern to avoid is describing the broader seam as one fixed triplet such as:
+
+- `LaunchApp -> AppStarted -> SplashVisible`
+
+That wording hides the real rule:
+
+- the command slice produces the event
+- later view slices consume prior event(s)
+- the view dependency belongs in the view explanation or `VIEW GWT`, not as a forced immediate third step
 
 ## Current First Seam
 
