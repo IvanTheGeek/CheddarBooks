@@ -404,6 +404,9 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
                   Expect.stringContains htmlDocument "application lifecycle lens" "Expected the application-lifecycle startup lens badge."
                   Expect.stringContains htmlDocument "app runtime lens" "Expected the app-runtime startup lens badge."
+                  Expect.stringContains htmlDocument "data-testid=\"screen-path-document\"" "Expected a stable browser-test hook for the path document."
+                  Expect.stringContains htmlDocument "data-testid=\"path-step\"" "Expected stable browser-test hooks for rendered steps."
+                  Expect.stringContains htmlDocument "data-step-key=\"01-app-started\"" "Expected the first screen-path step to expose its stable key for browser tests."
                   Expect.stringContains htmlDocument "fresh first launch with no known local data" "Expected explicit scenario context for the path."
                   Expect.stringContains htmlDocument "No saved location is available yet." "Expected the first-launch assumptions to be visible in detailed mode.")
 
@@ -413,7 +416,7 @@ module LaundryLogTests =
 
                   Expect.stringContains htmlDocument "data-view-mode=\"standard\"" "Expected the path document to carry a default view mode."
                   Expect.stringContains htmlDocument "class=\"ll-path-view-toggle\"" "Expected explicit path viewer controls."
-                  Expect.stringContains htmlDocument "class=\"ll-path-lens-toggle\"" "Expected explicit header lens visibility controls."
+                  Expect.stringContains htmlDocument "data-testid=\"path-lens-toggle\"" "Expected stable browser-test hooks for header lens visibility controls."
                   Expect.stringContains htmlDocument "lensFilterStorageKey" "Expected lens visibility choices to be stored locally."
                   Expect.stringContains htmlDocument "step.hidden = !activeLensKeys.includes(stepLensKey);" "Expected header lens toggles to hide or show step columns."
                   Expect.stringContains htmlDocument "button.dataset.viewMode" "Expected the viewer controls to be wired by script."
@@ -438,12 +441,12 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\""
+                      "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\" data-testid=\"path-nav-start\""
                       "Expected a dedicated button for returning to the beginning of the path."
 
                   Expect.stringContains
                       htmlDocument
-                      "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\""
+                      "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\" data-testid=\"path-nav-end\""
                       "Expected a dedicated button for jumping to the end of the path."
 
                   Expect.stringContains
@@ -458,7 +461,7 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\">"
+                      "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\" data-testid=\"path-flow-viewport\">"
                       "Expected the screen strip to live in its own horizontal viewport."
 
                   Expect.stringContains
@@ -480,6 +483,11 @@ module LaundryLogTests =
                       htmlDocument
                       "const scrollByOneColumn = (direction) => {"
                       "Expected explicit one-column stepping logic for path navigation."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const refreshScrollMetrics = () => {"
+                      "Expected the path buttons to refresh measured scroll targets before stepping."
 
                   Expect.stringContains
                       htmlDocument
@@ -528,7 +536,17 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
-                      "const scrollToEnd = () => animateScrollToColumn(logicalMaxScrollLeft());"
+                      "document.fonts.ready.then(() => syncWidth()).catch(() => {});"
+                      "Expected the path to refresh its scroll metrics after fonts settle."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "const scrollToEnd = () => {"
+                      "Expected the end button to use a dedicated logical end-navigation helper."
+
+                  Expect.stringContains
+                      htmlDocument
+                      "animateScrollToColumn(logicalMaxScrollLeft());"
                       "Expected the end button to use the logical whole-column maximum rather than the native scroll width."
 
                   Expect.stringContains
@@ -547,7 +565,7 @@ module LaundryLogTests =
 
                   Expect.stringContains htmlDocument "Notify Me" "Expected a sticky notify-only update mode."
                   Expect.stringContains htmlDocument "Auto Refresh" "Expected a sticky auto-refresh update mode."
-                  Expect.stringContains htmlDocument "ll-path-refresh-now" "Expected a manual refresh button when an update is pending."
+                  Expect.stringContains htmlDocument "data-testid=\"path-update-refresh\"" "Expected a stable browser-test hook for the manual refresh button."
                   Expect.stringContains htmlDocument "ll-path-update-status" "Expected a visible update-status surface."
                   Expect.stringContains htmlDocument "window.__llPathUpdateManifest" "Expected the page to read a sidecar manifest script."
                   Expect.stringContains htmlDocument ".update.js" "Expected the update monitor to target the companion update script."

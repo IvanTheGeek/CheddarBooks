@@ -467,7 +467,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder "      step.hidden = !activeLensKeys.includes(stepLensKey);"
         appendLine builder "    });"
         appendLine builder "    persistLensKeys(activeLensKeys);"
-        appendLine builder "    window.requestAnimationFrame(syncWidth);"
+        appendLine builder "    window.requestAnimationFrame(() => syncWidth());"
         appendLine builder "  };"
         appendLine builder "  lensButtons.forEach((button) => {"
         appendLine builder "    button.addEventListener('click', () => {"
@@ -614,10 +614,20 @@ module ScreenPathHtmlRenderer =
         appendLine builder "    syncingScroll = false;"
         appendLine builder "    updateButtonState();"
         appendLine builder "  });"
-        appendLine builder "  const scrollToStart = () => animateScrollToColumn(0);"
-        appendLine builder "  const scrollToEnd = () => animateScrollToColumn(logicalMaxScrollLeft());"
+        appendLine builder "  const refreshScrollMetrics = () => {"
+        appendLine builder "    syncWidth();"
+        appendLine builder "    return currentStepMetrics;"
+        appendLine builder "  };"
+        appendLine builder "  const scrollToStart = () => {"
+        appendLine builder "    refreshScrollMetrics();"
+        appendLine builder "    animateScrollToColumn(0);"
+        appendLine builder "  };"
+        appendLine builder "  const scrollToEnd = () => {"
+        appendLine builder "    refreshScrollMetrics();"
+        appendLine builder "    animateScrollToColumn(logicalMaxScrollLeft());"
+        appendLine builder "  };"
         appendLine builder "  const scrollByOneColumn = (direction) => {"
-        appendLine builder "    const targets = currentStepMetrics.targets;"
+        appendLine builder "    const targets = refreshScrollMetrics().targets;"
         appendLine builder "    if (targets.length === 0) { return; }"
         appendLine builder "    const currentIndex = stepIndexAtOrBefore(targets, viewport.scrollLeft);"
         appendLine builder "    const targetIndex = Math.max(0, Math.min(targets.length - 1, currentIndex + direction));"
@@ -628,9 +638,14 @@ module ScreenPathHtmlRenderer =
         appendLine builder "  if (nextButton) { nextButton.addEventListener('click', () => scrollByOneColumn(1)); }"
         appendLine builder "  if (endButton) { endButton.addEventListener('click', scrollToEnd); }"
         appendLine builder "  syncWidth();"
+        appendLine builder "  window.requestAnimationFrame(() => syncWidth());"
         appendLine builder "  window.addEventListener('resize', syncWidth);"
+        appendLine builder "  window.addEventListener('load', syncWidth);"
         appendLine builder "  if (window.ResizeObserver) {"
         appendLine builder "    new ResizeObserver(syncWidth).observe(flow);"
+        appendLine builder "  }"
+        appendLine builder "  if (document.fonts && document.fonts.ready) {"
+        appendLine builder "    document.fonts.ready.then(() => syncWidth()).catch(() => {});"
         appendLine builder "  }"
 
         match updateState with
@@ -735,7 +750,7 @@ module ScreenPathHtmlRenderer =
         renderPathStyles builder
         appendLine builder "</head>"
         appendLine builder "<body>"
-        appendLine builder "<main class=\"ll-path-document\" data-view-mode=\"standard\">"
+        appendLine builder "<main class=\"ll-path-document\" data-view-mode=\"standard\" data-testid=\"screen-path-document\">"
         appendLine builder "<header class=\"ll-path-document__header\">"
         appendLine builder "<div class=\"ll-path-document__topline\">"
         appendLine builder "<div class=\"ll-path-document__title-zone\">"
@@ -775,16 +790,16 @@ module ScreenPathHtmlRenderer =
         |> List.iter (fun lensKind ->
             let lensKey = lensKindDomKey lensKind
             let lensLabel = lensKindButtonLabel lensKind
-            appendLine builder $"<button class=\"ll-path-lens-toggle\" type=\"button\" data-lens-key=\"{htmlEncode lensKey}\" aria-pressed=\"true\">{htmlEncode lensLabel}</button>")
+            appendLine builder $"<button class=\"ll-path-lens-toggle\" type=\"button\" data-testid=\"path-lens-toggle\" data-lens-key=\"{htmlEncode lensKey}\" aria-pressed=\"true\">{htmlEncode lensLabel}</button>")
 
         appendLine builder "</div>"
         appendLine builder "</section>"
         appendLine builder "<section class=\"ll-path-document__update-controls\" aria-label=\"Path update controls\">"
         appendLine builder "<div class=\"ll-path-document__update-label\">Updates</div>"
         appendLine builder "<div class=\"ll-path-document__update-buttons\">"
-        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-update-mode=\"notify\" aria-pressed=\"true\">Notify Me</button>"
-        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-update-mode=\"auto\" aria-pressed=\"false\">Auto Refresh</button>"
-        appendLine builder "<button id=\"ll-path-refresh-now\" class=\"ll-path-update-refresh\" type=\"button\" hidden>Refresh Now</button>"
+        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-testid=\"path-update-toggle\" data-update-mode=\"notify\" aria-pressed=\"true\">Notify Me</button>"
+        appendLine builder "<button class=\"ll-path-update-toggle\" type=\"button\" data-testid=\"path-update-toggle\" data-update-mode=\"auto\" aria-pressed=\"false\">Auto Refresh</button>"
+        appendLine builder "<button id=\"ll-path-refresh-now\" class=\"ll-path-update-refresh\" data-testid=\"path-update-refresh\" type=\"button\" hidden>Refresh Now</button>"
         appendLine builder "</div>"
         appendLine builder "<div id=\"ll-path-update-status\" class=\"ll-path-document__update-status\" aria-live=\"polite\"></div>"
         appendLine builder "</section>"
@@ -792,17 +807,17 @@ module ScreenPathHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "</header>"
         appendLine builder "<section class=\"ll-path-scroll-controls\">"
-        appendLine builder "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\" type=\"button\" aria-label=\"Back to beginning\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--left\"></span></span></button>"
-        appendLine builder "<button id=\"ll-path-nav-previous\" class=\"ll-path-nav-button\" type=\"button\" aria-label=\"Show the previous screen column\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--left\"></span></span></button>"
-        appendLine builder "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\" aria-label=\"Screen path horizontal scroll rail\">"
-        appendLine builder "<div id=\"ll-path-scrollbar-content\" class=\"ll-path-scrollbar__content\"></div>"
+        appendLine builder "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\" data-testid=\"path-nav-start\" type=\"button\" aria-label=\"Back to beginning\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--left\"></span></span></button>"
+        appendLine builder "<button id=\"ll-path-nav-previous\" class=\"ll-path-nav-button\" data-testid=\"path-nav-previous\" type=\"button\" aria-label=\"Show the previous screen column\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--left\"></span></span></button>"
+        appendLine builder "<div id=\"ll-path-scrollbar\" class=\"ll-path-scrollbar\" data-testid=\"path-scrollbar\" aria-label=\"Screen path horizontal scroll rail\">"
+        appendLine builder "<div id=\"ll-path-scrollbar-content\" class=\"ll-path-scrollbar__content\" data-testid=\"path-scrollbar-content\"></div>"
         appendLine builder "</div>"
-        appendLine builder "<button id=\"ll-path-nav-next\" class=\"ll-path-nav-button\" type=\"button\" aria-label=\"Show the next screen column\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--right\"></span><span class=\"ll-path-nav-button__bar\"></span></span></button>"
-        appendLine builder "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\" type=\"button\" aria-label=\"Go to end\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--right\"></span><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__bar\"></span></span></button>"
+        appendLine builder "<button id=\"ll-path-nav-next\" class=\"ll-path-nav-button\" data-testid=\"path-nav-next\" type=\"button\" aria-label=\"Show the next screen column\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--right\"></span><span class=\"ll-path-nav-button__bar\"></span></span></button>"
+        appendLine builder "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\" data-testid=\"path-nav-end\" type=\"button\" aria-label=\"Go to end\"><span class=\"ll-path-nav-button__icon\" aria-hidden=\"true\"><span class=\"ll-path-nav-button__chevron ll-path-nav-button__chevron--right\"></span><span class=\"ll-path-nav-button__bar\"></span><span class=\"ll-path-nav-button__bar\"></span></span></button>"
         appendLine builder "</section>"
         appendLine builder "<section class=\"ll-path-stage\">"
-        appendLine builder "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\">"
-        appendLine builder "<section id=\"ll-path-flow\" class=\"ll-path-flow\">"
+        appendLine builder "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\" data-testid=\"path-flow-viewport\">"
+        appendLine builder "<section id=\"ll-path-flow\" class=\"ll-path-flow\" data-testid=\"path-flow\">"
 
         screenPathState.Steps
         |> List.iteri (fun index stepState ->
@@ -810,7 +825,7 @@ module ScreenPathHtmlRenderer =
             let stepNumberText = stepNumber.ToString("00")
             let stepLensKey = lensKindDomKey stepState.LensKind
 
-            appendLine builder $"<section class=\"ll-path-step\" data-lens-key=\"{htmlEncode stepLensKey}\">"
+            appendLine builder $"<section class=\"ll-path-step\" data-testid=\"path-step\" data-step-key=\"{htmlEncode stepState.StepKey}\" data-lens-key=\"{htmlEncode stepLensKey}\">"
             appendLine builder $"<div class=\"ll-path-step__eyebrow\">Step {stepNumberText} · {htmlEncode stepState.StepKey}</div>"
             appendLine builder $"<h2 class=\"ll-path-step__title\">{htmlEncode stepState.StepTitle}</h2>"
 

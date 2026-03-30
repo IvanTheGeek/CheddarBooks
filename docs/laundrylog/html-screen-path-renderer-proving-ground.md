@@ -15,6 +15,10 @@ Usual refresh helper:
 
 - [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
 
+Formal browser harness:
+
+- [`../../tests/browser/README.md`](../../tests/browser/README.md)
+
 Scratch copies may still be regenerated under `tmp/`, but the workspace copy is the checked-in current path surface.
 
 ## Lens Split
@@ -195,6 +199,29 @@ That means:
   - the header and top horizontal controls stay fixed
   - the path rows scroll inside an internal stage
   - first/previous/next/end controls can move the visible screen columns by whole-step boundaries instead of partial drift
+
+## Browser Verification
+
+The formal browser proof for this page now belongs to the local Playwright workspace:
+
+- [`../../tests/browser/README.md`](../../tests/browser/README.md)
+
+Working split:
+
+- `Expecto`
+  keeps covering typed state, renderer output invariants, and deterministic artifact generation
+- `JS/TS Playwright Test`
+  covers browser-only truth for the tracked workspace artifact, such as:
+  - whole-column path navigation
+  - start/end rail alignment
+  - lens-toggle visibility behavior
+  - local-storage-backed UI persistence
+
+Current working rule:
+
+- the tracked `workspace/` HTML is the browser-test target
+- `file://` loading is still kept as a secondary smoke path
+- the formal browser suite should primarily serve the tracked workspace artifact over a tiny local HTTP server instead of relying only on `file://`
 
 ## Horizontal Navigation Guidance
 

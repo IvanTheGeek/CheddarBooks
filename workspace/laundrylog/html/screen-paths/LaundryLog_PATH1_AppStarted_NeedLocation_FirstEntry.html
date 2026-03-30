@@ -193,7 +193,7 @@ html, body { height: 100%; overflow: hidden; }
 </style>
 </head>
 <body>
-<main class="ll-path-document" data-view-mode="standard">
+<main class="ll-path-document" data-view-mode="standard" data-testid="screen-path-document">
 <header class="ll-path-document__header">
 <div class="ll-path-document__topline">
 <div class="ll-path-document__title-zone">
@@ -227,17 +227,17 @@ html, body { height: 100%; overflow: hidden; }
 <section class="ll-path-document__lens-controls" aria-label="Lens visibility controls">
 <div class="ll-path-document__view-label">Lenses</div>
 <div class="ll-path-document__lens-buttons">
-<button class="ll-path-lens-toggle" type="button" data-lens-key="application-lifecycle" aria-pressed="true">Lifecycle</button>
-<button class="ll-path-lens-toggle" type="button" data-lens-key="app-runtime" aria-pressed="true">Runtime</button>
-<button class="ll-path-lens-toggle" type="button" data-lens-key="screen-path" aria-pressed="true">Screen Path</button>
+<button class="ll-path-lens-toggle" type="button" data-testid="path-lens-toggle" data-lens-key="application-lifecycle" aria-pressed="true">Lifecycle</button>
+<button class="ll-path-lens-toggle" type="button" data-testid="path-lens-toggle" data-lens-key="app-runtime" aria-pressed="true">Runtime</button>
+<button class="ll-path-lens-toggle" type="button" data-testid="path-lens-toggle" data-lens-key="screen-path" aria-pressed="true">Screen Path</button>
 </div>
 </section>
 <section class="ll-path-document__update-controls" aria-label="Path update controls">
 <div class="ll-path-document__update-label">Updates</div>
 <div class="ll-path-document__update-buttons">
-<button class="ll-path-update-toggle" type="button" data-update-mode="notify" aria-pressed="true">Notify Me</button>
-<button class="ll-path-update-toggle" type="button" data-update-mode="auto" aria-pressed="false">Auto Refresh</button>
-<button id="ll-path-refresh-now" class="ll-path-update-refresh" type="button" hidden>Refresh Now</button>
+<button class="ll-path-update-toggle" type="button" data-testid="path-update-toggle" data-update-mode="notify" aria-pressed="true">Notify Me</button>
+<button class="ll-path-update-toggle" type="button" data-testid="path-update-toggle" data-update-mode="auto" aria-pressed="false">Auto Refresh</button>
+<button id="ll-path-refresh-now" class="ll-path-update-refresh" data-testid="path-update-refresh" type="button" hidden>Refresh Now</button>
 </div>
 <div id="ll-path-update-status" class="ll-path-document__update-status" aria-live="polite"></div>
 </section>
@@ -245,18 +245,18 @@ html, body { height: 100%; overflow: hidden; }
 </div>
 </header>
 <section class="ll-path-scroll-controls">
-<button id="ll-path-nav-start" class="ll-path-nav-button" type="button" aria-label="Back to beginning"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--left"></span></span></button>
-<button id="ll-path-nav-previous" class="ll-path-nav-button" type="button" aria-label="Show the previous screen column"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--left"></span></span></button>
-<div id="ll-path-scrollbar" class="ll-path-scrollbar" aria-label="Screen path horizontal scroll rail">
-<div id="ll-path-scrollbar-content" class="ll-path-scrollbar__content"></div>
+<button id="ll-path-nav-start" class="ll-path-nav-button" data-testid="path-nav-start" type="button" aria-label="Back to beginning"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--left"></span></span></button>
+<button id="ll-path-nav-previous" class="ll-path-nav-button" data-testid="path-nav-previous" type="button" aria-label="Show the previous screen column"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--left"></span></span></button>
+<div id="ll-path-scrollbar" class="ll-path-scrollbar" data-testid="path-scrollbar" aria-label="Screen path horizontal scroll rail">
+<div id="ll-path-scrollbar-content" class="ll-path-scrollbar__content" data-testid="path-scrollbar-content"></div>
 </div>
-<button id="ll-path-nav-next" class="ll-path-nav-button" type="button" aria-label="Show the next screen column"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--right"></span><span class="ll-path-nav-button__bar"></span></span></button>
-<button id="ll-path-nav-end" class="ll-path-nav-button" type="button" aria-label="Go to end"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--right"></span><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__bar"></span></span></button>
+<button id="ll-path-nav-next" class="ll-path-nav-button" data-testid="path-nav-next" type="button" aria-label="Show the next screen column"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--right"></span><span class="ll-path-nav-button__bar"></span></span></button>
+<button id="ll-path-nav-end" class="ll-path-nav-button" data-testid="path-nav-end" type="button" aria-label="Go to end"><span class="ll-path-nav-button__icon" aria-hidden="true"><span class="ll-path-nav-button__chevron ll-path-nav-button__chevron--right"></span><span class="ll-path-nav-button__bar"></span><span class="ll-path-nav-button__bar"></span></span></button>
 </section>
 <section class="ll-path-stage">
-<div id="ll-path-flow-viewport" class="ll-path-flow-viewport">
-<section id="ll-path-flow" class="ll-path-flow">
-<section class="ll-path-step" data-lens-key="application-lifecycle">
+<div id="ll-path-flow-viewport" class="ll-path-flow-viewport" data-testid="path-flow-viewport">
+<section id="ll-path-flow" class="ll-path-flow" data-testid="path-flow">
+<section class="ll-path-step" data-testid="path-step" data-step-key="01-app-started" data-lens-key="application-lifecycle">
 <div class="ll-path-step__eyebrow">Step 01 · 01-app-started</div>
 <h2 class="ll-path-step__title">AppStarted</h2>
 <p class="ll-path-step__note">User taps the app icon and the splash screen appears immediately.</p>
@@ -298,7 +298,7 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step" data-lens-key="app-runtime">
+<section class="ll-path-step" data-testid="path-step" data-step-key="02-runtime-checks" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 02 · 02-runtime-checks</div>
 <h2 class="ll-path-step__title">Runtime Checks</h2>
 <p class="ll-path-step__note">Startup/runtime checks begin while the splash state remains visible.</p>
@@ -340,7 +340,7 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step" data-lens-key="app-runtime">
+<section class="ll-path-step" data-testid="path-step" data-step-key="03-no-local-session" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 03 · 03-no-local-session</div>
 <h2 class="ll-path-step__title">No Local Session</h2>
 <p class="ll-path-step__note">Fresh-first-launch assumptions are confirmed: no saved location and no active session were found.</p>
@@ -382,7 +382,7 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step" data-lens-key="app-runtime">
+<section class="ll-path-step" data-testid="path-step" data-step-key="04-route-resolved" data-lens-key="app-runtime">
 <div class="ll-path-step__eyebrow">Step 04 · 04-route-resolved</div>
 <h2 class="ll-path-step__title">Route Resolved</h2>
 <p class="ll-path-step__note">Runtime orchestration resolves Need Location as the first usable screen.</p>
@@ -424,7 +424,7 @@ html, body { height: 100%; overflow: hidden; }
 </section>
 </article>
 </section>
-<section class="ll-path-step" data-lens-key="screen-path">
+<section class="ll-path-step" data-testid="path-step" data-step-key="05-need-location" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 05 · 05-need-location</div>
 <h2 class="ll-path-step__title">Need Location</h2>
 <p class="ll-path-step__note">Fresh start with no known location yet.</p>
@@ -464,7 +464,7 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step" data-lens-key="screen-path">
+<section class="ll-path-step" data-testid="path-step" data-step-key="06-ready-to-set-location" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 06 · 06-ready-to-set-location</div>
 <h2 class="ll-path-step__title">Ready To Set Location</h2>
 <p class="ll-path-step__note">The location text is entered and the confirm action is available.</p>
@@ -504,7 +504,7 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step" data-lens-key="screen-path">
+<section class="ll-path-step" data-testid="path-step" data-step-key="07-entry-form-ready" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 07 · 07-entry-form-ready</div>
 <h2 class="ll-path-step__title">Entry Form Ready</h2>
 <p class="ll-path-step__note">The app enters the main entry surface after location capture.</p>
@@ -620,7 +620,7 @@ html, body { height: 100%; overflow: hidden; }
 </article>
 
 </section>
-<section class="ll-path-step" data-lens-key="screen-path">
+<section class="ll-path-step" data-testid="path-step" data-step-key="08-washer-draft" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 08 · 08-washer-draft</div>
 <h2 class="ll-path-step__title">Washer Draft</h2>
 <p class="ll-path-step__note">The first expense draft is composed on the main screen.</p>
@@ -739,7 +739,7 @@ Log Expense
 </article>
 
 </section>
-<section class="ll-path-step" data-lens-key="screen-path">
+<section class="ll-path-step" data-testid="path-step" data-step-key="09-logged-success" data-lens-key="screen-path">
 <div class="ll-path-step__eyebrow">Step 09 · 09-logged-success</div>
 <h2 class="ll-path-step__title">Logged Success</h2>
 <p class="ll-path-step__note">The first entry is logged and the screen is ready for the next quick entry.</p>
@@ -932,7 +932,7 @@ Log Expense
       step.hidden = !activeLensKeys.includes(stepLensKey);
     });
     persistLensKeys(activeLensKeys);
-    window.requestAnimationFrame(syncWidth);
+    window.requestAnimationFrame(() => syncWidth());
   };
   lensButtons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -1079,10 +1079,20 @@ Log Expense
     syncingScroll = false;
     updateButtonState();
   });
-  const scrollToStart = () => animateScrollToColumn(0);
-  const scrollToEnd = () => animateScrollToColumn(logicalMaxScrollLeft());
+  const refreshScrollMetrics = () => {
+    syncWidth();
+    return currentStepMetrics;
+  };
+  const scrollToStart = () => {
+    refreshScrollMetrics();
+    animateScrollToColumn(0);
+  };
+  const scrollToEnd = () => {
+    refreshScrollMetrics();
+    animateScrollToColumn(logicalMaxScrollLeft());
+  };
   const scrollByOneColumn = (direction) => {
-    const targets = currentStepMetrics.targets;
+    const targets = refreshScrollMetrics().targets;
     if (targets.length === 0) { return; }
     const currentIndex = stepIndexAtOrBefore(targets, viewport.scrollLeft);
     const targetIndex = Math.max(0, Math.min(targets.length - 1, currentIndex + direction));
@@ -1093,12 +1103,17 @@ Log Expense
   if (nextButton) { nextButton.addEventListener('click', () => scrollByOneColumn(1)); }
   if (endButton) { endButton.addEventListener('click', scrollToEnd); }
   syncWidth();
+  window.requestAnimationFrame(() => syncWidth());
   window.addEventListener('resize', syncWidth);
+  window.addEventListener('load', syncWidth);
   if (window.ResizeObserver) {
     new ResizeObserver(syncWidth).observe(flow);
   }
-  const currentArtifactVersion = "screen-path::20260329143205629";
-  const currentArtifactUpdatedAt = "2026-03-29T14:32:05Z";
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => syncWidth()).catch(() => {});
+  }
+  const currentArtifactVersion = "screen-path::20260330022159795";
+  const currentArtifactUpdatedAt = "2026-03-30T02:21:59Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updatePollTimer = 0;

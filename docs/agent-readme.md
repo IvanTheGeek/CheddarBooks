@@ -102,6 +102,8 @@ For local F# Interactive artifact generation:
 - treat `dotnet fsi <<'EOF' ... EOF` as a scratch-only fallback, not the usual path
 - if the artifact generation is recurring, prefer a checked-in helper script over ad hoc shell-wrapped REPL input
 - for the tracked LaundryLog workspace HTML, use [`../scripts/laundrylog/refresh-workspace-html.sh`](../scripts/laundrylog/refresh-workspace-html.sh) as the usual refresh path
+- for formal browser verification of tracked LaundryLog HTML behavior, use the Playwright workspace under [`../tests/browser/README.md`](../tests/browser/README.md)
+- keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
 
 ## Verification Discipline
 

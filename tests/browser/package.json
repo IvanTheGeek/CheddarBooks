@@ -1,0 +1,16 @@
+{
+  "name": "cheddarbooks-browser-tests",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "install:browsers": "playwright install chromium",
+    "show-report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@types/node": "25.5.0",
+    "typescript": "6.0.2"
+  }
+}

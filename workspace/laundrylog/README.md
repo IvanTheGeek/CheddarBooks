@@ -28,6 +28,10 @@ Refresh helper:
 - [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
 - [`../../scripts/laundrylog/refresh-workspace-html.fsx`](../../scripts/laundrylog/refresh-workspace-html.fsx)
 
+Formal browser harness:
+
+- [`../../tests/browser/README.md`](../../tests/browser/README.md)
+
 Working rule:
 
 - review the checked-in artifacts in this workspace first
@@ -37,6 +41,7 @@ Working rule:
 - refresh the tracked HTML with the checked-in helper under `scripts/laundrylog/` rather than ad hoc shell snippets
 - when renderer or artifact behavior changes materially, refresh the relevant workspace artifact in the same commit as the code/docs change
 - do not force separate artifact-only commits just to keep the workspace current
+- for formal browser proof, target these tracked workspace artifacts through the Playwright workspace under `tests/browser/`
 
 Current first review targets:
 
