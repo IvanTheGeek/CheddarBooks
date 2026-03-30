@@ -662,6 +662,7 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "data-slot-kind=\"primary\"" "Expected NM columns to emit a shared primary detail slot."
                   Expect.stringContains htmlDocument "data-slot-kind=\"secondary\"" "Expected NM columns to emit a shared secondary detail slot."
                   Expect.stringContains htmlDocument "data-slot-kind=\"gwt\"" "Expected NM columns to emit a shared gwt slot."
+                  Expect.stringContains htmlDocument "--nm-column-template-rows:" "Expected NM columns to emit per-column slot templates."
                   Expect.stringContains htmlDocument "--nm-slot-screen-height" "Expected the NM path to publish shared screen-row sizing variables."
                   Expect.stringContains htmlDocument "nm-column__slot--aem .slice-block" "Expected flattened AEM blocks to render directly inside the shared NM slots."
                   Expect.stringContains htmlDocument "ui lens" "Expected the linked-screen lens badge to move into the NM SCREEN compartment for AEM columns."
@@ -715,6 +716,50 @@ module LaundryLogTests =
                   Expect.isGreaterThanOrEqual firstHeaderMetaIndex 0 "Expected the NM classification row to be rendered."
                   Expect.isGreaterThanOrEqual firstStepIndex 0 "Expected the first NM step label."
                   Expect.isLessThan firstHeaderMetaIndex firstStepIndex "Expected the classification row to appear above the step/key line.")
+
+              testCase "NM path trims trailing empty rows while preserving interior spacers for GWT alignment" (fun () ->
+                  let htmlDocument = NmPathHtmlRenderer.renderDocument (NmPathHtmlExamples.path1FirstLaunchFirstEntry ())
+
+                  let columnSegment columnKey nextColumnKey =
+                      let startMarker = $"data-column-key=\"{columnKey}\""
+                      let startIndex = htmlDocument.IndexOf(startMarker)
+                      Expect.isGreaterThanOrEqual startIndex 0 $"Expected the NM column '{columnKey}' in the rendered HTML."
+
+                      let endIndex =
+                          match nextColumnKey with
+                          | Some nextKey ->
+                              let endMarker = $"data-column-key=\"{nextKey}\""
+                              let foundIndex = htmlDocument.IndexOf(endMarker, startIndex + startMarker.Length)
+                              Expect.isGreaterThanOrEqual foundIndex 0 $"Expected the NM column '{nextKey}' after '{columnKey}'."
+                              foundIndex
+                          | None -> htmlDocument.Length
+
+                      htmlDocument.Substring(startIndex, endIndex - startIndex)
+
+                  let needLocationSegment = columnSegment "05-need-location" (Some "06-ready-to-set-location")
+                  let readyToSetSegment = columnSegment "06-ready-to-set-location" (Some "07-capture-laundry-location")
+                  let viewWithGwtSegment = columnSegment "08-current-laundry-session-location" (Some "09-entry-form-ready")
+                  let interactionEntrySegment = columnSegment "09-entry-form-ready" (Some "10-washer-draft")
+
+                  Expect.stringContains needLocationSegment "data-slot-kind=\"header\"" "Expected shorter NM columns to keep the header slot."
+                  Expect.stringContains needLocationSegment "data-slot-kind=\"screen\"" "Expected shorter NM columns to keep the screen slot."
+                  Expect.stringContains needLocationSegment "data-slot-kind=\"primary\"" "Expected shorter NM columns to keep the primary slot."
+                  Expect.isFalse (needLocationSegment.Contains("data-slot-kind=\"secondary\"")) "Expected a screen-plus-primary column to omit a trailing secondary slot."
+                  Expect.isFalse (needLocationSegment.Contains("data-slot-kind=\"gwt\"")) "Expected a screen-plus-primary column to omit a trailing gwt slot."
+
+                  Expect.isFalse (readyToSetSegment.Contains("data-slot-kind=\"secondary\"")) "Expected another short screen column to omit a trailing secondary slot."
+                  Expect.isFalse (readyToSetSegment.Contains("data-slot-kind=\"gwt\"")) "Expected another short screen column to omit a trailing gwt slot."
+
+                  Expect.stringContains
+                      viewWithGwtSegment
+                      "class=\"nm-column__slot nm-column__slot--secondary nm-column__slot--empty\""
+                      "Expected AEM view columns with GWT content to keep an empty secondary spacer slot."
+
+                  Expect.stringContains viewWithGwtSegment "data-slot-kind=\"gwt\"" "Expected the AEM view column to keep its gwt slot."
+                  Expect.isFalse (viewWithGwtSegment.Contains("slice-block--event")) "Expected the AEM view spacer row to stay empty rather than render an event block."
+
+                  Expect.isFalse (interactionEntrySegment.Contains("data-slot-kind=\"secondary\"")) "Expected the interaction column to stop after the primary row."
+                  Expect.isFalse (interactionEntrySegment.Contains("data-slot-kind=\"gwt\"")) "Expected the interaction column to stop after the primary row.")
 
               testCase "NM path renderer emits its sidecar update manifest script" (fun () ->
                   let manifestScript =

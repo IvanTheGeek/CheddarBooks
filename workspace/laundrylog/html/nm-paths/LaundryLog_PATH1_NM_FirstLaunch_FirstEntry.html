@@ -267,7 +267,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }
 .nm-path-flow-viewport::-webkit-scrollbar { display: none; }
 .nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }
-.nm-column { display: grid; grid-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto); gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; align-content: start; }
+.nm-column { display: grid; grid-template-rows: var(--nm-column-template-rows, minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto)); gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; align-content: start; }
 .nm-column[hidden] { display: none !important; }
 .nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }
 .nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }
@@ -473,7 +473,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-path-stage">
 <div id="nm-path-flow-viewport" class="nm-path-flow-viewport" data-testid="nm-path-flow-viewport">
 <section id="nm-path-flow" class="nm-path-flow" data-testid="nm-path-flow">
-<section class="nm-column nm-column--app-runtime nm-column--context-application-lifecycle" data-testid="nm-path-column" data-column-key="01-app-started" data-context-key="application-lifecycle" data-lens-keys="lifecycle">
+<section class="nm-column nm-column--app-runtime nm-column--context-application-lifecycle" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="01-app-started" data-context-key="application-lifecycle" data-lens-keys="lifecycle">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -622,16 +622,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -780,16 +772,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="03-no-local-session" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="03-no-local-session" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -938,16 +922,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="04-route-resolved" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="04-route-resolved" data-context-key="runtime-orchestration" data-lens-keys="runtime">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -1096,16 +1072,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="05-need-location" data-context-key="screen-path" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="05-need-location" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -1248,16 +1216,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-context-key="screen-path" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -1400,16 +1360,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-context-key="event-modeling" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto);" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -1705,7 +1657,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-context-key="event-modeling" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto);" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -2052,7 +2004,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-context-key="screen-path" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -2280,16 +2232,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="10-washer-draft" data-context-key="screen-path" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="10-washer-draft" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -2520,16 +2464,8 @@ Log Expense
 </section>
 </div>
 </div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
 </section>
-<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-context-key="event-modeling" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto);" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -2984,7 +2920,7 @@ Log Expense
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-context-key="event-modeling" data-lens-keys="aem">
+<section class="nm-column nm-column--business nm-column--context-event-modeling" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto);" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-context-key="event-modeling" data-lens-keys="aem">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -3355,7 +3291,7 @@ Log Expense
 </div>
 </div>
 </section>
-<section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="13-logged-success" data-context-key="screen-path" data-lens-keys="screen">
+<section class="nm-column nm-column--interaction nm-column--context-screen-path" style="--nm-column-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto);" data-testid="nm-path-column" data-column-key="13-logged-success" data-context-key="screen-path" data-lens-keys="screen">
 <div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
 <div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
@@ -3593,14 +3529,6 @@ Log Expense
 </ul>
 </div>
 </section>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
-</div>
-</div>
-<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
-<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 </div>
 </div>
 </section>
@@ -4098,8 +4026,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330160652262";
-  const currentArtifactUpdatedAt = "2026-03-30T16:06:52Z";
+  const currentArtifactVersion = "nm-path::20260330164558013";
+  const currentArtifactUpdatedAt = "2026-03-30T16:45:58Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

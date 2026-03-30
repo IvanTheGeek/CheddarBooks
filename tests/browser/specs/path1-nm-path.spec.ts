@@ -197,6 +197,12 @@ async function readSlotContentHeight(page: Page, columnKey: string, slotKind: st
   );
 }
 
+async function readColumnHeight(page: Page, columnKey: string): Promise<number> {
+  return page
+    .locator(`[data-testid="nm-path-column"][data-column-key="${columnKey}"]`)
+    .evaluate((column) => Math.round((column as HTMLElement).getBoundingClientRect().height));
+}
+
 async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
   const updateStatus = page.getByTestId('nm-path-update-status');
   await expect(updateStatus).toBeVisible();
@@ -247,7 +253,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(backAtStart.leadingVisibleColumnKey).toBe('01-app-started');
   });
 
-  test('shared NM slots keep mixed columns aligned by row type', async ({ page }) => {
+  test('shared NM slots align by row type while shorter columns trim trailing empty rows', async ({ page }) => {
     await page.goto(nmPathHttpPath);
     await page.getByTestId('nm-path-nav-end').click();
     await waitForNmScrollTarget(page, (await readNmPathMetrics(page)).logicalMaxTarget);
@@ -269,33 +275,54 @@ test.describe('PATH1 NM workspace artifact', () => {
       expect(slotHeight.header).toBe(first.header);
       expect(slotHeight.screen).toBe(first.screen);
       expect(slotHeight.primary).toBe(first.primary);
-      expect(slotHeight.secondary).toBe(first.secondary);
-      expect(slotHeight.gwt).toBe(first.gwt);
     }
 
     expect(first.screen).toBeGreaterThan(0);
     expect(first.primary).toBeGreaterThan(0);
-    expect(first.secondary).toBeGreaterThan(0);
-    expect(first.gwt).toBeGreaterThan(0);
+
+    const renderedSecondaryKeys = ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'] as const;
+    const renderedGwtKeys = ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'] as const;
+    const trimmedKeys = ['09-entry-form-ready', '10-washer-draft', '13-logged-success'] as const;
+
+    for (const columnKey of renderedSecondaryKeys) {
+      expect((await readSlotHeights(page, columnKey)).secondary).toBeGreaterThan(0);
+    }
+
+    for (const columnKey of renderedGwtKeys) {
+      expect((await readSlotHeights(page, columnKey)).gwt).toBeGreaterThan(0);
+    }
+
+    for (const columnKey of trimmedKeys) {
+      const trimmedHeights = await readSlotHeights(page, columnKey);
+      expect(trimmedHeights.secondary).toBe(0);
+      expect(trimmedHeights.gwt).toBe(0);
+    }
 
     const screenBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'screen')));
     const primaryBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'primary')));
-    const secondaryBoxHeights = await Promise.all(
-      ['07-capture-laundry-location', '11-log-laundry-expense'].map((key) => readSlotContentHeight(page, key, 'secondary')),
-    );
     const gwtBoxHeights = await Promise.all(
-      [
-        '07-capture-laundry-location',
-        '08-current-laundry-session-location',
-        '11-log-laundry-expense',
-        '12-current-laundry-session-washer',
-      ].map((key) => readSlotContentHeight(page, key, 'gwt')),
+      ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'].map((key) =>
+        readSlotContentHeight(page, key, 'gwt'),
+      ),
     );
 
     expect(new Set(screenBoxHeights).size).toBe(1);
     expect(new Set(primaryBoxHeights).size).toBe(1);
-    expect(new Set(secondaryBoxHeights).size).toBe(1);
     expect(new Set(gwtBoxHeights).size).toBe(1);
+
+    const renderedSecondaryHeights = await Promise.all(renderedSecondaryKeys.map((key) => readSlotHeights(page, key)));
+    const secondarySlotHeights = renderedSecondaryHeights.map((height) => height.secondary);
+    const gwtSlotHeights = renderedSecondaryHeights.map((height) => height.gwt);
+
+    expect(new Set(secondarySlotHeights).size).toBe(1);
+    expect(new Set(gwtSlotHeights).size).toBe(1);
+
+    const shorterColumnHeights = await Promise.all(trimmedKeys.map((key) => readColumnHeight(page, key)));
+    const gwtColumnHeights = await Promise.all(renderedGwtKeys.map((key) => readColumnHeight(page, key)));
+
+    for (const shorterHeight of shorterColumnHeights) {
+      expect(shorterHeight).toBeLessThan(gwtColumnHeights[0]);
+    }
   });
 
   test('surface thumbnails stay small in thumbnail mode and full mode expands the live surface without breaking layout', async ({ page }) => {

@@ -782,6 +782,13 @@ module NmPathHtmlRenderer =
     let private renderEmptyColumnSlot (builder: StringBuilder) slotKind =
         renderColumnSlot builder slotKind "nm-column__slot--empty" (fun () -> ())
 
+    let private slotRowDefinition slotKind = $"minmax(var(--nm-slot-{slotKind}-height, 0px), auto)"
+
+    let private columnTemplateRows slotKinds =
+        slotKinds
+        |> List.map slotRowDefinition
+        |> String.concat " "
+
     let private renderStructuredDetailBox
         (builder: StringBuilder)
         detailKind
@@ -906,9 +913,6 @@ module NmPathHtmlRenderer =
                 None
                 "nm-column-changes")
 
-        renderEmptyColumnSlot builder "secondary"
-        renderEmptyColumnSlot builder "gwt"
-
     let private renderEmbeddedAemPrimary (builder: StringBuilder) (sliceCard: PathSliceCard) =
         match sliceCard with
         | PathSliceCard.CommandSlice commandSlice ->
@@ -949,22 +953,32 @@ module NmPathHtmlRenderer =
 
         if hasSecondaryAemSlot sliceCard then
             renderColumnSlot builder "secondary" "nm-column__slot--aem" (fun () -> renderEmbeddedAemSecondary builder sliceCard)
-        else
+        elif hasGwtAemSlot sliceCard then
             renderEmptyColumnSlot builder "secondary"
 
         if hasGwtAemSlot sliceCard then
             renderColumnSlot builder "gwt" "nm-column__slot--aem" (fun () -> renderEmbeddedAemGwt builder sliceCard)
-        else
-            renderEmptyColumnSlot builder "gwt"
+
+    let private renderedSlotKinds =
+        function
+        | { Surface = NmAemSliceSurface (_, sliceCard) } ->
+            if hasGwtAemSlot sliceCard then
+                [ "header"; "screen"; "primary"; "secondary"; "gwt" ]
+            elif hasSecondaryAemSlot sliceCard then
+                [ "header"; "screen"; "primary"; "secondary" ]
+            else
+                [ "header"; "screen"; "primary" ]
+        | _ -> [ "header"; "screen"; "primary" ]
 
     let private renderColumn (builder: StringBuilder) (index: int) (columnState: NmColumnState) =
         let stepNumberText = (index + 1).ToString("00")
         let groupDomKey = ContextGroupKind.domKey columnState.ContextGroup
         let contextDomKey = NmContextKind.domKey columnState.PrimaryContext
+        let templateRows = columnTemplateRows (renderedSlotKinds columnState)
 
         appendLine
             builder
-            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey} nm-column--context-{htmlEncode contextDomKey}\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-context-key=\"{htmlEncode contextDomKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
+            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey} nm-column--context-{htmlEncode contextDomKey}\" style=\"--nm-column-template-rows: {htmlEncode templateRows};\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-context-key=\"{htmlEncode contextDomKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
         renderColumnSlot builder "header" "" (fun () ->
             appendLine builder "<div class=\"nm-column__header\">"
             renderClassificationRow builder columnState
@@ -1035,7 +1049,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }"
         appendLine builder ".nm-path-flow-viewport::-webkit-scrollbar { display: none; }"
         appendLine builder ".nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }"
-        appendLine builder ".nm-column { display: grid; grid-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto); gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; align-content: start; }"
+        appendLine builder ".nm-column { display: grid; grid-template-rows: var(--nm-column-template-rows, minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto)); gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; align-content: start; }"
         appendLine builder ".nm-column[hidden] { display: none !important; }"
         appendLine builder ".nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }"
         appendLine builder ".nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }"
