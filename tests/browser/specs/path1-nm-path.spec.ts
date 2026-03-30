@@ -39,6 +39,14 @@ type NmPreviewMetrics = {
   renderingHeight: number;
 };
 
+type NmSlotHeights = {
+  header: number;
+  screen: number;
+  primary: number;
+  secondary: number;
+  gwt: number;
+};
+
 async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
   return page.evaluate(() => {
     const viewport = document.getElementById('nm-path-flow-viewport') as HTMLElement | null;
@@ -161,6 +169,23 @@ async function readPreviewMetrics(page: Page, columnKey: string): Promise<NmPrev
   });
 }
 
+async function readSlotHeights(page: Page, columnKey: string): Promise<NmSlotHeights> {
+  return page.locator(`[data-testid="nm-path-column"][data-column-key="${columnKey}"]`).evaluate((column) => {
+    const readSlotHeight = (slotKind: string) => {
+      const slot = column.querySelector(`[data-slot-kind="${slotKind}"]`) as HTMLElement | null;
+      return Math.round(slot?.getBoundingClientRect().height ?? 0);
+    };
+
+    return {
+      header: readSlotHeight('header'),
+      screen: readSlotHeight('screen'),
+      primary: readSlotHeight('primary'),
+      secondary: readSlotHeight('secondary'),
+      gwt: readSlotHeight('gwt'),
+    };
+  });
+}
+
 async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
   const updateStatus = page.getByTestId('nm-path-update-status');
   await expect(updateStatus).toBeVisible();
@@ -211,6 +236,38 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(backAtStart.leadingVisibleColumnKey).toBe('01-app-started');
   });
 
+  test('shared NM slots keep mixed columns aligned by row type', async ({ page }) => {
+    await page.goto(nmPathHttpPath);
+    await page.getByTestId('nm-path-nav-end').click();
+    await waitForNmScrollTarget(page, (await readNmPathMetrics(page)).logicalMaxTarget);
+
+    const keys = [
+      '08-current-laundry-session-location',
+      '09-entry-form-ready',
+      '10-washer-draft',
+      '11-log-laundry-expense',
+      '12-current-laundry-session-washer',
+      '13-logged-success',
+    ] as const;
+
+    const slotHeights = await Promise.all(keys.map((key) => readSlotHeights(page, key)));
+
+    const first = slotHeights[0];
+
+    for (const slotHeight of slotHeights.slice(1)) {
+      expect(slotHeight.header).toBe(first.header);
+      expect(slotHeight.screen).toBe(first.screen);
+      expect(slotHeight.primary).toBe(first.primary);
+      expect(slotHeight.secondary).toBe(first.secondary);
+      expect(slotHeight.gwt).toBe(first.gwt);
+    }
+
+    expect(first.screen).toBeGreaterThan(0);
+    expect(first.primary).toBeGreaterThan(0);
+    expect(first.secondary).toBeGreaterThan(0);
+    expect(first.gwt).toBeGreaterThan(0);
+  });
+
   test('surface thumbnails stay small in thumbnail mode and full mode expands the live surface without breaking layout', async ({ page }) => {
     await page.goto(nmPathHttpPath);
 
@@ -225,7 +282,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(thumbnailMetrics.thumbnailWidth).toBeLessThanOrEqual(102);
     expect(thumbnailMetrics.thumbnailHeight).toBeGreaterThanOrEqual(112);
     expect(thumbnailMetrics.thumbnailHeight).toBeLessThanOrEqual(154);
-    expect(thumbnailMetrics.columnHeight).toBeLessThan(680);
+    expect(thumbnailMetrics.columnHeight).toBeLessThan(980);
     expect(thumbnailMetrics.renderingWidth).toBe(0);
 
     await expect(
@@ -243,7 +300,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(fullMetrics.frameWidth).toBeGreaterThan(thumbnailMetrics.frameWidth);
     expect(fullMetrics.frameHeight).toBeGreaterThan(thumbnailMetrics.frameHeight);
     expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(220);
-    expect(fullMetrics.columnHeight).toBeLessThan(760);
+    expect(fullMetrics.columnHeight).toBeLessThan(1120);
     expect(fullMetrics.thumbnailWidth).toBe(0);
     expect(fullMetrics.renderingWidth).toBeGreaterThan(thumbnailMetrics.renderingWidth);
     expect(fullMetrics.renderingWidth).toBeGreaterThan(90);
@@ -345,12 +402,12 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-changes"][data-detail-kind="orchestration"]')).toBeVisible();
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-changes"][data-detail-kind="interaction"]')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--command')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--event')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-aem-detail"] .slice-block--view')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"]')).not.toContainText('COMMAND SLICE');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-aem-detail"]')).not.toContainText('VIEW SLICE');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-card')).toHaveCount(0);
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="primary"] .slice-block--command')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="secondary"] .slice-block--event')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-slot-kind="primary"] .slice-block--view')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"]')).not.toContainText('COMMAND SLICE');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"]')).not.toContainText('VIEW SLICE');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] .slice-card')).toHaveCount(0);
 
     const aemHeaderRolePill = page.locator(
       '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] .nm-column__classification [data-testid="nm-column-pill"][data-pill-type="role"]',

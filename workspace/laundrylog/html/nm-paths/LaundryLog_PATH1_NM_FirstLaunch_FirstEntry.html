@@ -267,7 +267,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }
 .nm-path-flow-viewport::-webkit-scrollbar { display: none; }
 .nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }
-.nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; }
+.nm-column { display: grid; grid-template-rows: minmax(var(--nm-slot-header-height, 0px), auto) minmax(var(--nm-slot-screen-height, 0px), auto) minmax(var(--nm-slot-primary-height, 0px), auto) minmax(var(--nm-slot-secondary-height, 0px), auto) minmax(var(--nm-slot-gwt-height, 0px), auto); gap: 10px; border-radius: 24px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 10px 10px 12px; min-height: 0; overflow: visible; align-content: start; }
 .nm-column[hidden] { display: none !important; }
 .nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }
 .nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }
@@ -276,6 +276,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }
 .nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }
 .nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }
+.nm-column__slot { min-height: 0; display: block; }
+.nm-column__slot-body { width: 100%; min-height: 0; }
+.nm-column__slot--empty { pointer-events: none; }
+.nm-column__slot--empty .nm-column__slot-body { min-height: 0; }
 .nm-column__header { display: flex; flex-direction: column; gap: 5px; }
 .nm-column__classification { display: grid; gap: 4px; }
 .nm-column__classification-row { display: grid; align-items: start; }
@@ -329,8 +333,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-thumbnail__checkpoint--active { background: #fdba74; }
 .nm-thumbnail__checkpoint--complete { background: #93c5fd; }
 .nm-thumbnail__empty { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b; font-size: 0.62rem; font-weight: 600; background: #f8fafc; }
-.nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
-.nm-column__body--aem { gap: 10px; }
 .nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }
 .nm-column__meta--secondary { gap: 0.32rem; }
 .nm-column__pill-wrap { position: relative; display: inline-flex; max-width: 100%; }
@@ -343,8 +345,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__pill-wrap:hover .nm-column__pill-popover, .nm-column__pill-wrap:focus-within .nm-column__pill-popover { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .nm-column__pill-popover-title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }
 .nm-column__pill-popover-text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }
-.nm-column__detail-boxes { display: grid; gap: 10px; }
-.nm-column__detail-box { display: grid; gap: 7px; border-radius: 18px; padding: 10px 11px; border: 2px solid; min-height: 0; overflow: visible; background: rgba(255, 255, 255, 0.86); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72); }
+.nm-column__detail-box { display: grid; gap: 7px; border-radius: 18px; padding: 10px 11px; border: 2px solid; min-height: 0; height: 100%; overflow: visible; background: rgba(255, 255, 255, 0.86); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72); }
 .nm-column__detail-box--screen { border-color: #c8dcff; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); }
 .nm-column__detail-box--transition { border-color: #89b6e8; background: rgba(82, 155, 246, 0.14); }
 .nm-column__detail-box--orchestration { border-color: #8ac3dd; background: rgba(84, 165, 200, 0.14); }
@@ -357,14 +358,9 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }
 .nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }
 .nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }
-.nm-column__aem-detail { display: flex; flex-direction: column; border-radius: 18px; padding: 2px 0 0; }
-.nm-column__aem-detail .slice-card__embedded-body { display: grid; gap: 10px; }
-.nm-column__aem-detail .slice-card__embedded-gwt { display: grid; gap: 8px; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 8px; }
-.nm-column__aem-detail .slice-card__row { min-height: 0; }
-.nm-column__aem-detail .slice-card__row--detail { display: flex; }
-.nm-column__aem-detail .slice-card__width-action { display: none; }
-.nm-column__aem-detail .slice-block { min-height: var(--detail-row-height); }
-.nm-column__aem-detail .slice-card__gwt-card { min-height: 0; }
+.nm-column__slot--aem .slice-block { min-height: 0; height: 100%; }
+.nm-column__slot--aem .slice-card__gwt-card { min-height: 0; height: 100%; }
+.nm-column__slot--aem .slice-card__width-action { display: none; }
 .nm-surface-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.66); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 40; }
 .nm-surface-overlay.is-open { display: flex; }
 .nm-surface-overlay__dialog { width: min(92vw, 520px); max-height: 92vh; background: #f8fafc; border-radius: 20px; box-shadow: 0 20px 44px rgba(15, 23, 42, 0.34); display: flex; flex-direction: column; overflow: hidden; }
@@ -477,6 +473,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div id="nm-path-flow-viewport" class="nm-path-flow-viewport" data-testid="nm-path-flow-viewport">
 <section id="nm-path-flow" class="nm-path-flow" data-testid="nm-path-flow">
 <section class="nm-column nm-column--app-runtime nm-column--context-application-lifecycle" data-testid="nm-path-column" data-column-key="01-app-started" data-context-key="application-lifecycle" data-lens-keys="lifecycle">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -525,8 +523,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">AppStarted</h2>
 <p class="nm-column__note">The user launches the app and the first splash-state surface becomes visible.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -601,6 +601,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--transition" data-testid="nm-column-changes" data-detail-kind="transition">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">TRANSITION</span>
@@ -617,8 +621,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -667,8 +681,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Runtime Checks</h2>
 <p class="nm-column__note">Startup/runtime checks begin while the splash surface remains visible.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -743,6 +759,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">ORCHESTRATION</span>
@@ -759,8 +779,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="03-no-local-session" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -809,8 +839,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">No Local Session</h2>
 <p class="nm-column__note">Fresh-first-launch assumptions are confirmed from local/runtime inspection.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -885,6 +917,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">ORCHESTRATION</span>
@@ -901,8 +937,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--app-runtime nm-column--context-runtime-orchestration" data-testid="nm-path-column" data-column-key="04-route-resolved" data-context-key="runtime-orchestration" data-lens-keys="runtime">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -951,8 +997,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Route Resolved</h2>
 <p class="nm-column__note">Runtime orchestration resolves Need Location as the first usable screen.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1027,6 +1075,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--orchestration" data-testid="nm-column-changes" data-detail-kind="orchestration">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">ORCHESTRATION</span>
@@ -1043,8 +1095,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="05-need-location" data-context-key="screen-path" data-lens-keys="screen">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -1093,8 +1155,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Need Location</h2>
 <p class="nm-column__note">Fresh start with no known location yet.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1163,6 +1227,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">INTERACTION</span>
@@ -1179,8 +1247,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-context-key="screen-path" data-lens-keys="screen">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -1229,8 +1307,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Ready To Set Location</h2>
 <p class="nm-column__note">The user has entered location text and the confirm action is now available.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1299,6 +1379,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">INTERACTION</span>
@@ -1315,8 +1399,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-context-key="event-modeling" data-lens-keys="aem">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -1357,7 +1451,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">CaptureLaundryLocation</h2>
 <p class="nm-column__note">The business command for location capture becomes explicit in the NM flow.</p>
 </div>
-<div class="nm-column__body nm-column__body--aem">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1444,9 +1541,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<div class="slice-card__embedded-body slice-card__embedded-body--command">
-<div class="slice-card__row slice-card__row--detail">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--command">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CaptureLaundryLocation</h3>
@@ -1473,12 +1571,14 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">business</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__row slice-card__row--detail">
+</div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--event">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LaundryLocationCaptured</h3>
@@ -1509,12 +1609,14 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">business</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__embedded-gwt">
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">command gwt</span>
@@ -1598,13 +1700,13 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-</div>
-</div>
 
 </div>
 </div>
 </section>
 <section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-context-key="event-modeling" data-lens-keys="aem">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -1645,7 +1747,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">CurrentLaundrySession</h2>
 <p class="nm-column__note">The first business projection after location capture is now explicit.</p>
 </div>
-<div class="nm-column__body nm-column__body--aem">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1809,9 +1914,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<div class="slice-card__embedded-body slice-card__embedded-body--view">
-<div class="slice-card__row slice-card__row--detail">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--view">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CurrentLaundrySession</h3>
@@ -1842,12 +1948,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">classic em</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__embedded-gwt">
+</div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">view gwt</span>
@@ -1935,13 +2047,13 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
-</div>
-</div>
 
 </div>
 </div>
 </section>
 <section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-context-key="screen-path" data-lens-keys="screen">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -1990,8 +2102,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Entry Form Ready</h2>
 <p class="nm-column__note">The app enters the main entry surface after the location is captured.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2145,6 +2259,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">INTERACTION</span>
@@ -2161,8 +2279,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="10-washer-draft" data-context-key="screen-path" data-lens-keys="screen">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -2211,8 +2339,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <h2 class="nm-column__title">Washer Draft</h2>
 <p class="nm-column__note">The first expense draft is composed on the main screen.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2369,6 +2499,10 @@ Log Expense
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">INTERACTION</span>
@@ -2385,8 +2519,18 @@ Log Expense
 </section>
 </div>
 </div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
 </section>
 <section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-context-key="event-modeling" data-lens-keys="aem">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -2427,7 +2571,10 @@ Log Expense
 <h2 class="nm-column__title">LogLaundryExpense</h2>
 <p class="nm-column__note">The first washer expense draft is now explicit as a business command.</p>
 </div>
-<div class="nm-column__body nm-column__body--aem">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2602,9 +2749,10 @@ Log Expense
 </div>
 </div>
 </section>
-<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<div class="slice-card__embedded-body slice-card__embedded-body--command">
-<div class="slice-card__row slice-card__row--detail">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--command">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LogLaundryExpense</h3>
@@ -2639,12 +2787,14 @@ Log Expense
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">business</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__row slice-card__row--detail">
+</div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--event">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LaundryExpenseLogged</h3>
@@ -2687,12 +2837,14 @@ Log Expense
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">business</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__embedded-gwt">
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">command gwt</span>
@@ -2827,13 +2979,13 @@ Log Expense
 </div>
 </div>
 </section>
-</div>
-</div>
 
 </div>
 </div>
 </section>
 <section class="nm-column nm-column--business nm-column--context-event-modeling" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-context-key="event-modeling" data-lens-keys="aem">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -2874,7 +3026,10 @@ Log Expense
 <h2 class="nm-column__title">CurrentLaundrySession</h2>
 <p class="nm-column__note">The business projection now shows the first logged washer entry.</p>
 </div>
-<div class="nm-column__body nm-column__body--aem">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -3050,9 +3205,10 @@ Log Expense
 </div>
 </div>
 </section>
-<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<div class="slice-card__embedded-body slice-card__embedded-body--view">
-<div class="slice-card__row slice-card__row--detail">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-block slice-block--view">
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CurrentLaundrySession</h3>
@@ -3083,12 +3239,18 @@ Log Expense
 </div>
 <div class="slice-block__footer-right">
 <span class="slice-block__footer-badge">classic em</span>
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </section>
+
 </div>
-<div class="slice-card__embedded-gwt">
+</div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--aem" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">view gwt</span>
@@ -3188,13 +3350,13 @@ Log Expense
 </div>
 </div>
 </section>
-</div>
-</div>
 
 </div>
 </div>
 </section>
 <section class="nm-column nm-column--interaction nm-column--context-screen-path" data-testid="nm-path-column" data-column-key="13-logged-success" data-context-key="screen-path" data-lens-keys="screen">
+<div class="nm-column__slot nm-column__slot--header" data-testid="nm-column-slot" data-slot-kind="header">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <div class="nm-column__header">
 <div class="nm-column__classification">
 <div class="nm-column__classification-row nm-column__classification-row--primary">
@@ -3243,8 +3405,10 @@ Log Expense
 <h2 class="nm-column__title">Logged Success</h2>
 <p class="nm-column__note">The first entry is logged and the surface is ready for the next quick entry.</p>
 </div>
-<div class="nm-column__body nm-column__body--structured">
-<div class="nm-column__detail-boxes">
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--screen" data-testid="nm-column-slot" data-slot-kind="screen">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -3410,6 +3574,10 @@ Log Expense
 </div>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--primary" data-testid="nm-column-slot" data-slot-kind="primary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">INTERACTION</span>
@@ -3424,6 +3592,14 @@ Log Expense
 </ul>
 </div>
 </section>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--secondary nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="secondary">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
+</div>
+</div>
+<div class="nm-column__slot nm-column__slot--gwt nm-column__slot--empty" data-testid="nm-column-slot" data-slot-kind="gwt">
+<div class="nm-column__slot-body" data-testid="nm-column-slot-body" data-slot-body>
 </div>
 </div>
 </section>
@@ -3554,6 +3730,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const lensButtons = Array.from(document.querySelectorAll('.nm-path-lens-toggle'));
   const surfaceButtons = Array.from(document.querySelectorAll('.nm-path-surface-toggle'));
   const columnElements = Array.from(document.querySelectorAll('.nm-column'));
+  const slotKinds = ['header', 'screen', 'primary', 'secondary', 'gwt'];
   const updateModeButtons = Array.from(document.querySelectorAll('.nm-path-update-toggle'));
   const updateStatus = document.getElementById('nm-path-update-status');
   const refreshButton = document.getElementById('nm-path-refresh-now');
@@ -3575,6 +3752,7 @@ document.addEventListener('DOMContentLoaded', function () {
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
+    window.requestAnimationFrame(() => syncWidth());
   };
   const readStoredLensKeys = () => {
     try {
@@ -3590,6 +3768,20 @@ document.addEventListener('DOMContentLoaded', function () {
   };
   const persistLensKeys = (lensKeys) => {
     try { window.localStorage.setItem(lensFilterStorageKey, JSON.stringify(lensKeys)); } catch (_) { }
+  };
+  const syncSlotHeights = () => {
+    if (!pathDocument) { return; }
+    const visibleColumns = columnElements.filter((column) => !column.hidden);
+    slotKinds.forEach((slotKind) => {
+      let maxHeight = 0;
+      visibleColumns.forEach((column) => {
+        const slotBody = column.querySelector(`[data-slot-kind="${slotKind}"] [data-slot-body]`);
+        if (!slotBody) { return; }
+        const measuredHeight = Math.ceil(slotBody.getBoundingClientRect().height);
+        if (measuredHeight > maxHeight) { maxHeight = measuredHeight; }
+      });
+      pathDocument.style.setProperty(`--nm-slot-${slotKind}-height`, `${maxHeight}px`);
+    });
   };
   const setSyncedScrollLeft = (left) => {
     const clampedLeft = clampLeft(left);
@@ -3630,6 +3822,7 @@ document.addEventListener('DOMContentLoaded', function () {
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
+    window.requestAnimationFrame(() => syncWidth());
   };
   const applyLensFilters = (lensKeys) => {
     const activeLensKeys = lensKeys.filter((value, index, array) => defaultLensKeys.includes(value) && array.indexOf(value) === index);
@@ -3676,6 +3869,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const clampLeft = (left) => Math.max(0, Math.min(left, logicalMaxScrollLeft()));
   const syncWidth = () => {
     if (!flow || !viewport || !scrollbar || !scrollbarContent) { return; }
+    syncSlotHeights();
     flow.style.paddingRight = `${baseFlowPaddingRight}px`;
     currentStepMetrics = measureStepMetrics();
     const nativeMaxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
@@ -3898,8 +4092,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330151553633";
-  const currentArtifactUpdatedAt = "2026-03-30T15:15:53Z";
+  const currentArtifactVersion = "nm-path::20260330155120042";
+  const currentArtifactUpdatedAt = "2026-03-30T15:51:20Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

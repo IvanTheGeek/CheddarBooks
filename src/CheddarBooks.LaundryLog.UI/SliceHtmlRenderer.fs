@@ -859,6 +859,18 @@ module SliceHtmlRenderer =
         | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
         | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
 
+    /// Renders one embedded slice block without the outer slice shell.
+    let renderEmbeddedBlockHtml options (blockState: SliceBlockState) =
+        let builder = StringBuilder()
+        renderBlock builder options.ShowProperties false blockState
+        builder.ToString()
+
+    /// Renders one embedded GWT card without the outer slice shell.
+    let renderEmbeddedGwtHtml options (gwtCard: SliceGwtCard) =
+        let builder = StringBuilder()
+        renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+        builder.ToString()
+
     /// Renders the modeled AEM detail body without the outer slice shell or linked screen slot.
     let renderEmbeddedDetailBodyHtml options =
         function
