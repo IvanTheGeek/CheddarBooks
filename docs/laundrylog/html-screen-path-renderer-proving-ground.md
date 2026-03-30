@@ -109,6 +109,12 @@ It is enough to pressure:
 - screen-by-screen state changes
 - where app mechanics are different from business `AEM` slices
 
+Current working rule for this path:
+
+- each rendered step should state what changed from the previous step
+- those change summaries belong to the path surface itself, not only to chat or external notes
+- `Summary` view may hide that detail, but `Standard` and `Detailed` should keep the change list available
+
 ## View Modes
 
 The current page now has first-pass viewer controls:

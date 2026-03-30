@@ -404,8 +404,11 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
                   Expect.stringContains htmlDocument "application lifecycle lens" "Expected the application-lifecycle startup lens badge."
                   Expect.stringContains htmlDocument "app runtime lens" "Expected the app-runtime startup lens badge."
+                  Expect.stringContains htmlDocument "What Changed" "Expected each path step to state what changed."
+                  Expect.stringContains htmlDocument "The first usable screen replaces the splash surface." "Expected path-specific screen change summaries."
                   Expect.stringContains htmlDocument "data-testid=\"screen-path-document\"" "Expected a stable browser-test hook for the path document."
                   Expect.stringContains htmlDocument "data-testid=\"path-step\"" "Expected stable browser-test hooks for rendered steps."
+                  Expect.stringContains htmlDocument "data-testid=\"path-step-changes\"" "Expected stable browser-test hooks for step change summaries."
                   Expect.stringContains htmlDocument "data-step-key=\"01-app-started\"" "Expected the first screen-path step to expose its stable key for browser tests."
                   Expect.stringContains htmlDocument "fresh first launch with no known local data" "Expected explicit scenario context for the path."
                   Expect.stringContains htmlDocument "No saved location is available yet." "Expected the first-launch assumptions to be visible in detailed mode.")

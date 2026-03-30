@@ -238,14 +238,17 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await expect(pathDocument).toHaveAttribute('data-view-mode', 'standard');
     await expect(appStartedNote).toBeVisible();
     await expect(appStartedMeta).toBeVisible();
+    await expect(appStartedStep.getByTestId('path-step-changes')).toBeVisible();
     await expect(appStartedSurfaceName).toBeVisible();
     await expect(scenarioPanel).toBeVisible();
     await expect(page.getByText('No saved location is available yet.')).toBeHidden();
+    await expect(page.getByText('The splash screen becomes visible as the first surface.')).toBeVisible();
 
     await clickViewMode(page, 'summary');
     await expect(pathDocument).toHaveAttribute('data-view-mode', 'summary');
     await expect(appStartedNote).toBeHidden();
     await expect(appStartedMeta).toBeHidden();
+    await expect(appStartedStep.getByTestId('path-step-changes')).toBeHidden();
     await expect(appStartedSurfaceName).toBeHidden();
     await expect(scenarioPanel).toBeHidden();
 
@@ -253,6 +256,7 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await expect(pathDocument).toHaveAttribute('data-view-mode', 'detailed');
     await expect(appStartedNote).toBeVisible();
     await expect(appStartedMeta).toBeVisible();
+    await expect(appStartedStep.getByTestId('path-step-changes')).toBeVisible();
     await expect(appStartedSurfaceName).toBeVisible();
     await expect(scenarioPanel).toBeVisible();
     await expect(page.getByText('No saved location is available yet.')).toBeVisible();
@@ -292,6 +296,11 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await expect(
       page.locator('[data-testid="path-step"][data-step-key="04-route-resolved"] .ll-boot-state__title'),
     ).toHaveText('Routing to Need Location');
+    await expect(
+      page.locator('[data-testid="path-step"][data-step-key="04-route-resolved"]').getByText(
+        'Route to Need Location becomes the active checkpoint.',
+      ),
+    ).toBeVisible();
   });
 
   test('tracked file artifact still opens directly from file:// with the basic path controls visible', async ({ page }) => {

@@ -42,6 +42,7 @@ type ScreenPathStepState =
     { StepKey: string
       StepTitle: string
       StepNote: string option
+      ChangeItems: string list
       ContextLabel: string
       LensKind: ScreenPathLensKind
       LensLabel: string
@@ -80,10 +81,11 @@ module ScreenPathHtmlExamples =
           SecondaryMessage = secondaryMessage
           BootChecks = bootChecks }
 
-    let private step stepKey stepTitle stepNote contextLabel lensKind lensLabel surface =
+    let private step stepKey stepTitle stepNote changeItems contextLabel lensKind lensLabel surface =
         { StepKey = stepKey
           StepTitle = stepTitle
           StepNote = stepNote
+          ChangeItems = changeItems
           ContextLabel = contextLabel
           LensKind = lensKind
           LensLabel = lensLabel
@@ -106,6 +108,9 @@ module ScreenPathHtmlExamples =
                   "01-app-started"
                   "AppStarted"
                   (Some "User taps the app icon and the splash screen appears immediately.")
+                  [ "The splash screen becomes visible as the first surface."
+                    "The AppStarted checkpoint becomes active."
+                    "No runtime or route checkpoints are complete yet." ]
                   "ApplicationLifecycle"
                   ApplicationLifecycleLens
                   "application lifecycle lens"
@@ -123,6 +128,9 @@ module ScreenPathHtmlExamples =
                   "02-runtime-checks"
                   "Runtime Checks"
                   (Some "Startup/runtime checks begin while the splash state remains visible.")
+                  [ "The splash message changes to startup checking."
+                    "AppStarted becomes complete."
+                    "Runtime checks becomes the active checkpoint." ]
                   "RuntimeOrchestration"
                   AppRuntimeLens
                   "app runtime lens"
@@ -140,6 +148,9 @@ module ScreenPathHtmlExamples =
                   "03-no-local-session"
                   "No Local Session"
                   (Some "Fresh-first-launch assumptions are confirmed: no saved location and no active session were found.")
+                  [ "Runtime checks become complete."
+                    "No known local session becomes the active checkpoint."
+                    "The splash message confirms there is no saved location, active session, or pending draft." ]
                   "RuntimeOrchestration"
                   AppRuntimeLens
                   "app runtime lens"
@@ -157,6 +168,9 @@ module ScreenPathHtmlExamples =
                   "04-route-resolved"
                   "Route Resolved"
                   (Some "Runtime orchestration resolves Need Location as the first usable screen.")
+                  [ "All earlier startup checkpoints are complete."
+                    "Route to Need Location becomes the active checkpoint."
+                    "The splash message changes from checking to entering the app." ]
                   "RuntimeOrchestration"
                   AppRuntimeLens
                   "app runtime lens"
@@ -174,6 +188,9 @@ module ScreenPathHtmlExamples =
                   "05-need-location"
                   "Need Location"
                   (Some "Fresh start with no known location yet.")
+                  [ "The first usable screen replaces the splash surface."
+                    "The location field is empty."
+                    "Set Location remains disabled until a location is entered." ]
                   "ScreenPath"
                   ScreenPathLens
                   "screen path lens"
@@ -186,6 +203,9 @@ module ScreenPathHtmlExamples =
                   "06-ready-to-set-location"
                   "Ready To Set Location"
                   (Some "The location text is entered and the confirm action is available.")
+                  [ "The location input now contains the chosen text."
+                    "Set Location becomes enabled."
+                    "The rest of the expense form is still not visible yet." ]
                   "ScreenPath"
                   ScreenPathLens
                   "screen path lens"
@@ -198,6 +218,9 @@ module ScreenPathHtmlExamples =
                   "07-entry-form-ready"
                   "Entry Form Ready"
                   (Some "The app enters the main entry surface after location capture.")
+                  [ "The main entry screen replaces the location-only screen."
+                    "Machine, quantity, price, and payment controls become visible."
+                    "Log Expense is still blocked until the required entry choices are complete." ]
                   "ScreenPath"
                   ScreenPathLens
                   "screen path lens"
@@ -210,6 +233,9 @@ module ScreenPathHtmlExamples =
                   "08-washer-draft"
                   "Washer Draft"
                   (Some "The first expense draft is composed on the main screen.")
+                  [ "Washer becomes the selected machine."
+                    "Card payment details are expanded."
+                    "The draft is complete enough for Log Expense to become available." ]
                   "ScreenPath"
                   ScreenPathLens
                   "screen path lens"
@@ -222,6 +248,9 @@ module ScreenPathHtmlExamples =
                   "09-logged-success"
                   "Logged Success"
                   (Some "The first entry is logged and the screen is ready for the next quick entry.")
+                  [ "A logged-success confirmation appears."
+                    "Session total updates to the new amount."
+                    "Today's entries now shows logged items for continued quick entry." ]
                   "ScreenPath"
                   ScreenPathLens
                   "screen path lens"
@@ -371,7 +400,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-document__update-status[data-state=\"available\"] { color: #9a3412; font-weight: 700; }"
         appendLine builder ".ll-path-document__update-status[data-state=\"error\"] { color: #b91c1c; }"
         appendLine builder ".ll-path-document__update-status[data-state=\"auto\"] { color: #0e5883; font-weight: 700; }"
-        appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__assumptions, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__note, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__meta, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
+        appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__assumptions, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__note, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__meta, .ll-path-document[data-view-mode=\"summary\"] .ll-path-step__changes, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__name, .ll-path-document[data-view-mode=\"summary\"] .ll-screen-surface__note { display: none; }"
         appendLine builder ".ll-path-document[data-view-mode=\"summary\"] .ll-path-document__context-panel { display: none; }"
         appendLine builder ".ll-path-document[data-view-mode=\"standard\"] .ll-path-document__context-panel .ll-path-document__assumptions { display: none; }"
         appendLine builder ".ll-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }"
@@ -397,6 +426,9 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-step__meta { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }"
         appendLine builder ".ll-path-step__context { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #eef2f7; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; }"
         appendLine builder ".ll-path-step__lens { align-self: flex-start; padding: 0.2rem 0.5rem; border-radius: 999px; background: #e2e8f0; color: #475569; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }"
+        appendLine builder ".ll-path-step__changes { display: grid; gap: 0.25rem; padding: 0.55rem 0.7rem; border-radius: 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; }"
+        appendLine builder ".ll-path-step__changes-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
+        appendLine builder ".ll-path-step__changes-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.16rem; color: #475569; font-size: 0.7rem; line-height: 1.25; }"
         appendLine builder ".ll-panel--boot { min-height: 520px; justify-content: center; }"
         appendLine builder ".ll-boot-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.85rem; padding: 2rem 1rem; }"
         appendLine builder ".ll-boot-state__icon { width: 88px; height: 88px; border-radius: 1.25rem; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); display: flex; align-items: center; justify-content: center; font-size: 2.6rem; box-shadow: 0 8px 20px rgba(255, 183, 77, 0.35); }"
@@ -843,6 +875,16 @@ module ScreenPathHtmlRenderer =
             appendLine builder "<div class=\"ll-path-step__meta\">"
             appendLine builder $"<div class=\"ll-path-step__context\">Context · {htmlEncode stepState.ContextLabel}</div>"
             appendLine builder $"<div class=\"ll-path-step__lens\">{htmlEncode stepState.LensLabel}</div>"
+            appendLine builder "</div>"
+            appendLine builder "<div class=\"ll-path-step__changes\" data-testid=\"path-step-changes\">"
+            appendLine builder "<div class=\"ll-path-step__changes-label\">What Changed</div>"
+            appendLine builder "<ul class=\"ll-path-step__changes-list\">"
+
+            stepState.ChangeItems
+            |> List.iter (fun changeItem ->
+                appendLine builder $"<li>{htmlEncode changeItem}</li>")
+
+            appendLine builder "</ul>"
             appendLine builder "</div>"
             renderPathSurface builder stepState.Surface
             appendLine builder "</section>")
