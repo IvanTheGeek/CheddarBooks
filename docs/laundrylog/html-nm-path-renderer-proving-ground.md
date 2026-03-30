@@ -33,6 +33,12 @@ Current header controls:
 - `Notify Me`
 - `Auto Refresh`
 
+Scenario disclosure rule:
+
+- the scenario chip/disclosure is independent from `Summary` and `Detailed`
+- `Detailed` can show richer column metadata without forcing the scenario open
+- opening or closing the scenario remains a direct user action on the scenario disclosure itself
+
 Current surface rule:
 
 - the top surface slot defaults to `Thumbnail`

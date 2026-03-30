@@ -237,16 +237,25 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expectNmColumnRemovedFromLayout(page, '01-app-started');
 
     const runtimeColumn = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"]');
+    const scenarioDisclosure = page.locator('[data-testid="nm-path-scenario"]');
     await clickNmViewMode(page, 'summary');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'summary');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeHidden();
     await expect(runtimeColumn.locator('[data-testid="nm-column-changes"]')).toBeHidden();
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
+    await page.locator('[data-testid="nm-path-scenario-summary"]').click();
+    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+
     await clickNmViewMode(page, 'detailed');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'detailed');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeVisible();
     await expect(runtimeColumn.locator('[data-testid="nm-column-changes"]')).toBeVisible();
+    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
+
+    await page.locator('[data-testid="nm-path-scenario-summary"]').click();
+    await expect(scenarioDisclosure).toHaveAttribute('open', '');
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeVisible();
 
     await page.reload();
