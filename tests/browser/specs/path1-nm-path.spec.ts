@@ -457,6 +457,18 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-kind"]')).toHaveText('COMMAND');
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-column-kind"]')).toHaveText('VIEW');
 
+    const commandColumnBackground = await page
+      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"]')
+      .evaluate((column) => window.getComputedStyle(column as HTMLElement).backgroundImage);
+    const viewColumnBackground = await page
+      .locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"]')
+      .evaluate((column) => window.getComputedStyle(column as HTMLElement).backgroundImage);
+
+    expect(commandColumnBackground).toContain('223, 241, 255');
+    expect(commandColumnBackground).toContain('239, 247, 255');
+    expect(viewColumnBackground).toContain('219, 250, 228');
+    expect(viewColumnBackground).toContain('239, 251, 243');
+
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-changes"][data-detail-kind="orchestration"]')).toBeVisible();
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-changes"][data-detail-kind="interaction"]')).toBeVisible();
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="primary"] .slice-block--command')).toBeVisible();

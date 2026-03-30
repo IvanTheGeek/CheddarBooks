@@ -457,6 +457,13 @@ module NmPathHtmlRenderer =
         | { Surface = NmAemSliceSurface (_, PathSliceCard.CommandSlice _) } -> "COMMAND"
         | { Surface = NmAemSliceSurface (_, PathSliceCard.ViewSlice _) } -> "VIEW"
 
+    let private columnKindDomKey =
+        function
+        | { Surface = NmBootSurface _ } -> "boot"
+        | { Surface = NmAppScreenSurface _ } -> "screen"
+        | { Surface = NmAemSliceSurface (_, PathSliceCard.CommandSlice _) } -> "command"
+        | { Surface = NmAemSliceSurface (_, PathSliceCard.ViewSlice _) } -> "view"
+
     let private nonAemDetailKindLabel =
         function
         | { PrimaryContext = NmContextKind.ApplicationLifecycle } -> "TRANSITION"
@@ -974,11 +981,12 @@ module NmPathHtmlRenderer =
         let stepNumberText = (index + 1).ToString("00")
         let groupDomKey = ContextGroupKind.domKey columnState.ContextGroup
         let contextDomKey = NmContextKind.domKey columnState.PrimaryContext
+        let kindDomKey = columnKindDomKey columnState
         let templateRows = columnTemplateRows (renderedSlotKinds columnState)
 
         appendLine
             builder
-            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey} nm-column--context-{htmlEncode contextDomKey}\" style=\"--nm-column-template-rows: {htmlEncode templateRows};\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-context-key=\"{htmlEncode contextDomKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
+            $"<section class=\"nm-column nm-column--{htmlEncode groupDomKey} nm-column--context-{htmlEncode contextDomKey} nm-column--kind-{htmlEncode kindDomKey}\" style=\"--nm-column-template-rows: {htmlEncode templateRows};\" data-testid=\"nm-path-column\" data-column-key=\"{htmlEncode columnState.ColumnKey}\" data-context-key=\"{htmlEncode contextDomKey}\" data-lens-keys=\"{htmlEncode (lensDomKeys columnState)}\">"
         renderColumnSlot builder "header" "" (fun () ->
             appendLine builder "<div class=\"nm-column__header\">"
             renderClassificationRow builder columnState
@@ -1058,6 +1066,8 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column--context-runtime-orchestration { background: linear-gradient(180deg, #edf5ff 0%, #fbfdff 100%); border-color: #22506b; }"
         appendLine builder ".nm-column--context-screen-path { background: linear-gradient(180deg, #eef9f2 0%, #fbfffc 100%); border-color: #215743; }"
         appendLine builder ".nm-column--context-event-modeling { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); border-color: #1a2c45; }"
+        appendLine builder ".nm-column--context-event-modeling.nm-column--kind-command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
+        appendLine builder ".nm-column--context-event-modeling.nm-column--kind-view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
         appendLine builder ".nm-column__slot { min-height: 0; display: flex; align-items: stretch; }"
         appendLine builder ".nm-column__slot-body { width: 100%; min-height: 0; height: 100%; display: flex; align-items: stretch; }"
         appendLine builder ".nm-column__slot-body > * { width: 100%; }"
