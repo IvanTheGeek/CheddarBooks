@@ -586,6 +586,77 @@ module SliceHtmlRenderer =
     let private renderBadge (builder: StringBuilder) cssClass text =
         appendLine builder $"<span class=\"{cssClass}\">{htmlEncode text}</span>"
 
+    let private domSlug (value: string) =
+        value
+        |> Seq.map (fun ch ->
+            if Char.IsLetterOrDigit ch then
+                Char.ToLowerInvariant ch
+            else
+                '-')
+        |> Seq.toArray
+        |> String
+        |> fun slug -> slug.Trim('-')
+
+    let private blockKindMeaning (kind: SliceBlockKind) =
+        match kind with
+        | SliceBlockKind.Screen -> "Compartment Classification · SCREEN marks the app-facing screen compartment inside this modeled slice."
+        | SliceBlockKind.Command -> "Compartment Classification · COMMAND marks the business command block inside this modeled slice."
+        | SliceBlockKind.Event -> "Compartment Classification · EVENT marks the business event block inside this modeled slice."
+        | SliceBlockKind.View -> "Compartment Classification · VIEW marks the business projection block inside this modeled slice."
+
+    let private blockKindWhy (blockState: SliceBlockState) =
+        match blockState.Kind with
+        | SliceBlockKind.Screen -> $"This compartment is SCREEN because {blockState.Title} is the linked app surface shown in this slice."
+        | SliceBlockKind.Command -> $"This compartment is COMMAND because {blockState.Title} is the business command being modeled."
+        | SliceBlockKind.Event -> $"This compartment is EVENT because {blockState.Title} is the business event produced by the modeled action."
+        | SliceBlockKind.View -> $"This compartment is VIEW because {blockState.Title} is the business projection made visible by the slice."
+
+    let private gwtKindMeaning (kind: SliceGwtKind) =
+        match kind with
+        | SliceGwtKind.CommandRules -> "Compartment Classification · command gwt marks the Given/When/Then rule band that governs a business command."
+        | SliceGwtKind.ViewProjection -> "Compartment Classification · view gwt marks the Given/When/Then rule band that explains a business projection."
+
+    let private gwtKindWhy (kind: SliceGwtKind) =
+        match kind with
+        | SliceGwtKind.CommandRules -> "This compartment is command gwt because it traces the scenario rules that lead from given conditions into a command and its resulting event."
+        | SliceGwtKind.ViewProjection -> "This compartment is view gwt because it traces the scenario rules that explain how events become a projected view."
+
+    let private renderInteractiveKind
+        (builder: StringBuilder)
+        wrapperClass
+        triggerClass
+        triggerTestId
+        popoverTestId
+        helpType
+        idSeed
+        label
+        categoryLabel
+        meaning
+        whyText
+        =
+        let popoverId = $"slice-help-{helpType}-{domSlug idSeed}-{domSlug label}"
+
+        appendLine
+            builder
+            $"<div class=\"{wrapperClass}\" data-slice-help-wrap data-slice-help-type=\"{htmlEncode helpType}\">"
+        appendLine
+            builder
+            $"<button class=\"{triggerClass}\" type=\"button\" data-testid=\"{htmlEncode triggerTestId}\" data-slice-help-trigger data-slice-help-type=\"{htmlEncode helpType}\" data-slice-help-label=\"{htmlEncode label}\" aria-describedby=\"{htmlEncode popoverId}\">{htmlEncode label}</button>"
+        appendLine
+            builder
+            $"<div id=\"{htmlEncode popoverId}\" class=\"slice-help-popover\" data-testid=\"{htmlEncode popoverTestId}\" data-slice-help-popover data-slice-help-type=\"{htmlEncode helpType}\" role=\"dialog\" aria-modal=\"false\">"
+        appendLine builder "<div class=\"slice-help-popover__header\">"
+        appendLine builder "<div class=\"slice-help-popover__heading\">"
+        appendLine builder $"<div class=\"slice-help-popover__label\">{htmlEncode categoryLabel}</div>"
+        appendLine builder $"<div class=\"slice-help-popover__title\">{htmlEncode label}</div>"
+        appendLine builder "</div>"
+        appendLine builder "<button class=\"slice-help-popover__close\" type=\"button\" data-testid=\"slice-help-popover-close\" data-slice-help-popover-close aria-label=\"Close explanation\">Close</button>"
+        appendLine builder "</div>"
+        appendLine builder $"<p class=\"slice-help-popover__text\">{htmlEncode meaning}</p>"
+        appendLine builder $"<p class=\"slice-help-popover__text\">{htmlEncode whyText}</p>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
     let private renderPropertyLine (builder: StringBuilder) (line: string) =
         let separator = " = "
         let separatorIndex = line.IndexOf(separator, StringComparison.Ordinal)
@@ -672,7 +743,18 @@ module SliceHtmlRenderer =
         blockState.MetaBadges
         |> List.iter (renderBadge builder "slice-block__badge slice-block__badge--meta")
 
-        renderBadge builder "slice-block__badge slice-block__badge--kind" (SliceBlockKind.badgeLabel blockState.Kind)
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "slice-block__badge slice-block__badge--kind slice-help-trigger"
+            "slice-kind-trigger"
+            "slice-kind-popover"
+            "block-kind"
+            blockState.Title
+            (SliceBlockKind.badgeLabel blockState.Kind)
+            "Compartment Classification"
+            (blockKindMeaning blockState.Kind)
+            (blockKindWhy blockState)
         appendLine builder "</div>"
         appendLine builder "</div>"
         renderBlockContent builder showProperties blockState.Content
@@ -731,7 +813,18 @@ module SliceHtmlRenderer =
 
         appendLine builder $"<div class=\"path-document__gwt-ref path-document__gwt-ref--{blockCssClass}\">"
         appendLine builder "<div class=\"path-document__gwt-ref-topline\">"
-        renderBadge builder "path-document__gwt-ref-kind" (SliceBlockKind.badgeLabel blockState.Kind)
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "path-document__gwt-ref-kind slice-help-trigger"
+            "slice-gwt-ref-kind-trigger"
+            "slice-gwt-ref-kind-popover"
+            "gwt-ref-kind"
+            blockState.Title
+            (SliceBlockKind.badgeLabel blockState.Kind)
+            "Compartment Classification"
+            (blockKindMeaning blockState.Kind)
+            (blockKindWhy blockState)
         appendLine builder "</div>"
         appendLine builder $"<div class=\"path-document__gwt-ref-title\">{htmlEncode blockState.Title}</div>"
 
@@ -778,7 +871,18 @@ module SliceHtmlRenderer =
 
         appendLine builder $"<section class=\"slice-card__gwt-card slice-card__gwt-card--{kindCssClass}\">"
         appendLine builder "<div class=\"slice-card__gwt-topline\">"
-        renderBadge builder "slice-card__gwt-kind" (SliceGwtKind.label card.Kind)
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "slice-card__gwt-kind slice-help-trigger"
+            "slice-gwt-kind-trigger"
+            "slice-gwt-kind-popover"
+            "gwt-kind"
+            (SliceGwtKind.label card.Kind)
+            (SliceGwtKind.label card.Kind)
+            "Compartment Classification"
+            (gwtKindMeaning card.Kind)
+            (gwtKindWhy card.Kind)
         appendLine builder "</div>"
         appendLine builder "<div class=\"slice-card__gwt-clauses\">"
         card.Clauses |> List.iter (renderGwtClause builder showProperties showWidthActions)
@@ -915,6 +1019,7 @@ module SliceHtmlRenderer =
         appendLine builder "  const expandWidthButton = document.querySelector('[data-action=\"expand-width\"]');"
         appendLine builder "  const collapseWidthButton = document.querySelector('[data-action=\"collapse-width\"]');"
         appendLine builder "  const rowElements = Array.from(document.querySelectorAll('.path-document__row'));"
+        appendLine builder "  const helpWraps = Array.from(document.querySelectorAll('[data-slice-help-wrap]'));"
         appendLine builder "  const updatePropertyToggles = function () {"
         appendLine builder "    document.querySelectorAll('[data-action=\"toggle-block-properties\"]').forEach(function (button) {"
         appendLine builder "      const block = button.closest('.slice-block');"
@@ -1013,6 +1118,78 @@ module SliceHtmlRenderer =
         appendLine builder "      });"
         appendLine builder "    });"
         appendLine builder "  });"
+        appendLine builder "  const closeHelpPopovers = function (includePinned) {"
+        appendLine builder "    const shouldClosePinned = includePinned !== false;"
+        appendLine builder "    helpWraps.forEach(function (wrap) {"
+        appendLine builder "      if (!shouldClosePinned && wrap.dataset.pinned === 'true') { return; }"
+        appendLine builder "      delete wrap.dataset.open;"
+        appendLine builder "      delete wrap.dataset.pinned;"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  const openHelpPopover = function (wrap, pinned) {"
+        appendLine builder "    const shouldPin = pinned === true;"
+        appendLine builder "    if (!shouldPin) {"
+        appendLine builder "      const anotherPinnedPopoverIsOpen = helpWraps.some(function (candidate) {"
+        appendLine builder "        return candidate !== wrap && candidate.dataset.pinned === 'true';"
+        appendLine builder "      });"
+        appendLine builder "      if (anotherPinnedPopoverIsOpen) { return; }"
+        appendLine builder "    }"
+        appendLine builder "    helpWraps.forEach(function (candidate) {"
+        appendLine builder "      if (candidate === wrap) {"
+        appendLine builder "        candidate.dataset.open = 'true';"
+        appendLine builder "        if (shouldPin) { candidate.dataset.pinned = 'true'; }"
+        appendLine builder "      } else {"
+        appendLine builder "        delete candidate.dataset.open;"
+        appendLine builder "        delete candidate.dataset.pinned;"
+        appendLine builder "      }"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  helpWraps.forEach(function (wrap) {"
+        appendLine builder "    const trigger = wrap.querySelector('[data-slice-help-trigger]');"
+        appendLine builder "    const closeButton = wrap.querySelector('[data-slice-help-popover-close]');"
+        appendLine builder "    wrap.addEventListener('mouseenter', function () { openHelpPopover(wrap, false); });"
+        appendLine builder "    wrap.addEventListener('mouseleave', function () {"
+        appendLine builder "      if (wrap.dataset.pinned === 'true') { return; }"
+        appendLine builder "      delete wrap.dataset.open;"
+        appendLine builder "    });"
+        appendLine builder "    wrap.addEventListener('focusin', function () { openHelpPopover(wrap, false); });"
+        appendLine builder "    wrap.addEventListener('focusout', function () {"
+        appendLine builder "      window.requestAnimationFrame(function () {"
+        appendLine builder "        if (!wrap.contains(document.activeElement) && wrap.dataset.pinned !== 'true') {"
+        appendLine builder "          delete wrap.dataset.open;"
+        appendLine builder "        }"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "    if (trigger) {"
+        appendLine builder "      trigger.addEventListener('click', function (event) {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        if (wrap.dataset.pinned === 'true') {"
+        appendLine builder "          delete wrap.dataset.open;"
+        appendLine builder "          delete wrap.dataset.pinned;"
+        appendLine builder "          return;"
+        appendLine builder "        }"
+        appendLine builder "        openHelpPopover(wrap, true);"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "    if (closeButton) {"
+        appendLine builder "      closeButton.addEventListener('click', function (event) {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        delete wrap.dataset.open;"
+        appendLine builder "        delete wrap.dataset.pinned;"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "  });"
+        appendLine builder "  document.addEventListener('click', function (event) {"
+        appendLine builder "    const target = event.target;"
+        appendLine builder "    if (!(target instanceof Node)) { return; }"
+        appendLine builder "    const clickedInsideHelp = helpWraps.some(function (wrap) { return wrap.contains(target); });"
+        appendLine builder "    if (!clickedInsideHelp) { closeHelpPopovers(true); }"
+        appendLine builder "  });"
+        appendLine builder "  document.addEventListener('keydown', function (event) {"
+        appendLine builder "    if (event.key === 'Escape') { closeHelpPopovers(true); }"
+        appendLine builder "  });"
         appendLine builder "  updatePropertyToggles();"
         appendLine builder "});"
         appendLine builder "</script>"
@@ -1031,6 +1208,21 @@ module SliceHtmlRenderer =
         appendLine builder ".path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
         appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
         appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }"
+        appendLine builder ".slice-help-wrap { position: relative; display: inline-flex; flex: 0 0 auto; width: max-content; max-width: 100%; }"
+        appendLine builder ".slice-help-wrap[data-open=\"true\"] { z-index: 80; }"
+        appendLine builder ".slice-help-trigger { appearance: none; -webkit-appearance: none; cursor: pointer; font-family: inherit; }"
+        appendLine builder ".slice-help-trigger:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
+        appendLine builder ".slice-help-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }"
+        appendLine builder ".slice-help-wrap[data-open=\"true\"] .slice-help-popover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }"
+        appendLine builder ".slice-help-popover__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }"
+        appendLine builder ".slice-help-popover__heading { display: grid; gap: 0.14rem; }"
+        appendLine builder ".slice-help-popover__label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
+        appendLine builder ".slice-help-popover__title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }"
+        appendLine builder ".slice-help-popover__close { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.58rem; font-weight: 700; line-height: 1; padding: 0.28rem 0.5rem; cursor: pointer; }"
+        appendLine builder ".slice-help-popover__close:hover { border-color: #94a3b8; }"
+        appendLine builder ".slice-help-popover__close:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
+        appendLine builder ".slice-help-popover__text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }"
+        appendLine builder ".slice-block__badges .slice-help-popover, .slice-card__gwt-topline .slice-help-popover, .path-document__gwt-ref-topline .slice-help-popover { left: 0 !important; right: auto !important; }"
         appendLine builder ".path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }"
         appendLine builder ".path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }"
         appendLine builder ".path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }"

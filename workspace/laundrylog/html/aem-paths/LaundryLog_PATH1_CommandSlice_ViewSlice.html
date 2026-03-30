@@ -17,6 +17,21 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 .path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }
 .path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }
 .path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.slice-help-wrap { position: relative; display: inline-flex; flex: 0 0 auto; width: max-content; max-width: 100%; }
+.slice-help-wrap[data-open="true"] { z-index: 80; }
+.slice-help-trigger { appearance: none; -webkit-appearance: none; cursor: pointer; font-family: inherit; }
+.slice-help-trigger:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
+.slice-help-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }
+.slice-help-wrap[data-open="true"] .slice-help-popover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+.slice-help-popover__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.slice-help-popover__heading { display: grid; gap: 0.14rem; }
+.slice-help-popover__label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+.slice-help-popover__title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }
+.slice-help-popover__close { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.58rem; font-weight: 700; line-height: 1; padding: 0.28rem 0.5rem; cursor: pointer; }
+.slice-help-popover__close:hover { border-color: #94a3b8; }
+.slice-help-popover__close:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
+.slice-help-popover__text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }
+.slice-block__badges .slice-help-popover, .slice-card__gwt-topline .slice-help-popover, .path-document__gwt-ref-topline .slice-help-popover { left: 0 !important; right: auto !important; }
 .path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }
 .path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }
@@ -137,7 +152,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <h3 class="slice-block__title">Set Location Screen</h3>
 <div class="slice-block__badges">
 <span class="slice-block__badge slice-block__badge--meta">User</span>
-<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-set-location-screen-screen">SCREEN</button>
+<div id="slice-help-block-kind-set-location-screen-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Set Location Screen is the linked app surface shown in this slice.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="slice-block__snapshot"><span>Screen snapshot</span></div>
@@ -155,7 +183,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CaptureLaundryLocation</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-capturelaundrylocation-command">COMMAND</button>
+<div id="slice-help-block-kind-capturelaundrylocation-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because CaptureLaundryLocation is the business command being modeled.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -187,7 +228,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LaundryLocationCaptured</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-block-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -222,7 +276,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">command gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="command gwt" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">command gwt</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">command gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; command gwt marks the Given/When/Then rule band that governs a business command.</p>
+<p class="slice-help-popover__text">This compartment is command gwt because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -237,7 +304,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--command">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-capturelaundrylocation-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-capturelaundrylocation-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because CaptureLaundryLocation is the business command being modeled.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">CaptureLaundryLocation</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -271,7 +351,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -325,7 +418,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CurrentLaundrySession</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -363,7 +469,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">view gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="view gwt" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">view gwt</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">view gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; view gwt marks the Given/When/Then rule band that explains a business projection.</p>
+<p class="slice-help-popover__text">This compartment is view gwt because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -372,7 +491,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -416,7 +548,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--view">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -468,7 +613,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <h3 class="slice-block__title">Log Expense Screen - Ready</h3>
 <div class="slice-block__badges">
 <span class="slice-block__badge slice-block__badge--meta">User</span>
-<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-log-expense-screen---ready-screen">SCREEN</button>
+<div id="slice-help-block-kind-log-expense-screen---ready-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Log Expense Screen - Ready is the linked app surface shown in this slice.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="slice-block__snapshot"><span>Screen snapshot</span></div>
@@ -486,7 +644,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LogLaundryExpense</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-block-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the business command being modeled.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -526,7 +697,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LaundryExpenseLogged</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-block-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -573,7 +757,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">command gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="command gwt" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">command gwt</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">command gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; command gwt marks the Given/When/Then rule band that governs a business command.</p>
+<p class="slice-help-popover__text">This compartment is command gwt because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -582,7 +779,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -620,7 +830,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--command">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the business command being modeled.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LogLaundryExpense</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -662,7 +885,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -728,7 +964,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CurrentLaundrySession</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -766,7 +1015,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">view gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="view gwt" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">view gwt</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">view gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; view gwt marks the Given/When/Then rule band that explains a business projection.</p>
+<p class="slice-help-popover__text">This compartment is view gwt because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -775,7 +1037,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -831,7 +1106,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--view">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -883,7 +1171,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <h3 class="slice-block__title">Log Expense Screen - Washer Visible</h3>
 <div class="slice-block__badges">
 <span class="slice-block__badge slice-block__badge--meta">User</span>
-<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-log-expense-screen---washer-visible-screen">SCREEN</button>
+<div id="slice-help-block-kind-log-expense-screen---washer-visible-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Log Expense Screen - Washer Visible is the linked app surface shown in this slice.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="slice-block__snapshot"><span>Screen snapshot</span></div>
@@ -901,7 +1202,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LogLaundryExpense</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-block-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the business command being modeled.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -941,7 +1255,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">LaundryExpenseLogged</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-block-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -988,7 +1315,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">command gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="command gwt" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">command gwt</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">command gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; command gwt marks the Given/When/Then rule band that governs a business command.</p>
+<p class="slice-help-popover__text">This compartment is command gwt because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -997,7 +1337,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1047,7 +1400,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--command">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">COMMAND</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the business command block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the business command being modeled.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LogLaundryExpense</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1089,7 +1455,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1155,7 +1534,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-block__topline">
 <h3 class="slice-block__title">CurrentLaundrySession</h3>
 <div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 </div>
 <details class="slice-block__properties-panel">
@@ -1193,7 +1585,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="slice-card__gwt-row">
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
-<span class="slice-card__gwt-kind">view gwt</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="view gwt" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">view gwt</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">view gwt</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; view gwt marks the Given/When/Then rule band that explains a business projection.</p>
+<p class="slice-help-popover__text">This compartment is view gwt because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
 </div>
 <div class="slice-card__gwt-clauses">
 <div class="path-document__gwt-clause">
@@ -1202,7 +1607,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1245,7 +1663,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 </div>
 <div class="path-document__gwt-ref path-document__gwt-ref--event">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">EVENT</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the business event block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the business event produced by the modeled action.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1301,7 +1732,20 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <div class="path-document__gwt-ref-stack">
 <div class="path-document__gwt-ref path-document__gwt-ref--view">
 <div class="path-document__gwt-ref-topline">
-<span class="path-document__gwt-ref-kind">VIEW</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the business projection block inside this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the business projection made visible by the slice.</p>
+</div>
+</div>
 </div>
 <div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
 <details class="path-document__gwt-ref-properties-panel">
@@ -1346,6 +1790,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const expandWidthButton = document.querySelector('[data-action="expand-width"]');
   const collapseWidthButton = document.querySelector('[data-action="collapse-width"]');
   const rowElements = Array.from(document.querySelectorAll('.path-document__row'));
+  const helpWraps = Array.from(document.querySelectorAll('[data-slice-help-wrap]'));
   const updatePropertyToggles = function () {
     document.querySelectorAll('[data-action="toggle-block-properties"]').forEach(function (button) {
       const block = button.closest('.slice-block');
@@ -1443,6 +1888,78 @@ document.addEventListener('DOMContentLoaded', function () {
         updateRowWidthState(rowElement);
       });
     });
+  });
+  const closeHelpPopovers = function (includePinned) {
+    const shouldClosePinned = includePinned !== false;
+    helpWraps.forEach(function (wrap) {
+      if (!shouldClosePinned && wrap.dataset.pinned === 'true') { return; }
+      delete wrap.dataset.open;
+      delete wrap.dataset.pinned;
+    });
+  };
+  const openHelpPopover = function (wrap, pinned) {
+    const shouldPin = pinned === true;
+    if (!shouldPin) {
+      const anotherPinnedPopoverIsOpen = helpWraps.some(function (candidate) {
+        return candidate !== wrap && candidate.dataset.pinned === 'true';
+      });
+      if (anotherPinnedPopoverIsOpen) { return; }
+    }
+    helpWraps.forEach(function (candidate) {
+      if (candidate === wrap) {
+        candidate.dataset.open = 'true';
+        if (shouldPin) { candidate.dataset.pinned = 'true'; }
+      } else {
+        delete candidate.dataset.open;
+        delete candidate.dataset.pinned;
+      }
+    });
+  };
+  helpWraps.forEach(function (wrap) {
+    const trigger = wrap.querySelector('[data-slice-help-trigger]');
+    const closeButton = wrap.querySelector('[data-slice-help-popover-close]');
+    wrap.addEventListener('mouseenter', function () { openHelpPopover(wrap, false); });
+    wrap.addEventListener('mouseleave', function () {
+      if (wrap.dataset.pinned === 'true') { return; }
+      delete wrap.dataset.open;
+    });
+    wrap.addEventListener('focusin', function () { openHelpPopover(wrap, false); });
+    wrap.addEventListener('focusout', function () {
+      window.requestAnimationFrame(function () {
+        if (!wrap.contains(document.activeElement) && wrap.dataset.pinned !== 'true') {
+          delete wrap.dataset.open;
+        }
+      });
+    });
+    if (trigger) {
+      trigger.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (wrap.dataset.pinned === 'true') {
+          delete wrap.dataset.open;
+          delete wrap.dataset.pinned;
+          return;
+        }
+        openHelpPopover(wrap, true);
+      });
+    }
+    if (closeButton) {
+      closeButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        delete wrap.dataset.open;
+        delete wrap.dataset.pinned;
+      });
+    }
+  });
+  document.addEventListener('click', function (event) {
+    const target = event.target;
+    if (!(target instanceof Node)) { return; }
+    const clickedInsideHelp = helpWraps.some(function (wrap) { return wrap.contains(target); });
+    if (!clickedInsideHelp) { closeHelpPopovers(true); }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') { closeHelpPopovers(true); }
   });
   updatePropertyToggles();
 });

@@ -223,6 +223,18 @@ function popoverForPill(pill: Locator): Locator {
     .locator('[data-testid="nm-column-pill-popover"]');
 }
 
+function popoverForNmKind(trigger: Locator): Locator {
+  return trigger
+    .locator('xpath=ancestor::div[@data-testid="nm-column-kind-wrap"][1]')
+    .locator('[data-testid$="popover"]');
+}
+
+function popoverForSliceHelp(trigger: Locator): Locator {
+  return trigger
+    .locator('xpath=ancestor::*[@data-slice-help-wrap][1]')
+    .locator('[data-slice-help-popover]');
+}
+
 test.describe('PATH1 NM workspace artifact', () => {
   test('next and end navigation move by whole logical columns and keep the rail synchronized', async ({ page }) => {
     await page.goto(nmPathHttpPath);
@@ -526,6 +538,22 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(lifecycleContextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
     await expect(lifecycleContextPopover).toContainText('AppStarted marks an app lifecycle phase becoming visible.');
 
+    const lifecycleKindTrigger = lifecycleColumn.getByTestId('nm-column-kind');
+    const lifecycleKindPopover = popoverForNmKind(lifecycleKindTrigger);
+    await lifecycleKindTrigger.click();
+    await expect(lifecycleKindPopover).toBeVisible();
+    await expect(lifecycleKindPopover).toContainText('Column Classification');
+    await expect(lifecycleKindPopover).toContainText('BOOT');
+    await expect(lifecycleKindPopover).toContainText('this whole NM column is fundamentally about startup or runtime boot behavior');
+    await expect(lifecycleKindPopover).toContainText('This column is classified as BOOT because AppStarted is part of the app startup story.');
+    const lifecycleKindTriggerBox = await lifecycleKindTrigger.boundingBox();
+    const lifecycleKindPopoverBox = await lifecycleKindPopover.boundingBox();
+    expect(lifecycleKindTriggerBox).not.toBeNull();
+    expect(lifecycleKindPopoverBox).not.toBeNull();
+    expect(Math.abs((lifecycleKindPopoverBox?.x ?? 0) - (lifecycleKindTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
+    await lifecycleKindPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(lifecycleKindPopover).toBeHidden();
+
     const runtimeContextPill = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="RuntimeOrchestration"]');
     const runtimeContextPopover = popoverForPill(runtimeContextPill);
     await runtimeContextPill.hover();
@@ -546,6 +574,17 @@ test.describe('PATH1 NM workspace artifact', () => {
     await userRolePopover.getByTestId('nm-column-pill-popover-close').click();
     await expect(userRolePopover).toBeHidden();
 
+    const interactionKindTrigger = interactionScreenLabelRow.getByTestId('nm-column-detail-kind');
+    const interactionKindPopover = popoverForNmKind(interactionKindTrigger);
+    await interactionKindTrigger.click();
+    await expect(interactionKindPopover).toBeVisible();
+    await expect(interactionKindPopover).toContainText('Compartment Classification');
+    await expect(interactionKindPopover).toContainText('SCREEN');
+    await expect(interactionKindPopover).toContainText('marks the linked app surface that frames or illustrates this slice');
+    await expect(interactionKindPopover).toContainText('This compartment is SCREEN because it shows the linked app surface for Need Location.');
+    await interactionKindPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(interactionKindPopover).toBeHidden();
+
     const aemScreenLensPill = page.locator(
       '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-pill"][data-pill-type="screen-lens"][data-pill-label="ui lens"]',
     );
@@ -555,6 +594,43 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(aemScreenLensPopover).toContainText('Lens');
     await expect(aemScreenLensPopover).toContainText('ui lens marks the linked app surface that frames the business slice.');
     await expect(aemScreenLensPopover).toContainText('CaptureLaundryLocation is being grounded in the app surface around the business slice.');
+    const aemScreenLensTriggerBox = await aemScreenLensPill.boundingBox();
+    const aemScreenLensPopoverBox = await aemScreenLensPopover.boundingBox();
+    expect(aemScreenLensTriggerBox).not.toBeNull();
+    expect(aemScreenLensPopoverBox).not.toBeNull();
+    expect(Math.abs((aemScreenLensPopoverBox?.x ?? 0) - (aemScreenLensTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
+    await aemScreenLensPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(aemScreenLensPopover).toBeHidden();
+
+    const commandBlockKindTrigger = page
+      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="primary"] [data-testid="slice-kind-trigger"]')
+      .first();
+    const commandBlockKindPopover = popoverForSliceHelp(commandBlockKindTrigger);
+    await commandBlockKindTrigger.click();
+    await expect(commandBlockKindPopover).toBeVisible();
+    await expect(commandBlockKindPopover).toContainText('Compartment Classification');
+    await expect(commandBlockKindPopover).toContainText('COMMAND');
+    await expect(commandBlockKindPopover).toContainText('marks the business command block inside this modeled slice');
+    await expect(commandBlockKindPopover).toContainText('This compartment is COMMAND because CaptureLaundryLocation is the business command being modeled.');
+    const commandBlockKindTriggerBox = await commandBlockKindTrigger.boundingBox();
+    const commandBlockKindPopoverBox = await commandBlockKindPopover.boundingBox();
+    expect(commandBlockKindTriggerBox).not.toBeNull();
+    expect(commandBlockKindPopoverBox).not.toBeNull();
+    expect(Math.abs((commandBlockKindPopoverBox?.x ?? 0) - (commandBlockKindTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
+    await commandBlockKindPopover.getByTestId('slice-help-popover-close').click();
+    await expect(commandBlockKindPopover).toBeHidden();
+
+    const gwtKindTrigger = page
+      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="slice-gwt-kind-trigger"]')
+      .first();
+    const gwtKindPopover = popoverForSliceHelp(gwtKindTrigger);
+    await gwtKindTrigger.click();
+    await expect(gwtKindPopover).toBeVisible();
+    await expect(gwtKindPopover).toContainText('Compartment Classification');
+    await expect(gwtKindPopover).toContainText('command gwt');
+    await expect(gwtKindPopover).toContainText('Given/When/Then rule band that governs a business command');
+    await gwtKindPopover.getByTestId('slice-help-popover-close').click();
+    await expect(gwtKindPopover).toBeHidden();
   });
 
   test('surface thumbnails open the overlay and the tracked file artifact still loads directly from disk', async ({ page }) => {
