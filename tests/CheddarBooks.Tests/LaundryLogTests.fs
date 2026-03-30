@@ -618,7 +618,11 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-surface-toggle\"" "Expected stable browser-test hooks for surface-mode toggles."
                   Expect.stringContains htmlDocument "data-testid=\"nm-surface-open\"" "Expected stable browser-test hooks for opening expanded surface overlays."
                   Expect.stringContains htmlDocument "data-testid=\"nm-surface-overlay\"" "Expected the NM path to provide a surface overlay."
-                  Expect.stringContains htmlDocument ".nm-column__surface-preview" "Expected the NM surface slot to render through a dedicated preview wrapper."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-surface-thumbnail\"" "Expected the NM surface slot to provide a static thumbnail artifact."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-surface-live\"" "Expected the NM surface slot to retain the live surface for full mode and overlay use."
+                  Expect.stringContains htmlDocument ".nm-column__surface-thumbnail-frame" "Expected the NM surface slot to dedicate a thumbnail wrapper."
+                  Expect.stringContains htmlDocument ".nm-thumbnail__device" "Expected the NM thumbnail renderer to use a separate bounded device preview."
+                  Expect.stringContains htmlDocument ".nm-column__surface-preview" "Expected the NM full-surface slot to keep a dedicated live preview wrapper."
                   Expect.stringContains htmlDocument ".nm-column__surface-rendering { position: absolute;" "Expected the NM preview rendering to be absolutely positioned inside the clipped slot."
                   Expect.isFalse
                       (htmlDocument.Contains("<button type=\"button\" class=\"nm-column__surface-button\""))
@@ -656,6 +660,9 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument ".nm-column__aem-detail .slice-card__slot--screen { display: none; }" "Expected the linked app surface to replace the embedded AEM screen slot."
                   Expect.stringContains htmlDocument "The business command for location capture becomes explicit in the NM flow." "Expected the AEM command column note above the slice body."
                   Expect.stringContains htmlDocument "The first business projection after location capture is now explicit." "Expected the AEM view column note above the slice body."
+                  Expect.stringContains htmlDocument ">Splash Screen</h3>" "Expected the SCREEN compartment title to be human-first for startup columns."
+                  Expect.stringContains htmlDocument ">Set Location Screen</h3>" "Expected the SCREEN compartment title to be human-first for location columns."
+                  Expect.stringContains htmlDocument ">Laundry Entry Screen</h3>" "Expected the SCREEN compartment title to be human-first for entry columns."
                   Expect.stringContains htmlDocument "Surface · Screen.NewSession - Ready To Set" "Expected the AEM location-command column to show the linked app surface inside the SCREEN box."
                   Expect.stringContains htmlDocument "Surface · Screen.EntryForm - Ready At Location" "Expected the AEM view column to show the linked app surface inside the SCREEN box."
                   Expect.stringContains htmlDocument "Surface · Screen.EntryForm - Washer Draft" "Expected the AEM washer-command column to show the linked app surface inside the SCREEN box."

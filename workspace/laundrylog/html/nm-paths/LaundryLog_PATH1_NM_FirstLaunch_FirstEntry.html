@@ -219,9 +219,9 @@ body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%);
 <style>
 html, body { height: 100%; overflow: hidden; }
 body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%); color: #0d2440; font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif; }
-.nm-path-document { --nm-column-width: 292px; --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }
-.nm-path-document[data-surface-mode="thumbnail"] { --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; }
-.nm-path-document[data-surface-mode="full"] { --nm-surface-scale: 0.24; --nm-surface-slot-height: 176px; --nm-surface-frame-width: 228px; }
+.nm-path-document { --nm-column-width: 292px; --nm-surface-scale: 0.24; --nm-surface-slot-height: 136px; --nm-surface-frame-width: 182px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }
+.nm-path-document[data-surface-mode="thumbnail"] { --nm-surface-scale: 0.24; --nm-surface-slot-height: 136px; --nm-surface-frame-width: 182px; }
+.nm-path-document[data-surface-mode="full"] { --nm-surface-scale: 0.28; --nm-surface-slot-height: 228px; --nm-surface-frame-width: 246px; }
 .nm-path-document__header { display: flex; flex-direction: column; gap: 6px; }
 .nm-path-document__topline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; }
 .nm-path-document__title-zone { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -288,10 +288,47 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__surface-preview-stage { display: flex; justify-content: center; padding-top: 0.3rem; }
 .nm-column__surface-button { display: flex; justify-content: center; width: 100%; border: 0; background: transparent; padding: 0; cursor: zoom-in; text-align: left; border-radius: 18px; }
 .nm-column__surface-button:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
-.nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; width: min(100%, var(--nm-surface-frame-width)); border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.3); background: linear-gradient(180deg, #f6f9fd 0%, #eef3f9 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding: 6px; }
-.nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 10px; display: flex; justify-content: center; align-items: flex-start; }
+.nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; width: min(100%, var(--nm-surface-frame-width)); border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.3); background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: center; padding: 8px; }
+.nm-column__surface-thumbnail-frame { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.nm-column__surface-live { width: 100%; height: 100%; display: flex; align-items: flex-start; justify-content: center; }
+.nm-path-document[data-surface-mode="thumbnail"] .nm-column__surface-thumbnail-frame { display: flex; }
+.nm-path-document[data-surface-mode="thumbnail"] .nm-column__surface-live { display: none; }
+.nm-path-document[data-surface-mode="full"] .nm-column__surface-thumbnail-frame { display: none; }
+.nm-path-document[data-surface-mode="full"] .nm-column__surface-live { display: flex; }
+.nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; display: flex; justify-content: center; align-items: flex-start; }
 .nm-column__surface-rendering { position: absolute; top: 8px; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; filter: drop-shadow(0 5px 12px rgba(15, 23, 42, 0.16)); }
 .nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }
+.nm-thumbnail { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.nm-thumbnail__device { width: 96px; min-height: 118px; border-radius: 18px; border: 1px solid #c7d4e4; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1); padding: 7px 7px 8px; display: grid; gap: 7px; justify-items: stretch; }
+.nm-thumbnail__device-top { justify-self: center; width: 34px; height: 4px; border-radius: 999px; background: #d6deea; }
+.nm-thumbnail__app-bar { height: 12px; border-radius: 8px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); }
+.nm-thumbnail__screen-body { display: grid; gap: 7px; }
+.nm-thumbnail__panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; align-items: center; }
+.nm-thumbnail__field { min-width: 0; border-radius: 8px; border: 1px solid #d7e3f0; background: #ffffff; color: #94a3b8; font-size: 0.4rem; line-height: 1.2; padding: 5px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nm-thumbnail__field--filled { color: #1e3a5f; }
+.nm-thumbnail__field-action { width: 20px; height: 20px; border-radius: 8px; border: 1px solid #d7e3f0; display: flex; align-items: center; justify-content: center; font-size: 0.48rem; color: #ff7d51; background: #ffffff; }
+.nm-thumbnail__button { border-radius: 9px; padding: 5px 6px; text-align: center; font-size: 0.42rem; font-weight: 700; letter-spacing: 0.01em; }
+.nm-thumbnail__button--enabled { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; }
+.nm-thumbnail__button--disabled { background: #eef2f7; color: #94a3b8; border: 1px solid #dbe5f1; }
+.nm-thumbnail__location-pill { border-radius: 999px; border: 1px solid #d7e3f0; background: #ffffff; color: #274463; font-size: 0.4rem; line-height: 1.2; padding: 4px 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nm-thumbnail__choice-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.nm-thumbnail__choice-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 2px 5px; border-radius: 999px; border: 1px solid #d7e3f0; background: #ffffff; color: #5b7088; font-size: 0.38rem; font-weight: 700; line-height: 1; }
+.nm-thumbnail__choice-pill--selected { border-color: #ffb74d; background: #fff7ed; color: #c26d0b; }
+.nm-thumbnail__metric-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.nm-thumbnail__metric-box { border-radius: 8px; background: #f8fafc; border: 1px solid #dbe5f1; color: #334155; font-size: 0.4rem; font-weight: 700; text-align: center; padding: 4px 5px; }
+.nm-thumbnail__total-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; border-radius: 9px; padding: 5px 6px; background: #e8eef6; color: #1e3a5f; font-size: 0.4rem; line-height: 1; font-weight: 700; }
+.nm-thumbnail__total-bar strong { font-size: 0.44rem; }
+.nm-thumbnail__total-bar--success { background: #e7f7ec; color: #1f6b37; }
+.nm-thumbnail__hero { display: grid; justify-items: center; gap: 6px; padding-top: 4px; }
+.nm-thumbnail__hero-icon { width: 30px; height: 30px; border-radius: 10px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); display: flex; align-items: center; justify-content: center; font-size: 0.92rem; box-shadow: 0 5px 12px rgba(255, 183, 77, 0.28); }
+.nm-thumbnail__hero-title { font-size: 0.43rem; font-weight: 700; color: #0f172a; text-align: center; }
+.nm-thumbnail__hero-subtitle { font-size: 0.38rem; line-height: 1.28; color: #64748b; text-align: center; }
+.nm-thumbnail__checkpoint-stack { display: grid; gap: 4px; }
+.nm-thumbnail__checkpoint { height: 6px; border-radius: 999px; background: #dbe5f1; }
+.nm-thumbnail__checkpoint--pending { background: #e2e8f0; }
+.nm-thumbnail__checkpoint--active { background: #fdba74; }
+.nm-thumbnail__checkpoint--complete { background: #93c5fd; }
+.nm-thumbnail__empty { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b; font-size: 0.62rem; font-weight: 600; background: #f8fafc; }
 .nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
 .nm-column__body--aem { gap: 10px; }
 .nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }
@@ -492,7 +529,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.AppStart - Splash</h3>
+<h3 class="nm-column__detail-title">Splash Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The visible boot surface linked to this lifecycle step.</p>
@@ -501,8 +538,27 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="AppStarted" role="button" tabindex="0" aria-label="Expand AppStarted surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--boot" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__hero">
+<div class="nm-thumbnail__hero-icon">🧺</div>
+<div class="nm-thumbnail__hero-title">Starting LaundryLog</div>
+<div class="nm-thumbnail__hero-subtitle">Preparing the first-launch startup sequence.</div>
+</div>
+<div class="nm-thumbnail__checkpoint-stack">
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--active"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Splash</div>
 <p class="ll-screen-surface__note">fresh first launch before runtime checks complete</p>
@@ -537,6 +593,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -614,7 +671,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.AppStart - Runtime Checks</h3>
+<h3 class="nm-column__detail-title">Splash Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
@@ -623,8 +680,27 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Runtime Checks" role="button" tabindex="0" aria-label="Expand Runtime Checks surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--boot" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__hero">
+<div class="nm-thumbnail__hero-icon">🧺</div>
+<div class="nm-thumbnail__hero-title">Checking startup requirements</div>
+<div class="nm-thumbnail__hero-subtitle">Inspecting local state, offline readiness, and runtime startup conditions.</div>
+</div>
+<div class="nm-thumbnail__checkpoint-stack">
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--active"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Runtime Checks</div>
 <p class="ll-screen-surface__note">first-launch runtime checks are in progress</p>
@@ -659,6 +735,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -736,7 +813,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.AppStart - No Local Session</h3>
+<h3 class="nm-column__detail-title">Splash Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
@@ -745,8 +822,27 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="No Local Session" role="button" tabindex="0" aria-label="Expand No Local Session surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--boot" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__hero">
+<div class="nm-thumbnail__hero-icon">🧺</div>
+<div class="nm-thumbnail__hero-title">No local session found</div>
+<div class="nm-thumbnail__hero-subtitle">No saved location, active session, or pending expense draft was discovered.</div>
+</div>
+<div class="nm-thumbnail__checkpoint-stack">
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--active"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--pending"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - No Local Session</div>
 <p class="ll-screen-surface__note">fresh first launch confirmed from local/runtime checks</p>
@@ -781,6 +877,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -858,7 +955,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.AppStart - Route Resolved</h3>
+<h3 class="nm-column__detail-title">Splash Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The visible boot surface linked to this runtime orchestration step.</p>
@@ -867,8 +964,27 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Route Resolved" role="button" tabindex="0" aria-label="Expand Route Resolved surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--boot" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__hero">
+<div class="nm-thumbnail__hero-icon">🧺</div>
+<div class="nm-thumbnail__hero-title">Routing to Need Location</div>
+<div class="nm-thumbnail__hero-subtitle">Startup checks are complete and the first-launch path is ready to enter the app.</div>
+</div>
+<div class="nm-thumbnail__checkpoint-stack">
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--complete"></div>
+<div class="nm-thumbnail__checkpoint nm-thumbnail__checkpoint--active"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.AppStart - Route Resolved</div>
 <p class="ll-screen-surface__note">runtime routes the app to the first usable screen</p>
@@ -903,6 +1019,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -980,7 +1097,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.NewSession - Awaiting Location</h3>
+<h3 class="nm-column__detail-title">Set Location Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
@@ -989,8 +1106,24 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Need Location" role="button" tabindex="0" aria-label="Expand Need Location surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--new-session" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__panel">
+<div class="nm-thumbnail__field">Enter location...</div>
+<div class="nm-thumbnail__field-action">📍</div>
+</div>
+<div class="nm-thumbnail__button nm-thumbnail__button--disabled">Set Location</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.NewSession - Awaiting Location</div>
 <p class="ll-screen-surface__note">manual location entry before the first expense</p>
@@ -1022,6 +1155,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -1099,7 +1233,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.NewSession - Ready To Set</h3>
+<h3 class="nm-column__detail-title">Set Location Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
@@ -1108,8 +1242,24 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Ready To Set Location" role="button" tabindex="0" aria-label="Expand Ready To Set Location surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--new-session" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__panel">
+<div class="nm-thumbnail__field nm-thumbnail__field--filled">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__field-action">📍</div>
+</div>
+<div class="nm-thumbnail__button nm-thumbnail__button--enabled">Set Location</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
 <p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
@@ -1141,6 +1291,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -1217,17 +1368,33 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">CommandSlice.Capture Laundry Location</h3>
+<h3 class="nm-column__detail-title">Set Location Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
-<div class="nm-column__technical" data-testid="nm-column-technical">Surface · CommandSlice.Capture Laundry Location</div>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.NewSession - Ready To Set</div>
 </div>
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CaptureLaundryLocation" role="button" tabindex="0" aria-label="Expand CaptureLaundryLocation surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--new-session" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__panel">
+<div class="nm-thumbnail__field nm-thumbnail__field--filled">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__field-action">📍</div>
+</div>
+<div class="nm-thumbnail__button nm-thumbnail__button--enabled">Set Location</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
 <p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
@@ -1259,6 +1426,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -1503,17 +1671,42 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">ViewSlice.Current Laundry Session</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
-<div class="nm-column__technical" data-testid="nm-column-technical">Surface · ViewSlice.Current Laundry Session</div>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Ready At Location</div>
 </div>
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CurrentLaundrySession" role="button" tabindex="0" aria-label="Expand CurrentLaundrySession surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar">
+<span>Entry</span>
+<strong>$0.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
 <p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
@@ -1621,6 +1814,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -1833,7 +2027,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.EntryForm - Ready At Location</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
@@ -1842,8 +2036,33 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Entry Form Ready" role="button" tabindex="0" aria-label="Expand Entry Form Ready surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar">
+<span>Entry</span>
+<strong>$0.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
 <p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
@@ -1956,6 +2175,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </div>
 </div>
+</div>
 </section>
 <section class="nm-column__detail-box nm-column__detail-box--interaction" data-testid="nm-column-changes" data-detail-kind="interaction">
 <div class="nm-column__detail-topline">
@@ -2028,7 +2248,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.EntryForm - Washer Draft</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
@@ -2037,8 +2257,33 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Washer Draft" role="button" tabindex="0" aria-label="Expand Washer Draft surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill nm-thumbnail__choice-pill--selected">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar">
+<span>Washer</span>
+<strong>$0.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
 <p class="ll-screen-surface__note">first expense draft inside the current location context</p>
@@ -2149,6 +2394,7 @@ Log Expense
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -2225,17 +2471,42 @@ Log Expense
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">CommandSlice.Log Washer Expense</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
-<div class="nm-column__technical" data-testid="nm-column-technical">Surface · CommandSlice.Log Washer Expense</div>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Washer Draft</div>
 </div>
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="LogLaundryExpense" role="button" tabindex="0" aria-label="Expand LogLaundryExpense surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill nm-thumbnail__choice-pill--selected">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar">
+<span>Washer</span>
+<strong>$0.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
 <p class="ll-screen-surface__note">first expense draft inside the current location context</p>
@@ -2346,6 +2617,7 @@ Log Expense
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -2662,17 +2934,42 @@ Log Expense
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">ViewSlice.Current Laundry Session</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
-<div class="nm-column__technical" data-testid="nm-column-technical">Surface · ViewSlice.Current Laundry Session</div>
+<div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Logged Success</div>
 </div>
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CurrentLaundrySession" role="button" tabindex="0" aria-label="Expand CurrentLaundrySession surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar nm-thumbnail__total-bar--success">
+<span>Entry</span>
+<strong>$5.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
 <p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
@@ -2792,6 +3089,7 @@ Log Expense
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -3016,7 +3314,7 @@ Log Expense
 <section class="nm-column__detail-box nm-column__detail-box--screen" data-testid="nm-column-screen-box" data-detail-kind="screen">
 <div class="nm-column__detail-topline">
 <span class="nm-column__detail-kind">SCREEN</span>
-<h3 class="nm-column__detail-title">Screen.EntryForm - Logged Success</h3>
+<h3 class="nm-column__detail-title">Laundry Entry Screen</h3>
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The user-visible screen surface linked to this path step.</p>
@@ -3025,8 +3323,33 @@ Log Expense
 <div class="nm-column__surface-preview-stage">
 <div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Logged Success" role="button" tabindex="0" aria-label="Expand Logged Success surface">
 <div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-thumbnail-frame" data-testid="nm-surface-thumbnail-frame">
+<div class="nm-thumbnail nm-thumbnail--entry-form" data-testid="nm-surface-thumbnail">
+<div class="nm-thumbnail__device">
+<div class="nm-thumbnail__device-top"></div>
+<div class="nm-thumbnail__app-bar"></div>
+<div class="nm-thumbnail__screen-body">
+<div class="nm-thumbnail__location-pill">Love&#39;s #123 - Springfield, OH</div>
+<div class="nm-thumbnail__choice-row">
+<span class="nm-thumbnail__choice-pill">Washer</span>
+<span class="nm-thumbnail__choice-pill">Dryer</span>
+<span class="nm-thumbnail__choice-pill">Supplies</span>
+</div>
+<div class="nm-thumbnail__metric-row">
+<div class="nm-thumbnail__metric-box">Qty 1</div>
+<div class="nm-thumbnail__metric-box">3.00</div>
+</div>
+<div class="nm-thumbnail__total-bar nm-thumbnail__total-bar--success">
+<span>Entry</span>
+<strong>$5.00</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__surface-live" data-testid="nm-surface-live">
 <div class="nm-column__surface-preview">
-<div class="nm-column__surface-rendering">
+<div class="nm-column__surface-rendering" data-testid="nm-surface-rendering">
 <article class="ll-screen-surface">
 <div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
 <p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
@@ -3146,6 +3469,7 @@ Log Expense
 </section>
 </article>
 
+</div>
 </div>
 </div>
 </div>
@@ -3640,8 +3964,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330141724631";
-  const currentArtifactUpdatedAt = "2026-03-30T14:17:24Z";
+  const currentArtifactVersion = "nm-path::20260330145759023";
+  const currentArtifactUpdatedAt = "2026-03-30T14:57:59Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

@@ -44,6 +44,9 @@ Current surface rule:
 - the top surface slot defaults to `Thumbnail`
 - `Full` expands the slot height across the page
 - clicking a surface preview opens a full overlay for that individual column
+- `Thumbnail` should render as a small static schematic preview, not as a live mini-app
+- keep the live DOM surface for `Full` mode and the overlay instead of trying to make one shrunken live render serve both jobs
+- use human-first screen titles like `Splash Screen`, `Set Location Screen`, and `Laundry Entry Screen` in the `SCREEN` compartment; keep technical renderer ids as secondary detail only
 
 Important renderer guidance learned here:
 

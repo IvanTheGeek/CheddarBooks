@@ -33,6 +33,8 @@ type NmPreviewMetrics = {
   frameWidth: number;
   frameHeight: number;
   activatorHeight: number;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
   renderingWidth: number;
   renderingHeight: number;
 };
@@ -138,10 +140,12 @@ async function readPreviewMetrics(page: Page, columnKey: string): Promise<NmPrev
   return page.locator(`[data-testid="nm-path-column"][data-column-key="${columnKey}"]`).evaluate((column) => {
     const frame = column.querySelector('.nm-column__surface-frame') as HTMLElement | null;
     const activator = column.querySelector('[data-testid="nm-surface-open"]') as HTMLElement | null;
+    const thumbnail = column.querySelector('.nm-thumbnail__device') as HTMLElement | null;
     const rendering = column.querySelector('.nm-column__surface-rendering') as HTMLElement | null;
     const columnRect = column.getBoundingClientRect();
     const frameRect = frame?.getBoundingClientRect();
     const activatorRect = activator?.getBoundingClientRect();
+    const thumbnailRect = thumbnail?.getBoundingClientRect();
     const renderingRect = rendering?.getBoundingClientRect();
 
     return {
@@ -149,6 +153,8 @@ async function readPreviewMetrics(page: Page, columnKey: string): Promise<NmPrev
       frameWidth: Math.round(frameRect?.width ?? 0),
       frameHeight: Math.round(frameRect?.height ?? 0),
       activatorHeight: Math.round(activatorRect?.height ?? 0),
+      thumbnailWidth: Math.round(thumbnailRect?.width ?? 0),
+      thumbnailHeight: Math.round(thumbnailRect?.height ?? 0),
       renderingWidth: Math.round(renderingRect?.width ?? 0),
       renderingHeight: Math.round(renderingRect?.height ?? 0),
     };
@@ -205,18 +211,29 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(backAtStart.leadingVisibleColumnKey).toBe('01-app-started');
   });
 
-  test('surface previews stay clipped in thumbnail mode and full mode expands them without breaking layout', async ({ page }) => {
+  test('surface thumbnails stay small in thumbnail mode and full mode expands the live surface without breaking layout', async ({ page }) => {
     await page.goto(nmPathHttpPath);
 
     const thumbnailMetrics = await readPreviewMetrics(page, '09-entry-form-ready');
 
-    expect(thumbnailMetrics.frameWidth).toBeGreaterThanOrEqual(168);
-    expect(thumbnailMetrics.frameWidth).toBeLessThanOrEqual(182);
-    expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(120);
-    expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(132);
+    expect(thumbnailMetrics.frameWidth).toBeGreaterThanOrEqual(176);
+    expect(thumbnailMetrics.frameWidth).toBeLessThanOrEqual(190);
+    expect(thumbnailMetrics.frameHeight).toBeGreaterThanOrEqual(132);
+    expect(thumbnailMetrics.frameHeight).toBeLessThanOrEqual(144);
     expect(thumbnailMetrics.activatorHeight).toBe(thumbnailMetrics.frameHeight);
+    expect(thumbnailMetrics.thumbnailWidth).toBeGreaterThanOrEqual(90);
+    expect(thumbnailMetrics.thumbnailWidth).toBeLessThanOrEqual(102);
+    expect(thumbnailMetrics.thumbnailHeight).toBeGreaterThanOrEqual(112);
+    expect(thumbnailMetrics.thumbnailHeight).toBeLessThanOrEqual(154);
     expect(thumbnailMetrics.columnHeight).toBeLessThan(680);
-    expect(thumbnailMetrics.renderingWidth).toBeLessThan(90);
+    expect(thumbnailMetrics.renderingWidth).toBe(0);
+
+    await expect(
+      page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-box"] .nm-column__detail-title'),
+    ).toHaveText('Set Location Screen');
+    await expect(
+      page.locator('[data-testid="nm-path-column"][data-column-key="01-app-started"] [data-testid="nm-column-screen-box"] .nm-column__detail-title'),
+    ).toHaveText('Splash Screen');
 
     await clickNmSurfaceMode(page, 'full');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
@@ -225,9 +242,11 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     expect(fullMetrics.frameWidth).toBeGreaterThan(thumbnailMetrics.frameWidth);
     expect(fullMetrics.frameHeight).toBeGreaterThan(thumbnailMetrics.frameHeight);
-    expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(170);
+    expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(220);
     expect(fullMetrics.columnHeight).toBeLessThan(760);
+    expect(fullMetrics.thumbnailWidth).toBe(0);
     expect(fullMetrics.renderingWidth).toBeGreaterThan(thumbnailMetrics.renderingWidth);
+    expect(fullMetrics.renderingWidth).toBeGreaterThan(90);
 
     await page.reload();
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');

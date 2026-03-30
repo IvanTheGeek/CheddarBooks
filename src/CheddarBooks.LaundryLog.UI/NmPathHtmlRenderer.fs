@@ -105,7 +105,8 @@ type NmColumnState =
       VisibleInLenses: NmLensKind list
       ActorRoleBadge: string option
       Surface: NmColumnSurfaceState
-      TechnicalSurfaceLabel: string option }
+      TechnicalSurfaceLabel: string option
+      HumanSurfaceTitle: string }
 
 /// Describes one complete NM path document.
 type NmPathState =
@@ -150,8 +151,9 @@ module NmPathHtmlExamples =
         function
         | NmBootSurface bootState -> Some bootState.SurfaceName
         | NmAppScreenSurface screenSurface -> Some(ScreenSurfaceState.title screenSurface)
-        | NmAemSliceSurface (_, PathSliceCard.CommandSlice sliceState) -> Some $"CommandSlice.{sliceState.Title}"
-        | NmAemSliceSurface (_, PathSliceCard.ViewSlice sliceState) -> Some $"ViewSlice.{sliceState.Title}"
+        | NmAemSliceSurface (Some topSurface, _) -> Some(ScreenSurfaceState.title topSurface)
+        | NmAemSliceSurface (None, PathSliceCard.CommandSlice sliceState) -> Some $"CommandSlice.{sliceState.Title}"
+        | NmAemSliceSurface (None, PathSliceCard.ViewSlice sliceState) -> Some $"ViewSlice.{sliceState.Title}"
 
     let private column
         columnKey
@@ -163,6 +165,7 @@ module NmPathHtmlExamples =
         visibleInLenses
         actorRoleBadge
         surface
+        humanSurfaceTitle
         =
         { ColumnKey = columnKey
           ColumnTitle = columnTitle
@@ -173,7 +176,8 @@ module NmPathHtmlExamples =
           VisibleInLenses = visibleInLenses
           ActorRoleBadge = actorRoleBadge
           Surface = surface
-          TechnicalSurfaceLabel = technicalLabel surface }
+          TechnicalSurfaceLabel = technicalLabel surface
+          HumanSurfaceTitle = humanSurfaceTitle }
 
     /// Returns the first ATLAS/NM proving-ground path for LaundryLog.
     let path1FirstLaunchFirstEntry () : NmPathState =
@@ -201,6 +205,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Lifecycle ]
                   (Some "System")
                   (NmBootSurface(bootSurface "01-app-started"))
+                  "Splash Screen"
               column
                   "02-runtime-checks"
                   "Runtime Checks"
@@ -213,6 +218,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Runtime ]
                   (Some "System")
                   (NmBootSurface(bootSurface "02-runtime-checks"))
+                  "Splash Screen"
               column
                   "03-no-local-session"
                   "No Local Session"
@@ -225,6 +231,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Runtime ]
                   (Some "System")
                   (NmBootSurface(bootSurface "03-no-local-session"))
+                  "Splash Screen"
               column
                   "04-route-resolved"
                   "Route Resolved"
@@ -237,6 +244,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Runtime ]
                   (Some "System")
                   (NmBootSurface(bootSurface "04-route-resolved"))
+                  "Splash Screen"
               column
                   "05-need-location"
                   "Need Location"
@@ -249,6 +257,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Screen ]
                   (Some "User")
                   (NmAppScreenSurface(appScreenSurface "05-need-location"))
+                  "Set Location Screen"
               column
                   "06-ready-to-set-location"
                   "Ready To Set Location"
@@ -261,6 +270,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Screen ]
                   (Some "User")
                   (NmAppScreenSurface(appScreenSurface "06-ready-to-set-location"))
+                  "Set Location Screen"
               column
                   "07-capture-laundry-location"
                   "CaptureLaundryLocation"
@@ -273,6 +283,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Aem ]
                   (Some "User")
                   (NmAemSliceSurface(Some(appScreenSurface "06-ready-to-set-location"), aemSliceCard 0))
+                  "Set Location Screen"
               column
                   "08-current-laundry-session-location"
                   "CurrentLaundrySession"
@@ -285,6 +296,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Aem ]
                   None
                   (NmAemSliceSurface(Some(appScreenSurface "07-entry-form-ready"), aemSliceCard 1))
+                  "Laundry Entry Screen"
               column
                   "09-entry-form-ready"
                   "Entry Form Ready"
@@ -297,6 +309,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Screen ]
                   (Some "User")
                   (NmAppScreenSurface(appScreenSurface "07-entry-form-ready"))
+                  "Laundry Entry Screen"
               column
                   "10-washer-draft"
                   "Washer Draft"
@@ -309,6 +322,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Screen ]
                   (Some "User")
                   (NmAppScreenSurface(appScreenSurface "08-washer-draft"))
+                  "Laundry Entry Screen"
               column
                   "11-log-laundry-expense"
                   "LogLaundryExpense"
@@ -321,6 +335,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Aem ]
                   (Some "User")
                   (NmAemSliceSurface(Some(appScreenSurface "08-washer-draft"), aemSliceCard 2))
+                  "Laundry Entry Screen"
               column
                   "12-current-laundry-session-washer"
                   "CurrentLaundrySession"
@@ -333,6 +348,7 @@ module NmPathHtmlExamples =
                   [ NmLensKind.Aem ]
                   None
                   (NmAemSliceSurface(Some(appScreenSurface "09-logged-success"), aemSliceCard 3))
+                  "Laundry Entry Screen"
               column
                   "13-logged-success"
                   "Logged Success"
@@ -344,7 +360,8 @@ module NmPathHtmlExamples =
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
-                  (NmAppScreenSurface(appScreenSurface "09-logged-success")) ] }
+                  (NmAppScreenSurface(appScreenSurface "09-logged-success"))
+                  "Laundry Entry Screen" ] }
 
 /// Renders deterministic HTML/CSS NM path documents from the current LaundryLog surfaces.
 [<RequireQualifiedAccess>]
@@ -447,8 +464,7 @@ module NmPathHtmlRenderer =
         | { PrimaryContext = NmContextKind.ScreenPath } -> "INTERACTION"
         | { PrimaryContext = NmContextKind.EventModeling } -> "STATE"
 
-    let private screenBoxTitle (columnState: NmColumnState) =
-        columnState.TechnicalSurfaceLabel |> Option.defaultValue columnState.ColumnTitle
+    let private screenBoxTitle (columnState: NmColumnState) = columnState.HumanSurfaceTitle
 
     let private screenBoxNote =
         function
@@ -527,6 +543,131 @@ module NmPathHtmlRenderer =
         | "System" -> $"This column is tagged System because {columnState.ColumnTitle} happens through app/runtime work rather than direct user input."
         | "User" -> $"This column is tagged User because {columnState.ColumnTitle} depends on or expresses a direct user action."
         | roleText -> $"This column is tagged {roleText} because that actor is the relevant participant in {columnState.ColumnTitle}."
+
+    let private selectedChoiceLabels (optionGroup: OptionGroupState) =
+        optionGroup.Choices
+        |> List.filter (fun choice -> choice.IsSelected)
+        |> List.map (fun choice -> choice.Label)
+
+    let private locationPreviewText (textInput: TextInputState) =
+        textInput.ValueText |> Option.defaultValue textInput.PlaceholderText
+
+    let private pricePreviewText (priceInput: MoneyInputState) =
+        priceInput.ValueText |> Option.defaultValue priceInput.PlaceholderText
+
+    let private entryPreviewTotal (screenState: EntryFormPrimitiveState) =
+        if String.IsNullOrWhiteSpace screenState.SessionTotal.ValueText then
+            pricePreviewText screenState.PriceInput
+        else
+            screenState.SessionTotal.ValueText
+
+    let private renderThumbnailChoicePill (builder: StringBuilder) isSelected label =
+        let selectedClass = if isSelected then " nm-thumbnail__choice-pill--selected" else ""
+        appendLine builder $"<span class=\"nm-thumbnail__choice-pill{selectedClass}\">{htmlEncode label}</span>"
+
+    let private renderBootThumbnail (builder: StringBuilder) (bootState: AppBootScreenState) =
+        appendLine builder "<div class=\"nm-thumbnail nm-thumbnail--boot\" data-testid=\"nm-surface-thumbnail\">"
+        appendLine builder "<div class=\"nm-thumbnail__device\">"
+        appendLine builder "<div class=\"nm-thumbnail__device-top\"></div>"
+        appendLine builder "<div class=\"nm-thumbnail__hero\">"
+        appendLine builder "<div class=\"nm-thumbnail__hero-icon\">🧺</div>"
+        appendLine builder $"<div class=\"nm-thumbnail__hero-title\">{htmlEncode bootState.PrimaryMessage}</div>"
+        appendLine builder $"<div class=\"nm-thumbnail__hero-subtitle\">{htmlEncode bootState.SecondaryMessage}</div>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-thumbnail__checkpoint-stack\">"
+
+        bootState.BootChecks
+        |> List.truncate 4
+        |> List.iter (fun checkState ->
+            let statusClass =
+                match checkState.Status with
+                | Pending -> " nm-thumbnail__checkpoint--pending"
+                | Active -> " nm-thumbnail__checkpoint--active"
+                | Complete -> " nm-thumbnail__checkpoint--complete"
+
+            appendLine builder $"<div class=\"nm-thumbnail__checkpoint{statusClass}\"></div>")
+
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderNewSessionThumbnail (builder: StringBuilder) (screenState: NewSessionPrimitiveState) =
+        let locationText = locationPreviewText screenState.LocationInput
+        let locationClass = if screenState.LocationInput.ValueText.IsSome then " nm-thumbnail__field--filled" else ""
+        let actionClass =
+            if screenState.SetLocationAction.IsEnabled then
+                " nm-thumbnail__button--enabled"
+            else
+                " nm-thumbnail__button--disabled"
+
+        appendLine builder "<div class=\"nm-thumbnail nm-thumbnail--new-session\" data-testid=\"nm-surface-thumbnail\">"
+        appendLine builder "<div class=\"nm-thumbnail__device\">"
+        appendLine builder "<div class=\"nm-thumbnail__device-top\"></div>"
+        appendLine builder "<div class=\"nm-thumbnail__app-bar\"></div>"
+        appendLine builder "<div class=\"nm-thumbnail__screen-body\">"
+        appendLine builder "<div class=\"nm-thumbnail__panel\">"
+        appendLine builder $"<div class=\"nm-thumbnail__field{locationClass}\">{htmlEncode locationText}</div>"
+        appendLine builder "<div class=\"nm-thumbnail__field-action\">📍</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<div class=\"nm-thumbnail__button{actionClass}\">{htmlEncode screenState.SetLocationAction.Label}</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderEntryFormThumbnail (builder: StringBuilder) (screenState: EntryFormPrimitiveState) =
+        let selectedMachine =
+            selectedChoiceLabels screenState.MachineTypeOptions
+            |> List.tryHead
+
+        let orderedMachineChoices =
+            screenState.MachineTypeOptions.Choices
+            |> List.sortByDescending (fun choice -> choice.IsSelected)
+            |> List.truncate 3
+
+        let totalText = entryPreviewTotal screenState
+        let priceText = pricePreviewText screenState.PriceInput
+        let quantityText = screenState.QuantityStepper.ValueText
+        let feedbackClass = if screenState.FeedbackBanner.IsSome then " nm-thumbnail__total-bar--success" else ""
+        let selectedMachineText = selectedMachine |> Option.defaultValue "Entry"
+
+        appendLine builder "<div class=\"nm-thumbnail nm-thumbnail--entry-form\" data-testid=\"nm-surface-thumbnail\">"
+        appendLine builder "<div class=\"nm-thumbnail__device\">"
+        appendLine builder "<div class=\"nm-thumbnail__device-top\"></div>"
+        appendLine builder "<div class=\"nm-thumbnail__app-bar\"></div>"
+        appendLine builder "<div class=\"nm-thumbnail__screen-body\">"
+
+        match screenState.LocationInput with
+        | Some locationInput ->
+            appendLine builder $"<div class=\"nm-thumbnail__location-pill\">{htmlEncode (locationPreviewText locationInput)}</div>"
+        | None -> ()
+
+        appendLine builder "<div class=\"nm-thumbnail__choice-row\">"
+
+        orderedMachineChoices
+        |> List.iter (fun choice -> renderThumbnailChoicePill builder choice.IsSelected choice.Label)
+
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-thumbnail__metric-row\">"
+        appendLine builder $"<div class=\"nm-thumbnail__metric-box\">Qty {htmlEncode quantityText}</div>"
+        appendLine builder $"<div class=\"nm-thumbnail__metric-box\">{htmlEncode priceText}</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<div class=\"nm-thumbnail__total-bar{feedbackClass}\">"
+        appendLine builder $"<span>{htmlEncode selectedMachineText}</span>"
+        appendLine builder $"<strong>{htmlEncode totalText}</strong>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderStaticSurfaceThumbnail (builder: StringBuilder) =
+        function
+        | NmBootSurface bootState -> renderBootThumbnail builder bootState
+        | NmAppScreenSurface (NewSessionScreen (_, _, screenState)) -> renderNewSessionThumbnail builder screenState
+        | NmAppScreenSurface (EntryFormScreen (_, _, screenState)) -> renderEntryFormThumbnail builder screenState
+        | NmAemSliceSurface (Some(NewSessionScreen (_, _, screenState)), _) -> renderNewSessionThumbnail builder screenState
+        | NmAemSliceSurface (Some(EntryFormScreen (_, _, screenState)), _) -> renderEntryFormThumbnail builder screenState
+        | NmAemSliceSurface (None, _) ->
+            appendLine builder "<div class=\"nm-thumbnail nm-thumbnail--empty\" data-testid=\"nm-surface-thumbnail\"><div class=\"nm-thumbnail__empty\">No screen linked</div></div>"
 
     let private renderSurfaceFragment =
         function
@@ -674,9 +815,14 @@ module NmPathHtmlRenderer =
             builder
             $"<div class=\"nm-column__surface-button\" data-testid=\"nm-surface-open\" data-action=\"open-surface-overlay\" data-surface-label=\"{htmlEncode columnState.ColumnTitle}\" role=\"button\" tabindex=\"0\" aria-label=\"Expand {htmlEncode columnState.ColumnTitle} surface\">"
         appendLine builder $"<div class=\"nm-column__surface-frame\"{surfaceSizing}>"
+        appendLine builder "<div class=\"nm-column__surface-thumbnail-frame\" data-testid=\"nm-surface-thumbnail-frame\">"
+        renderStaticSurfaceThumbnail builder columnState.Surface
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-column__surface-live\" data-testid=\"nm-surface-live\">"
         appendLine builder "<div class=\"nm-column__surface-preview\">"
-        appendLine builder "<div class=\"nm-column__surface-rendering\">"
+        appendLine builder "<div class=\"nm-column__surface-rendering\" data-testid=\"nm-surface-rendering\">"
         appendLine builder (renderSurfaceFragment columnState.Surface)
+        appendLine builder "</div>"
         appendLine builder "</div>"
         appendLine builder "</div>"
         appendLine builder "</div>"
@@ -757,9 +903,9 @@ module NmPathHtmlRenderer =
         appendLine builder "<style>"
         appendLine builder "html, body { height: 100%; overflow: hidden; }"
         appendLine builder "body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
-        appendLine builder ".nm-path-document { --nm-column-width: 292px; --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }"
-        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] { --nm-surface-scale: 0.16; --nm-surface-slot-height: 124px; --nm-surface-frame-width: 176px; }"
-        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] { --nm-surface-scale: 0.24; --nm-surface-slot-height: 176px; --nm-surface-frame-width: 228px; }"
+        appendLine builder ".nm-path-document { --nm-column-width: 292px; --nm-surface-scale: 0.24; --nm-surface-slot-height: 136px; --nm-surface-frame-width: 182px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] { --nm-surface-scale: 0.24; --nm-surface-slot-height: 136px; --nm-surface-frame-width: 182px; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] { --nm-surface-scale: 0.28; --nm-surface-slot-height: 228px; --nm-surface-frame-width: 246px; }"
         appendLine builder ".nm-path-document__header { display: flex; flex-direction: column; gap: 6px; }"
         appendLine builder ".nm-path-document__topline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; }"
         appendLine builder ".nm-path-document__title-zone { min-width: 0; display: flex; flex-direction: column; gap: 4px; }"
@@ -826,10 +972,47 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__surface-preview-stage { display: flex; justify-content: center; padding-top: 0.3rem; }"
         appendLine builder ".nm-column__surface-button { display: flex; justify-content: center; width: 100%; border: 0; background: transparent; padding: 0; cursor: zoom-in; text-align: left; border-radius: 18px; }"
         appendLine builder ".nm-column__surface-button:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
-        appendLine builder ".nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; width: min(100%, var(--nm-surface-frame-width)); border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.3); background: linear-gradient(180deg, #f6f9fd 0%, #eef3f9 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding: 6px; }"
-        appendLine builder ".nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 10px; display: flex; justify-content: center; align-items: flex-start; }"
+        appendLine builder ".nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; width: min(100%, var(--nm-surface-frame-width)); border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.3); background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: center; padding: 8px; }"
+        appendLine builder ".nm-column__surface-thumbnail-frame { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }"
+        appendLine builder ".nm-column__surface-live { width: 100%; height: 100%; display: flex; align-items: flex-start; justify-content: center; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] .nm-column__surface-thumbnail-frame { display: flex; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"thumbnail\"] .nm-column__surface-live { display: none; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] .nm-column__surface-thumbnail-frame { display: none; }"
+        appendLine builder ".nm-path-document[data-surface-mode=\"full\"] .nm-column__surface-live { display: flex; }"
+        appendLine builder ".nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; display: flex; justify-content: center; align-items: flex-start; }"
         appendLine builder ".nm-column__surface-rendering { position: absolute; top: 8px; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; filter: drop-shadow(0 5px 12px rgba(15, 23, 42, 0.16)); }"
         appendLine builder ".nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }"
+        appendLine builder ".nm-thumbnail { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }"
+        appendLine builder ".nm-thumbnail__device { width: 96px; min-height: 118px; border-radius: 18px; border: 1px solid #c7d4e4; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1); padding: 7px 7px 8px; display: grid; gap: 7px; justify-items: stretch; }"
+        appendLine builder ".nm-thumbnail__device-top { justify-self: center; width: 34px; height: 4px; border-radius: 999px; background: #d6deea; }"
+        appendLine builder ".nm-thumbnail__app-bar { height: 12px; border-radius: 8px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); }"
+        appendLine builder ".nm-thumbnail__screen-body { display: grid; gap: 7px; }"
+        appendLine builder ".nm-thumbnail__panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px; align-items: center; }"
+        appendLine builder ".nm-thumbnail__field { min-width: 0; border-radius: 8px; border: 1px solid #d7e3f0; background: #ffffff; color: #94a3b8; font-size: 0.4rem; line-height: 1.2; padding: 5px 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }"
+        appendLine builder ".nm-thumbnail__field--filled { color: #1e3a5f; }"
+        appendLine builder ".nm-thumbnail__field-action { width: 20px; height: 20px; border-radius: 8px; border: 1px solid #d7e3f0; display: flex; align-items: center; justify-content: center; font-size: 0.48rem; color: #ff7d51; background: #ffffff; }"
+        appendLine builder ".nm-thumbnail__button { border-radius: 9px; padding: 5px 6px; text-align: center; font-size: 0.42rem; font-weight: 700; letter-spacing: 0.01em; }"
+        appendLine builder ".nm-thumbnail__button--enabled { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; }"
+        appendLine builder ".nm-thumbnail__button--disabled { background: #eef2f7; color: #94a3b8; border: 1px solid #dbe5f1; }"
+        appendLine builder ".nm-thumbnail__location-pill { border-radius: 999px; border: 1px solid #d7e3f0; background: #ffffff; color: #274463; font-size: 0.4rem; line-height: 1.2; padding: 4px 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }"
+        appendLine builder ".nm-thumbnail__choice-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }"
+        appendLine builder ".nm-thumbnail__choice-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 2px 5px; border-radius: 999px; border: 1px solid #d7e3f0; background: #ffffff; color: #5b7088; font-size: 0.38rem; font-weight: 700; line-height: 1; }"
+        appendLine builder ".nm-thumbnail__choice-pill--selected { border-color: #ffb74d; background: #fff7ed; color: #c26d0b; }"
+        appendLine builder ".nm-thumbnail__metric-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }"
+        appendLine builder ".nm-thumbnail__metric-box { border-radius: 8px; background: #f8fafc; border: 1px solid #dbe5f1; color: #334155; font-size: 0.4rem; font-weight: 700; text-align: center; padding: 4px 5px; }"
+        appendLine builder ".nm-thumbnail__total-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; border-radius: 9px; padding: 5px 6px; background: #e8eef6; color: #1e3a5f; font-size: 0.4rem; line-height: 1; font-weight: 700; }"
+        appendLine builder ".nm-thumbnail__total-bar strong { font-size: 0.44rem; }"
+        appendLine builder ".nm-thumbnail__total-bar--success { background: #e7f7ec; color: #1f6b37; }"
+        appendLine builder ".nm-thumbnail__hero { display: grid; justify-items: center; gap: 6px; padding-top: 4px; }"
+        appendLine builder ".nm-thumbnail__hero-icon { width: 30px; height: 30px; border-radius: 10px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); display: flex; align-items: center; justify-content: center; font-size: 0.92rem; box-shadow: 0 5px 12px rgba(255, 183, 77, 0.28); }"
+        appendLine builder ".nm-thumbnail__hero-title { font-size: 0.43rem; font-weight: 700; color: #0f172a; text-align: center; }"
+        appendLine builder ".nm-thumbnail__hero-subtitle { font-size: 0.38rem; line-height: 1.28; color: #64748b; text-align: center; }"
+        appendLine builder ".nm-thumbnail__checkpoint-stack { display: grid; gap: 4px; }"
+        appendLine builder ".nm-thumbnail__checkpoint { height: 6px; border-radius: 999px; background: #dbe5f1; }"
+        appendLine builder ".nm-thumbnail__checkpoint--pending { background: #e2e8f0; }"
+        appendLine builder ".nm-thumbnail__checkpoint--active { background: #fdba74; }"
+        appendLine builder ".nm-thumbnail__checkpoint--complete { background: #93c5fd; }"
+        appendLine builder ".nm-thumbnail__empty { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b; font-size: 0.62rem; font-weight: 600; background: #f8fafc; }"
         appendLine builder ".nm-column__body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }"
         appendLine builder ".nm-column__body--aem { gap: 10px; }"
         appendLine builder ".nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }"
