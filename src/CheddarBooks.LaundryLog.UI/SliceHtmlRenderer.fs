@@ -114,8 +114,8 @@ module SliceGwtKind =
     /// Returns the stable badge label for the current GWT card kind.
     let label =
         function
-        | SliceGwtKind.CommandRules -> "command gwt"
-        | SliceGwtKind.ViewProjection -> "view gwt"
+        | SliceGwtKind.CommandRules -> "COMMAND GWT"
+        | SliceGwtKind.ViewProjection -> "VIEW GWT"
 
     /// Returns the stable CSS class suffix for the current GWT card kind.
     let cssClass =
@@ -599,27 +599,27 @@ module SliceHtmlRenderer =
 
     let private blockKindMeaning (kind: SliceBlockKind) =
         match kind with
-        | SliceBlockKind.Screen -> "Compartment Classification · SCREEN marks the app-facing screen compartment inside this modeled slice."
-        | SliceBlockKind.Command -> "Compartment Classification · COMMAND marks the business command block inside this modeled slice."
-        | SliceBlockKind.Event -> "Compartment Classification · EVENT marks the business event block inside this modeled slice."
-        | SliceBlockKind.View -> "Compartment Classification · VIEW marks the business projection block inside this modeled slice."
+        | SliceBlockKind.Screen -> "Compartment Classification · SCREEN marks the app-facing screen compartment attached to this modeled slice."
+        | SliceBlockKind.Command -> "Compartment Classification · COMMAND marks the modeled change or intent block inside this slice."
+        | SliceBlockKind.Event -> "Compartment Classification · EVENT marks the backbone event block produced by the modeled change."
+        | SliceBlockKind.View -> "Compartment Classification · VIEW marks the modeled read or interpretation block inside this slice."
 
     let private blockKindWhy (blockState: SliceBlockState) =
         match blockState.Kind with
         | SliceBlockKind.Screen -> $"This compartment is SCREEN because {blockState.Title} is the linked app surface shown in this slice."
-        | SliceBlockKind.Command -> $"This compartment is COMMAND because {blockState.Title} is the business command being modeled."
-        | SliceBlockKind.Event -> $"This compartment is EVENT because {blockState.Title} is the business event produced by the modeled action."
-        | SliceBlockKind.View -> $"This compartment is VIEW because {blockState.Title} is the business projection made visible by the slice."
+        | SliceBlockKind.Command -> $"This compartment is COMMAND because {blockState.Title} is the modeled change or intent in this slice."
+        | SliceBlockKind.Event -> $"This compartment is EVENT because {blockState.Title} is the event backbone produced by the modeled change."
+        | SliceBlockKind.View -> $"This compartment is VIEW because {blockState.Title} is the modeled read or interpretation made visible by the slice."
 
     let private gwtKindMeaning (kind: SliceGwtKind) =
         match kind with
-        | SliceGwtKind.CommandRules -> "Compartment Classification · command gwt marks the Given/When/Then rule band that governs a business command."
-        | SliceGwtKind.ViewProjection -> "Compartment Classification · view gwt marks the Given/When/Then rule band that explains a business projection."
+        | SliceGwtKind.CommandRules -> "Compartment Classification · COMMAND GWT marks the Given/When/Then rule band that governs a command slice."
+        | SliceGwtKind.ViewProjection -> "Compartment Classification · VIEW GWT marks the Given/When/Then rule band that explains a view slice."
 
     let private gwtKindWhy (kind: SliceGwtKind) =
         match kind with
-        | SliceGwtKind.CommandRules -> "This compartment is command gwt because it traces the scenario rules that lead from given conditions into a command and its resulting event."
-        | SliceGwtKind.ViewProjection -> "This compartment is view gwt because it traces the scenario rules that explain how events become a projected view."
+        | SliceGwtKind.CommandRules -> "This compartment is COMMAND GWT because it traces the scenario rules that lead from given conditions into a command and its resulting event."
+        | SliceGwtKind.ViewProjection -> "This compartment is VIEW GWT because it traces the scenario rules that explain how events become a projected view."
 
     let private renderInteractiveKind
         (builder: StringBuilder)

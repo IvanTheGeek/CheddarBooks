@@ -17,9 +17,9 @@ Current structure:
 - `html/aem-paths/`
   Adam/Event Modeling (`AEM`) HTML path artifacts
 - `html/nm-paths/`
-  broader `NM` / ATLAS-style modeling path artifacts
+  active `NM` / ATLAS-style modeling path artifacts
 - `html/screen-paths/`
-  ordered screen-path HTML artifacts
+  archived legacy screen-path HTML artifacts kept for reference only
 - `html/screens/`
   current screen-surface HTML artifacts
 - `html/reference/`
@@ -46,14 +46,19 @@ Working rule:
 - this workspace holds the checked-in current artifacts worth preserving in git history
 - refresh the tracked HTML with the checked-in helper under `scripts/laundrylog/` rather than ad hoc shell snippets
 - when you want the full current LaundryLog verification flow, prefer the checked-in verify helper so refresh, Expecto, and Playwright run in the right serial order
-- when renderer or artifact behavior changes materially, refresh the relevant workspace artifact in the same commit as the code/docs change
+- when renderer or artifact behavior changes materially, refresh the relevant active workspace artifact in the same commit as the code/docs change
 - do not force separate artifact-only commits just to keep the workspace current
 - for formal browser proof, target these tracked workspace artifacts through the Playwright workspace under `tests/browser/`
 - for recurring LaundryLog verification, AI should default to the checked-in helper scripts in `scripts/laundrylog/` rather than reconstructing the flow by hand
+- the NM path is the active modeling surface; the legacy screen-path artifact remains tracked but frozen
+- the checked-in refresh helper regenerates AEM, screens, and NM only; it does not rewrite the archived screen-path artifact
 
 Current first review targets:
 
 - [`html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html`](html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html)
-- [`html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 - [`html/screens/LaundryLog_ScreenComponents.html`](html/screens/LaundryLog_ScreenComponents.html)
 - [`html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html`](html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html)
+
+Archived reference:
+
+- [`html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)

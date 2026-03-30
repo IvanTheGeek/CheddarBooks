@@ -12,7 +12,6 @@ Use it for:
 Current target:
 
 - [`../../workspace/laundrylog/html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html`](../../workspace/laundrylog/html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html)
-- [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 
 Usual local flow:
 
@@ -32,6 +31,8 @@ Working rule:
 - `Expecto` remains the primary runner for F# model/renderer truth
 - this workspace is the formal browser harness for DOM/layout/interaction truth
 - test the tracked `workspace/` artifact first, not scratch files under `tmp/`
+- the active browser contract is the NM path surface
+- the legacy screen-path artifact remains tracked as an archived reference, not as an active Playwright contract
 - the checked-in npm scripts normalize both `FORCE_COLOR` and `NO_COLOR` before launching Playwright so Node does not emit repeated color-env warnings in the Codex desktop environment
 
 ## Playwright MCP Rule

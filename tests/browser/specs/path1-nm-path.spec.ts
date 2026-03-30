@@ -1,5 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
-import type { Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -17,6 +16,27 @@ const nmPathFileUrl = pathToFileURL(
     'LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html',
   ),
 ).toString();
+
+const orderedColumnKeys = [
+  '01-launch-app',
+  '02-splash-visible',
+  '03-run-startup-checks',
+  '04-runtime-checks-view',
+  '05-inspect-local-session',
+  '06-no-local-session-view',
+  '07-resolve-initial-route',
+  '08-need-location',
+  '09-enter-location-text',
+  '10-ready-to-set-location',
+  '11-capture-laundry-location',
+  '12-current-laundry-session-location',
+  '13-entry-form-ready',
+  '14-select-washer',
+  '15-washer-draft',
+  '16-log-laundry-expense',
+  '17-current-laundry-session-washer',
+  '18-logged-success',
+] as const;
 
 type NmPathMetrics = {
   logicalTargets: number[];
@@ -51,7 +71,6 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
   return page.evaluate(() => {
     const viewport = document.getElementById('nm-path-flow-viewport') as HTMLElement | null;
     const scrollbar = document.getElementById('nm-path-scrollbar') as HTMLElement | null;
-    const flow = document.getElementById('nm-path-flow') as HTMLElement | null;
     const columns = Array.from(document.querySelectorAll<HTMLElement>('[data-testid="nm-path-column"]')).filter(
       (column) => !column.hidden,
     );
@@ -69,7 +88,6 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
     const maxStartIndex =
       maxStartIndexCandidate >= 0 ? maxStartIndexCandidate : Math.max(0, normalizedTargets.length - 1);
     const logicalTargets = normalizedTargets.slice(0, maxStartIndex + 1);
-    const logicalStartKeys = columns.slice(0, maxStartIndex + 1).map((column) => column.dataset.columnKey || '');
     const viewportMaxScrollLeft = Math.max(0, Math.round((viewport?.scrollWidth ?? 0) - (viewport?.clientWidth ?? 0)));
     const logicalMaxTarget =
       logicalTargets.length > 0 ? Math.min(logicalTargets[logicalTargets.length - 1], viewportMaxScrollLeft) : 0;
@@ -94,7 +112,7 @@ async function readNmPathMetrics(page: Page): Promise<NmPathMetrics> {
 
     return {
       logicalTargets,
-      logicalStartKeys,
+      logicalStartKeys: columns.slice(0, maxStartIndex + 1).map((column) => column.dataset.columnKey || ''),
       logicalMaxTarget,
       visibleColumnKeys: columns.map((column) => column.dataset.columnKey || ''),
       leadingVisibleColumnKey: leadingVisibleColumn?.dataset.columnKey || null,
@@ -138,9 +156,7 @@ async function expectNmColumnRemovedFromLayout(page: Page, columnKey: string): P
   await expect(column).toBeHidden();
   await expect(column).toHaveAttribute('hidden', '');
   await expect
-    .poll(async () =>
-      column.evaluate((element) => window.getComputedStyle(element as HTMLElement).display),
-    )
+    .poll(async () => column.evaluate((element) => window.getComputedStyle(element as HTMLElement).display))
     .toBe('none');
 }
 
@@ -197,12 +213,6 @@ async function readSlotContentHeight(page: Page, columnKey: string, slotKind: st
   );
 }
 
-async function readColumnHeight(page: Page, columnKey: string): Promise<number> {
-  return page
-    .locator(`[data-testid="nm-path-column"][data-column-key="${columnKey}"]`)
-    .evaluate((column) => Math.round((column as HTMLElement).getBoundingClientRect().height));
-}
-
 async function expectNmUpdateStatusToUseLocalDisplay(page: Page): Promise<void> {
   const updateStatus = page.getByTestId('nm-path-update-status');
   await expect(updateStatus).toBeVisible();
@@ -240,107 +250,69 @@ test.describe('PATH1 NM workspace artifact', () => {
     await page.goto(nmPathHttpPath);
     await expect(page.getByRole('heading', { name: 'PATH 1 NM: Fresh First Launch -> Need Location -> First Entry' })).toBeVisible();
     await expect(page.getByTestId('nm-path-app-pill')).toHaveText('LaundryLog');
-    await expect(page.locator('.nm-column__app-pill')).toHaveCount(0);
 
     const initialMetrics = await readNmPathMetrics(page);
 
-    expect(initialMetrics.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[0]);
+    expect(initialMetrics.visibleColumnKeys).toEqual([...orderedColumnKeys]);
+    expect(initialMetrics.leadingVisibleColumnKey).toBe('01-launch-app');
     expect(initialMetrics.logicalTargets.length).toBeGreaterThan(1);
 
     await page.getByTestId('nm-path-nav-next').click();
     const afterNext = await waitForNmScrollTarget(page, initialMetrics.logicalTargets[1]);
-
     expect(afterNext.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[1]);
 
     await page.getByTestId('nm-path-nav-end').click();
     const atEnd = await waitForNmScrollTarget(page, initialMetrics.logicalMaxTarget);
-
     expect(atEnd.leadingVisibleColumnKey).toBe(initialMetrics.logicalStartKeys[initialMetrics.logicalStartKeys.length - 1]);
     await expect(page.getByTestId('nm-path-nav-next')).toBeDisabled();
     await expect(page.getByTestId('nm-path-nav-end')).toBeDisabled();
 
     await page.getByTestId('nm-path-nav-start').click();
     const backAtStart = await waitForNmScrollTarget(page, 0);
-
-    expect(backAtStart.leadingVisibleColumnKey).toBe('01-app-started');
+    expect(backAtStart.leadingVisibleColumnKey).toBe('01-launch-app');
   });
 
-  test('shared NM slots align by row type while shorter columns trim trailing empty rows', async ({ page }) => {
+  test('shared NM rows stay aligned across command and view slices', async ({ page }) => {
     await page.goto(nmPathHttpPath);
     await page.getByTestId('nm-path-nav-end').click();
     await waitForNmScrollTarget(page, (await readNmPathMetrics(page)).logicalMaxTarget);
 
     const keys = [
-      '08-current-laundry-session-location',
-      '09-entry-form-ready',
-      '10-washer-draft',
-      '11-log-laundry-expense',
-      '12-current-laundry-session-washer',
-      '13-logged-success',
+      '11-capture-laundry-location',
+      '12-current-laundry-session-location',
+      '13-entry-form-ready',
+      '16-log-laundry-expense',
+      '17-current-laundry-session-washer',
+      '18-logged-success',
     ] as const;
 
     const slotHeights = await Promise.all(keys.map((key) => readSlotHeights(page, key)));
-
     const first = slotHeights[0];
 
     for (const slotHeight of slotHeights.slice(1)) {
       expect(slotHeight.header).toBe(first.header);
       expect(slotHeight.screen).toBe(first.screen);
       expect(slotHeight.primary).toBe(first.primary);
+      expect(slotHeight.secondary).toBe(first.secondary);
+      expect(slotHeight.gwt).toBe(first.gwt);
     }
 
     expect(first.screen).toBeGreaterThan(0);
     expect(first.primary).toBeGreaterThan(0);
-
-    const renderedSecondaryKeys = ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'] as const;
-    const renderedGwtKeys = ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'] as const;
-    const trimmedKeys = ['09-entry-form-ready', '10-washer-draft', '13-logged-success'] as const;
-
-    for (const columnKey of renderedSecondaryKeys) {
-      expect((await readSlotHeights(page, columnKey)).secondary).toBeGreaterThan(0);
-    }
-
-    for (const columnKey of renderedGwtKeys) {
-      expect((await readSlotHeights(page, columnKey)).gwt).toBeGreaterThan(0);
-    }
-
-    for (const columnKey of trimmedKeys) {
-      const trimmedHeights = await readSlotHeights(page, columnKey);
-      expect(trimmedHeights.secondary).toBe(0);
-      expect(trimmedHeights.gwt).toBe(0);
-    }
+    expect(first.secondary).toBeGreaterThan(0);
+    expect(first.gwt).toBeGreaterThan(0);
 
     const screenBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'screen')));
-    const primaryBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'primary')));
-    const gwtBoxHeights = await Promise.all(
-      ['08-current-laundry-session-location', '11-log-laundry-expense', '12-current-laundry-session-washer'].map((key) =>
-        readSlotContentHeight(page, key, 'gwt'),
-      ),
-    );
+    const gwtBoxHeights = await Promise.all(keys.map((key) => readSlotContentHeight(page, key, 'gwt')));
 
     expect(new Set(screenBoxHeights).size).toBe(1);
-    expect(new Set(primaryBoxHeights).size).toBe(1);
     expect(new Set(gwtBoxHeights).size).toBe(1);
-
-    const renderedSecondaryHeights = await Promise.all(renderedSecondaryKeys.map((key) => readSlotHeights(page, key)));
-    const secondarySlotHeights = renderedSecondaryHeights.map((height) => height.secondary);
-    const gwtSlotHeights = renderedSecondaryHeights.map((height) => height.gwt);
-
-    expect(new Set(secondarySlotHeights).size).toBe(1);
-    expect(new Set(gwtSlotHeights).size).toBe(1);
-
-    const shorterColumnHeights = await Promise.all(trimmedKeys.map((key) => readColumnHeight(page, key)));
-    const gwtColumnHeights = await Promise.all(renderedGwtKeys.map((key) => readColumnHeight(page, key)));
-
-    for (const shorterHeight of shorterColumnHeights) {
-      expect(shorterHeight).toBeLessThan(gwtColumnHeights[0]);
-    }
   });
 
   test('surface thumbnails stay small in thumbnail mode and full mode expands the live surface without breaking layout', async ({ page }) => {
     await page.goto(nmPathHttpPath);
 
-    const thumbnailMetrics = await readPreviewMetrics(page, '09-entry-form-ready');
+    const thumbnailMetrics = await readPreviewMetrics(page, '13-entry-form-ready');
 
     expect(thumbnailMetrics.frameWidth).toBeGreaterThanOrEqual(176);
     expect(thumbnailMetrics.frameWidth).toBeLessThanOrEqual(190);
@@ -351,90 +323,96 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(thumbnailMetrics.thumbnailWidth).toBeLessThanOrEqual(102);
     expect(thumbnailMetrics.thumbnailHeight).toBeGreaterThanOrEqual(112);
     expect(thumbnailMetrics.thumbnailHeight).toBeLessThanOrEqual(154);
-    expect(thumbnailMetrics.columnHeight).toBeLessThan(980);
     expect(thumbnailMetrics.renderingWidth).toBe(0);
 
     await expect(
-      page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-box"] .nm-column__detail-title'),
+      page.locator('[data-testid="nm-path-column"][data-column-key="08-need-location"] [data-testid="nm-column-attachment-box"] .nm-column__detail-title'),
     ).toHaveText('Set Location Screen');
     await expect(
-      page.locator('[data-testid="nm-path-column"][data-column-key="01-app-started"] [data-testid="nm-column-screen-box"] .nm-column__detail-title'),
-    ).toHaveText('Splash Screen');
+      page.locator('[data-testid="nm-path-column"][data-column-key="01-launch-app"] [data-testid="nm-column-attachment-box"] .nm-column__detail-title'),
+    ).toHaveText('App Launch Trigger');
 
     await clickNmSurfaceMode(page, 'full');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
 
-    const fullMetrics = await readPreviewMetrics(page, '09-entry-form-ready');
+    const fullMetrics = await readPreviewMetrics(page, '13-entry-form-ready');
 
     expect(fullMetrics.frameWidth).toBeGreaterThan(thumbnailMetrics.frameWidth);
     expect(fullMetrics.frameHeight).toBeGreaterThan(thumbnailMetrics.frameHeight);
-    expect(fullMetrics.frameHeight).toBeGreaterThanOrEqual(220);
-    expect(fullMetrics.columnHeight).toBeLessThan(1120);
-    expect(fullMetrics.thumbnailWidth).toBe(0);
-    expect(fullMetrics.renderingWidth).toBeGreaterThan(thumbnailMetrics.renderingWidth);
     expect(fullMetrics.renderingWidth).toBeGreaterThan(90);
+    expect(fullMetrics.thumbnailWidth).toBe(0);
 
     await page.reload();
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-surface-mode', 'full');
   });
 
-  test('lens and view toggles change visible content and persist across reloads', async ({ page }) => {
+  test('lens and view toggles change visible NM content and persist across reloads', async ({ page }) => {
     await page.goto(nmPathHttpPath);
+
+    const scenarioDisclosure = page.locator('[data-testid="nm-path-scenario"]');
+    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
     await clickNmLens(page, 'aem');
     await expect
       .poll(async () => (await readNmPathMetrics(page)).visibleColumnKeys)
       .toEqual([
-        '01-app-started',
-        '02-runtime-checks',
-        '03-no-local-session',
-        '04-route-resolved',
-        '05-need-location',
-        '06-ready-to-set-location',
-        '09-entry-form-ready',
-        '10-washer-draft',
-        '13-logged-success',
+        '01-launch-app',
+        '02-splash-visible',
+        '03-run-startup-checks',
+        '04-runtime-checks-view',
+        '05-inspect-local-session',
+        '06-no-local-session-view',
+        '07-resolve-initial-route',
+        '08-need-location',
+        '09-enter-location-text',
+        '10-ready-to-set-location',
+        '13-entry-form-ready',
+        '14-select-washer',
+        '15-washer-draft',
+        '18-logged-success',
       ]);
 
-    await expectNmColumnRemovedFromLayout(page, '07-capture-laundry-location');
-    await expectNmColumnRemovedFromLayout(page, '11-log-laundry-expense');
+    await expectNmColumnRemovedFromLayout(page, '11-capture-laundry-location');
+    await expectNmColumnRemovedFromLayout(page, '12-current-laundry-session-location');
+    await expectNmColumnRemovedFromLayout(page, '16-log-laundry-expense');
+    await expectNmColumnRemovedFromLayout(page, '17-current-laundry-session-washer');
 
     await clickNmLens(page, 'lifecycle');
     await expect
       .poll(async () => (await readNmPathMetrics(page)).visibleColumnKeys)
       .toEqual([
-        '02-runtime-checks',
-        '03-no-local-session',
-        '04-route-resolved',
-        '05-need-location',
-        '06-ready-to-set-location',
-        '09-entry-form-ready',
-        '10-washer-draft',
-        '13-logged-success',
+        '03-run-startup-checks',
+        '04-runtime-checks-view',
+        '05-inspect-local-session',
+        '06-no-local-session-view',
+        '07-resolve-initial-route',
+        '08-need-location',
+        '09-enter-location-text',
+        '10-ready-to-set-location',
+        '13-entry-form-ready',
+        '14-select-washer',
+        '15-washer-draft',
+        '18-logged-success',
       ]);
 
-    await expectNmColumnRemovedFromLayout(page, '01-app-started');
+    await expectNmColumnRemovedFromLayout(page, '01-launch-app');
+    await expectNmColumnRemovedFromLayout(page, '02-splash-visible');
 
-    const runtimeColumn = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"]');
-    const scenarioDisclosure = page.locator('[data-testid="nm-path-scenario"]');
-    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
-    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
+    const runtimeColumn = page.locator('[data-testid="nm-path-column"][data-column-key="03-run-startup-checks"]');
 
     await clickNmViewMode(page, 'summary');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'summary');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeHidden();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-screen-box"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
-    await expect(runtimeColumn.locator('[data-testid="nm-surface-open"]')).toBeVisible();
-    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(runtimeColumn.locator('[data-testid="nm-column-detail-copy"]')).toBeHidden();
+    await expect(runtimeColumn.locator('[data-testid="nm-column-attachment-box"]')).toBeVisible();
+    await expect(runtimeColumn.locator('[data-testid="nm-attachment-schematic"]')).toBeVisible();
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
     await clickNmViewMode(page, 'detailed');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'detailed');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeVisible();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-changes"] [data-testid="nm-column-detail-copy"]')).toBeVisible();
-    await expect(runtimeColumn.locator('[data-testid="nm-column-screen-box"] [data-testid="nm-column-detail-copy"]')).toBeVisible();
-    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(runtimeColumn.locator('[data-testid="nm-column-detail-copy"]')).toBeVisible();
     await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
     await page.locator('[data-testid="nm-path-scenario-summary"]').click();
@@ -446,17 +424,14 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.locator('[data-testid="nm-path-lens-toggle"][data-lens-key="lifecycle"]')).not.toHaveClass(/is-active/);
     await expect(page.locator('[data-testid="nm-path-lens-toggle"][data-lens-key="aem"]')).not.toHaveClass(/is-active/);
     await expect(page.locator('[data-testid="nm-path-scenario"]')).not.toHaveAttribute('open', '');
-    await expectNmColumnRemovedFromLayout(page, '01-app-started');
-    await expectNmColumnRemovedFromLayout(page, '07-capture-laundry-location');
   });
 
-  test('classification pills move above the step line, surface kinds are distinct, and contextual popovers explain the current column', async ({ page }) => {
+  test('classification, attachment, actor, and compartment help explain the NM slice law', async ({ page }) => {
     await page.goto(nmPathHttpPath);
 
-    const lifecycleColumn = page.locator('[data-testid="nm-path-column"][data-column-key="01-app-started"]');
-    const classificationRow = lifecycleColumn.locator('[data-testid="nm-column-meta"]');
-    const stepLine = lifecycleColumn.locator('.nm-column__eyebrow');
-
+    const firstCommandColumn = page.locator('[data-testid="nm-path-column"][data-column-key="01-launch-app"]');
+    const classificationRow = firstCommandColumn.locator('[data-testid="nm-column-meta"]');
+    const stepLine = firstCommandColumn.locator('.nm-column__eyebrow');
     const classificationBox = await classificationRow.boundingBox();
     const stepBox = await stepLine.boundingBox();
 
@@ -464,183 +439,123 @@ test.describe('PATH1 NM workspace artifact', () => {
     expect(stepBox).not.toBeNull();
     expect((classificationBox?.y ?? 0) + (classificationBox?.height ?? 0)).toBeLessThan((stepBox?.y ?? 0) + 1);
 
-    await expect(lifecycleColumn.getByTestId('nm-column-kind')).toHaveText('BOOT');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-kind"]')).toHaveText('SCREEN');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-kind"]')).toHaveText('COMMAND');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-column-kind"]')).toHaveText('VIEW');
+    await expect(firstCommandColumn.getByTestId('nm-column-kind')).toHaveText('COMMAND');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="02-splash-visible"] [data-testid="nm-column-kind"]')).toHaveText('VIEW');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="01-launch-app"] [data-testid="nm-column-detail-kind"]')).toHaveText('TRIGGER');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="03-run-startup-checks"] [data-testid="nm-column-detail-kind"]')).toHaveText('RUNTIME');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-need-location"] [data-testid="nm-column-detail-kind"]')).toHaveText('SCREEN');
 
-    const commandColumnBackground = await page
-      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"]')
-      .evaluate((column) => window.getComputedStyle(column as HTMLElement).backgroundImage);
-    const viewColumnBackground = await page
-      .locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"]')
-      .evaluate((column) => window.getComputedStyle(column as HTMLElement).backgroundImage);
-
-    expect(commandColumnBackground).toContain('223, 241, 255');
-    expect(commandColumnBackground).toContain('239, 247, 255');
-    expect(viewColumnBackground).toContain('219, 250, 228');
-    expect(viewColumnBackground).toContain('239, 251, 243');
-
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-changes"][data-detail-kind="orchestration"]')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-changes"][data-detail-kind="interaction"]')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="primary"] .slice-block--command')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="secondary"] .slice-block--event')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-slot-kind="primary"] .slice-block--view')).toBeVisible();
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"]')).not.toContainText('COMMAND SLICE');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"]')).not.toContainText('VIEW SLICE');
-    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] .slice-card')).toHaveCount(0);
-
-    const aemHeaderRolePill = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] .nm-column__classification [data-testid="nm-column-pill"][data-pill-type="role"]',
+    const actorLabelRow = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="08-need-location"] [data-testid="nm-column-attachment-label-row"]',
     );
-    await expect(aemHeaderRolePill).toHaveCount(0);
+    const actorPill = actorLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]');
+    const attachmentTrigger = actorLabelRow.getByTestId('nm-column-detail-kind');
+    await expect(actorPill).toHaveText('User');
+    const actorBox = await actorPill.boundingBox();
+    const attachmentBox = await attachmentTrigger.boundingBox();
+    expect(actorBox).not.toBeNull();
+    expect(attachmentBox).not.toBeNull();
+    expect((actorBox?.x ?? 0) + (actorBox?.width ?? 0)).toBeLessThan((attachmentBox?.x ?? 0) + 1);
 
-    const interactionHeaderRolePill = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="05-need-location"] .nm-column__classification [data-testid="nm-column-pill"][data-pill-type="role"]',
+    const contextPill = firstCommandColumn.locator(
+      '[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]',
     );
-    await expect(interactionHeaderRolePill).toHaveCount(0);
+    const contextPopover = popoverForPill(contextPill);
+    await contextPill.hover();
+    await expect(contextPopover).toBeVisible();
+    await expect(contextPopover).toContainText('Bounded Context');
+    await expect(contextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
+    await expect(contextPopover).toContainText('LaunchApp belongs to the app\'s launch/lifecycle story.');
 
-    const aemScreenLabelRow = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-label-row"]',
-    );
-    await expect(aemScreenLabelRow).toBeVisible();
-    await expect(aemScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
-    await expect(aemScreenLabelRow.locator('.nm-column__detail-kind')).toHaveText('SCREEN');
+    const columnKindTrigger = firstCommandColumn.getByTestId('nm-column-kind');
+    const columnKindPopover = popoverForNmKind(columnKindTrigger);
+    await columnKindTrigger.click();
+    await expect(columnKindPopover).toBeVisible();
+    await expect(columnKindPopover).toContainText('Column Classification');
+    await expect(columnKindPopover).toContainText('COMMAND');
+    await expect(columnKindPopover).toContainText('this whole NM column is a change slice');
+    await expect(columnKindPopover).toContainText('LaunchApp models a change that culminates in an event');
+    await columnKindPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(columnKindPopover).toBeHidden();
 
-    const aemScreenMeta = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-meta"]',
-    );
-    await expect(aemScreenMeta).toBeVisible();
-    await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-lens"]')).toHaveText('ui lens');
-
-    const interactionScreenMeta = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-meta"]',
-    );
-    await expect(interactionScreenMeta).toHaveCount(0);
-
-    const interactionScreenLabelRow = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-label-row"]',
-    );
-    await expect(interactionScreenLabelRow).toBeVisible();
-    await expect(interactionScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
-
-    const actorBadgeBox = await interactionScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]').boundingBox();
-    const screenKindBox = await interactionScreenLabelRow.locator('.nm-column__detail-kind').boundingBox();
-    expect(actorBadgeBox).not.toBeNull();
-    expect(screenKindBox).not.toBeNull();
-    expect((actorBadgeBox?.x ?? 0) + (actorBadgeBox?.width ?? 0)).toBeLessThan((screenKindBox?.x ?? 0) + 1);
-
-    const lifecycleContextPill = lifecycleColumn.locator('[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]');
-    const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
-    await lifecycleContextPill.hover();
-    await expect(lifecycleContextPopover).toBeVisible();
-    await expect(lifecycleContextPopover).toContainText('Bounded Context');
-    await expect(lifecycleContextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
-    await expect(lifecycleContextPopover).toContainText('AppStarted marks an app lifecycle phase becoming visible.');
-
-    const lifecycleKindTrigger = lifecycleColumn.getByTestId('nm-column-kind');
-    const lifecycleKindPopover = popoverForNmKind(lifecycleKindTrigger);
-    await lifecycleKindTrigger.click();
-    await expect(lifecycleKindPopover).toBeVisible();
-    await expect(lifecycleKindPopover).toContainText('Column Classification');
-    await expect(lifecycleKindPopover).toContainText('BOOT');
-    await expect(lifecycleKindPopover).toContainText('this whole NM column is fundamentally about startup or runtime boot behavior');
-    await expect(lifecycleKindPopover).toContainText('This column is classified as BOOT because AppStarted is part of the app startup story.');
-    const lifecycleKindTriggerBox = await lifecycleKindTrigger.boundingBox();
-    const lifecycleKindPopoverBox = await lifecycleKindPopover.boundingBox();
-    expect(lifecycleKindTriggerBox).not.toBeNull();
-    expect(lifecycleKindPopoverBox).not.toBeNull();
-    expect(Math.abs((lifecycleKindPopoverBox?.x ?? 0) - (lifecycleKindTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
-    await lifecycleKindPopover.getByTestId('nm-column-pill-popover-close').click();
-    await expect(lifecycleKindPopover).toBeHidden();
-
-    const runtimeContextPill = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"] [data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="RuntimeOrchestration"]');
-    const runtimeContextPopover = popoverForPill(runtimeContextPill);
-    await runtimeContextPill.hover();
-    await expect(runtimeContextPopover).toBeVisible();
-    await expect(runtimeContextPopover).toContainText('Bounded Context');
-    await expect(runtimeContextPopover).toContainText('RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.');
-    await expect(runtimeContextPopover).toContainText('Runtime Checks coordinates checks, route choice, or state handoff.');
-
-    const userRolePill = page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-pill"][data-pill-type="screen-role"][data-pill-label="User"]');
-    const userRolePopover = popoverForPill(userRolePill);
-    await userRolePill.click();
-    await expect(userRolePopover).toBeVisible();
-    await expect(userRolePopover).toContainText('Actor');
-    await expect(userRolePopover).toContainText('Actor · User means the human is acting through the UI at this point in the path.');
-    await expect(userRolePopover).toContainText('This actor is User because Need Location depends on or expresses a direct user action.');
+    const actorPopover = popoverForPill(actorPill);
+    await actorPill.click();
+    await expect(actorPopover).toBeVisible();
+    await expect(actorPopover).toContainText('Actor');
+    await expect(actorPopover).toContainText('Actor · User means the human is acting through the UI at this point in the path.');
     await page.mouse.move(2, 2);
-    await expect(userRolePopover).toBeVisible();
-    await userRolePopover.getByTestId('nm-column-pill-popover-close').click();
-    await expect(userRolePopover).toBeHidden();
+    await expect(actorPopover).toBeVisible();
+    await actorPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(actorPopover).toBeHidden();
 
-    const interactionKindTrigger = interactionScreenLabelRow.getByTestId('nm-column-detail-kind');
-    const interactionKindPopover = popoverForNmKind(interactionKindTrigger);
-    await interactionKindTrigger.click();
-    await expect(interactionKindPopover).toBeVisible();
-    await expect(interactionKindPopover).toContainText('Compartment Classification');
-    await expect(interactionKindPopover).toContainText('SCREEN');
-    await expect(interactionKindPopover).toContainText('marks the linked app surface that frames or illustrates this slice');
-    await expect(interactionKindPopover).toContainText('This compartment is SCREEN because it shows the linked app surface for Need Location.');
-    await interactionKindPopover.getByTestId('nm-column-pill-popover-close').click();
-    await expect(interactionKindPopover).toBeHidden();
-
-    const aemScreenLensPill = page.locator(
-      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-pill"][data-pill-type="screen-lens"][data-pill-label="ui lens"]',
-    );
-    const aemScreenLensPopover = popoverForPill(aemScreenLensPill);
-    await aemScreenLensPill.click();
-    await expect(aemScreenLensPopover).toBeVisible();
-    await expect(aemScreenLensPopover).toContainText('Lens');
-    await expect(aemScreenLensPopover).toContainText('ui lens marks the linked app surface that frames the business slice.');
-    await expect(aemScreenLensPopover).toContainText('CaptureLaundryLocation is being grounded in the app surface around the business slice.');
-    const aemScreenLensTriggerBox = await aemScreenLensPill.boundingBox();
-    const aemScreenLensPopoverBox = await aemScreenLensPopover.boundingBox();
-    expect(aemScreenLensTriggerBox).not.toBeNull();
-    expect(aemScreenLensPopoverBox).not.toBeNull();
-    expect(Math.abs((aemScreenLensPopoverBox?.x ?? 0) - (aemScreenLensTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
-    await aemScreenLensPopover.getByTestId('nm-column-pill-popover-close').click();
-    await expect(aemScreenLensPopover).toBeHidden();
+    const attachmentPopover = popoverForNmKind(attachmentTrigger);
+    await attachmentTrigger.click();
+    await expect(attachmentPopover).toBeVisible();
+    await expect(attachmentPopover).toContainText('Attachment Classification');
+    await expect(attachmentPopover).toContainText('SCREEN');
+    await expect(attachmentPopover).toContainText('marks the linked app surface that frames or lands a slice');
+    await attachmentPopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(attachmentPopover).toBeHidden();
 
     const commandBlockKindTrigger = page
-      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-slot-kind="primary"] [data-testid="slice-kind-trigger"]')
+      .locator('[data-testid="nm-path-column"][data-column-key="11-capture-laundry-location"] [data-slot-kind="primary"] [data-testid="slice-kind-trigger"]')
       .first();
     const commandBlockKindPopover = popoverForSliceHelp(commandBlockKindTrigger);
     await commandBlockKindTrigger.click();
     await expect(commandBlockKindPopover).toBeVisible();
     await expect(commandBlockKindPopover).toContainText('Compartment Classification');
     await expect(commandBlockKindPopover).toContainText('COMMAND');
-    await expect(commandBlockKindPopover).toContainText('marks the business command block inside this modeled slice');
-    await expect(commandBlockKindPopover).toContainText('This compartment is COMMAND because CaptureLaundryLocation is the business command being modeled.');
-    const commandBlockKindTriggerBox = await commandBlockKindTrigger.boundingBox();
-    const commandBlockKindPopoverBox = await commandBlockKindPopover.boundingBox();
-    expect(commandBlockKindTriggerBox).not.toBeNull();
-    expect(commandBlockKindPopoverBox).not.toBeNull();
-    expect(Math.abs((commandBlockKindPopoverBox?.x ?? 0) - (commandBlockKindTriggerBox?.x ?? 0))).toBeLessThanOrEqual(2);
     await commandBlockKindPopover.getByTestId('slice-help-popover-close').click();
     await expect(commandBlockKindPopover).toBeHidden();
 
     const gwtKindTrigger = page
-      .locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="slice-gwt-kind-trigger"]')
+      .locator('[data-testid="nm-path-column"][data-column-key="11-capture-laundry-location"] [data-testid="slice-gwt-kind-trigger"]')
       .first();
     const gwtKindPopover = popoverForSliceHelp(gwtKindTrigger);
     await gwtKindTrigger.click();
     await expect(gwtKindPopover).toBeVisible();
     await expect(gwtKindPopover).toContainText('Compartment Classification');
-    await expect(gwtKindPopover).toContainText('command gwt');
-    await expect(gwtKindPopover).toContainText('Given/When/Then rule band that governs a business command');
+    await expect(gwtKindPopover).toContainText('COMMAND GWT');
     await gwtKindPopover.getByTestId('slice-help-popover-close').click();
     await expect(gwtKindPopover).toBeHidden();
+  });
+
+  test('universal COMMAND and VIEW slices keep EVENT as the command backbone and allow view fanout', async ({ page }) => {
+    await page.goto(nmPathHttpPath);
+
+    const launchCommand = page.locator('[data-testid="nm-path-column"][data-column-key="01-launch-app"]');
+    await expect(launchCommand.getByTestId('nm-column-kind')).toHaveText('COMMAND');
+    await expect(launchCommand.locator('[data-slot-kind="primary"] .slice-block--command')).toBeVisible();
+    await expect(launchCommand.locator('[data-slot-kind="secondary"] .slice-block--event')).toBeVisible();
+    await expect(launchCommand.locator('[data-testid="slice-gwt-kind-trigger"]')).toContainText('COMMAND GWT');
+    await expect(launchCommand).toContainText('AppStarted');
+
+    const splashView = page.locator('[data-testid="nm-path-column"][data-column-key="02-splash-visible"]');
+    await expect(splashView.getByTestId('nm-column-kind')).toHaveText('VIEW');
+    await expect(splashView.locator('[data-slot-kind="primary"] .slice-block--view')).toBeVisible();
+    await expect(splashView.locator('[data-slot-kind="secondary"] .slice-block--event')).toHaveCount(0);
+    await expect(splashView.locator('[data-testid="slice-gwt-kind-trigger"]')).toContainText('VIEW GWT');
+    await expect(splashView).toContainText('AppStarted');
+
+    const currentSessionLocationView = page.locator('[data-testid="nm-path-column"][data-column-key="12-current-laundry-session-location"]');
+    const entryFormReadyView = page.locator('[data-testid="nm-path-column"][data-column-key="13-entry-form-ready"]');
+    const currentSessionWasherView = page.locator('[data-testid="nm-path-column"][data-column-key="17-current-laundry-session-washer"]');
+    const loggedSuccessView = page.locator('[data-testid="nm-path-column"][data-column-key="18-logged-success"]');
+
+    await expect(currentSessionLocationView).toContainText('LaundryLocationCaptured');
+    await expect(entryFormReadyView).toContainText('LaundryLocationCaptured');
+    await expect(currentSessionWasherView).toContainText('LaundryExpenseLogged');
+    await expect(loggedSuccessView).toContainText('LaundryExpenseLogged');
   });
 
   test('surface thumbnails open the overlay and the tracked file artifact still loads directly from disk', async ({ page }) => {
     await page.goto(nmPathHttpPath);
 
     await page
-      .locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-surface-open"]')
+      .locator('[data-testid="nm-path-column"][data-column-key="08-need-location"] [data-testid="nm-surface-open"]')
       .click();
     await expect(page.getByTestId('nm-surface-overlay')).toBeVisible();
-    await expect(page.getByTestId('nm-surface-overlay').getByRole('heading', { name: 'Need Location' })).toBeVisible();
+    await expect(page.getByTestId('nm-surface-overlay').getByRole('heading', { name: 'NeedLocation' })).toBeVisible();
     await page.getByTestId('nm-surface-overlay-close').click();
     await expect(page.getByTestId('nm-surface-overlay')).toBeHidden();
 

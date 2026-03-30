@@ -88,25 +88,70 @@ module NmSurfacePresentation =
         | Thumbnail -> "Thumbnail"
         | Full -> "Full"
 
-/// Distinguishes the surface shell variants carried by NM columns.
+/// Distinguishes the universal slice kinds carried by NM columns.
+type NmSliceType =
+    | Command
+    | View
+
+[<RequireQualifiedAccess>]
+module NmSliceType =
+    let domKey =
+        function
+        | Command -> "command"
+        | View -> "view"
+
+    let label =
+        function
+        | Command -> "COMMAND"
+        | View -> "VIEW"
+
+/// Distinguishes the top attachment kinds that can frame an NM slice.
+type NmAttachmentKind =
+    | Trigger
+    | Runtime
+    | Screen
+
+[<RequireQualifiedAccess>]
+module NmAttachmentKind =
+    let domKey =
+        function
+        | Trigger -> "trigger"
+        | Runtime -> "runtime"
+        | Screen -> "screen"
+
+    let label =
+        function
+        | Trigger -> "TRIGGER"
+        | Runtime -> "RUNTIME"
+        | Screen -> "SCREEN"
+
+/// Distinguishes the attachment surface variants carried by NM columns.
 type NmColumnSurfaceState =
+    | NmTriggerSurface
+    | NmRuntimeSurface
     | NmBootSurface of AppBootScreenState
     | NmAppScreenSurface of ScreenSurfaceState
-    | NmAemSliceSurface of topSurface: ScreenSurfaceState option * sliceCard: PathSliceCard
+
+/// Carries the modeled body for one universal NM slice.
+type NmSliceBody =
+    | CommandBody of commandBlock: SliceBlockState * eventBlock: SliceBlockState * gwt: SliceGwtCard
+    | ViewBody of viewBlock: SliceBlockState * gwt: SliceGwtCard
 
 /// Describes one explicit ordered NM column.
 type NmColumnState =
     { ColumnKey: string
       ColumnTitle: string
       ColumnNote: string option
-      ChangeItems: string list
       ContextGroup: ContextGroupKind
       PrimaryContext: NmContextKind
       VisibleInLenses: NmLensKind list
+      SliceType: NmSliceType
+      AttachmentKind: NmAttachmentKind
       ActorRoleBadge: string option
       Surface: NmColumnSurfaceState
       TechnicalSurfaceLabel: string option
-      HumanSurfaceTitle: string }
+      HumanSurfaceTitle: string
+      Body: NmSliceBody }
 
 /// Describes one complete NM path document.
 type NmPathState =
@@ -125,6 +170,11 @@ type NmPathUpdateState =
 
 [<RequireQualifiedAccess>]
 module NmPathHtmlExamples =
+    let private expect description result =
+        match result with
+        | Ok value -> value
+        | Error message -> failwith $"Expected a valid {description}. {message}"
+
     let private getScreenPathState () = ScreenPathHtmlExamples.path1StartupToFirstEntry ()
     let private getAemPathState () = SliceHtmlExamples.path1ManualLocationWasherDryer ()
 
@@ -142,226 +192,601 @@ module NmPathHtmlExamples =
         | AppScreenSurface screenSurface -> screenSurface
         | _ -> failwith $"Expected '{stepKey}' to carry an app screen surface."
 
-    let private aemSliceCard index =
+    let private commandSliceCard index =
         match getAemPathState().SliceCards |> List.tryItem index with
-        | Some sliceCard -> sliceCard
-        | None -> failwith $"Expected AEM slice card index {index} in PATH1."
+        | Some(PathSliceCard.CommandSlice sliceCard) -> sliceCard
+        | Some _ -> failwith $"Expected AEM command slice card index {index} in PATH1."
+        | None -> failwith $"Expected AEM command slice card index {index} in PATH1."
+
+    let private viewSliceCard index =
+        match getAemPathState().SliceCards |> List.tryItem index with
+        | Some(PathSliceCard.ViewSlice sliceCard) -> sliceCard
+        | Some _ -> failwith $"Expected AEM view slice card index {index} in PATH1."
+        | None -> failwith $"Expected AEM view slice card index {index} in PATH1."
 
     let private technicalLabel =
         function
+        | NmTriggerSurface
+        | NmRuntimeSurface -> None
         | NmBootSurface bootState -> Some bootState.SurfaceName
         | NmAppScreenSurface screenSurface -> Some(ScreenSurfaceState.title screenSurface)
-        | NmAemSliceSurface (Some topSurface, _) -> Some(ScreenSurfaceState.title topSurface)
-        | NmAemSliceSurface (None, PathSliceCard.CommandSlice sliceState) -> Some $"CommandSlice.{sliceState.Title}"
-        | NmAemSliceSurface (None, PathSliceCard.ViewSlice sliceState) -> Some $"ViewSlice.{sliceState.Title}"
 
-    let private column
+    let private block kind title metaBadges propertyLines footerBadgeText =
+        SliceBlockState.tryCreate kind title metaBadges (PropertyLines propertyLines) footerBadgeText
+        |> expect $"slice block '{title}'"
+
+    let private gwtClauseText stage text =
+        GwtClause.tryCreate stage (Some text) []
+        |> expect $"gwt clause '{text}'"
+
+    let private gwtClauseBlocks stage blocks =
+        GwtClause.tryCreate stage None blocks
+        |> expect "gwt block clause"
+
+    let private gwtCard kind clauses =
+        SliceGwtCard.tryCreate kind clauses
+        |> expect "gwt card"
+
+    let private commandGwt givenClauses commandBlock eventBlock =
+        gwtCard
+            SliceGwtKind.CommandRules
+            [ yield! givenClauses
+              gwtClauseBlocks GwtStage.When [ commandBlock ]
+              gwtClauseBlocks GwtStage.Then [ eventBlock ] ]
+
+    let private viewGwt givenBlocks explanation viewBlock =
+        gwtCard
+            SliceGwtKind.ViewProjection
+            [ gwtClauseBlocks GwtStage.Given givenBlocks
+              gwtClauseText GwtStage.When explanation
+              gwtClauseBlocks GwtStage.Then [ viewBlock ] ]
+
+    let private commandColumn
         columnKey
         columnTitle
         columnNote
-        changeItems
         contextGroup
         primaryContext
         visibleInLenses
         actorRoleBadge
+        attachmentKind
         surface
         humanSurfaceTitle
+        commandBlock
+        eventBlock
+        gwtCardState
         =
         { ColumnKey = columnKey
           ColumnTitle = columnTitle
           ColumnNote = columnNote
-          ChangeItems = changeItems
           ContextGroup = contextGroup
           PrimaryContext = primaryContext
           VisibleInLenses = visibleInLenses
+          SliceType = NmSliceType.Command
+          AttachmentKind = attachmentKind
           ActorRoleBadge = actorRoleBadge
           Surface = surface
           TechnicalSurfaceLabel = technicalLabel surface
-          HumanSurfaceTitle = humanSurfaceTitle }
+          HumanSurfaceTitle = humanSurfaceTitle
+          Body = CommandBody(commandBlock, eventBlock, gwtCardState) }
+
+    let private viewColumn
+        columnKey
+        columnTitle
+        columnNote
+        contextGroup
+        primaryContext
+        visibleInLenses
+        actorRoleBadge
+        attachmentKind
+        surface
+        humanSurfaceTitle
+        viewBlock
+        gwtCardState
+        =
+        { ColumnKey = columnKey
+          ColumnTitle = columnTitle
+          ColumnNote = columnNote
+          ContextGroup = contextGroup
+          PrimaryContext = primaryContext
+          VisibleInLenses = visibleInLenses
+          SliceType = NmSliceType.View
+          AttachmentKind = attachmentKind
+          ActorRoleBadge = actorRoleBadge
+          Surface = surface
+          TechnicalSurfaceLabel = technicalLabel surface
+          HumanSurfaceTitle = humanSurfaceTitle
+          Body = ViewBody(viewBlock, gwtCardState) }
 
     /// Returns the first ATLAS/NM proving-ground path for LaundryLog.
     let path1FirstLaunchFirstEntry () : NmPathState =
+        let launchAppCommand =
+            block
+                SliceBlockKind.Command
+                "LaunchApp"
+                []
+                [ "entry_point = \"app-icon\""
+                  "requested_by = \"user\"" ]
+                (Some "app runtime")
+
+        let appStartedEvent =
+            block
+                SliceBlockKind.Event
+                "AppStarted"
+                []
+                [ "lifecycle_phase = \"started\""
+                  "boot_surface = \"SplashVisible\"" ]
+                (Some "app runtime")
+
+        let splashVisibleView =
+            block
+                SliceBlockKind.View
+                "SplashVisible"
+                []
+                [ "surface_name = \"Splash Screen\""
+                  "visible_checkpoint = \"app-started\"" ]
+                (Some "app runtime")
+
+        let runStartupChecksCommand =
+            block
+                SliceBlockKind.Command
+                "RunStartupChecks"
+                []
+                [ "check_scope = \"startup\""
+                  "initiated_by = \"system\"" ]
+                (Some "app runtime")
+
+        let runtimeChecksStartedEvent =
+            block
+                SliceBlockKind.Event
+                "RuntimeChecksStarted"
+                []
+                [ "active_checkpoint = \"runtime-checks\""
+                  "status = \"in-progress\"" ]
+                (Some "app runtime")
+
+        let runtimeChecksVisibleView =
+            block
+                SliceBlockKind.View
+                "RuntimeChecksVisible"
+                []
+                [ "surface_name = \"Splash Screen\""
+                  "visible_message = \"runtime-checks\"" ]
+                (Some "app runtime")
+
+        let inspectLocalSessionCommand =
+            block
+                SliceBlockKind.Command
+                "InspectLocalSession"
+                []
+                [ "inspection_scope = \"local-session\""
+                  "initiated_by = \"system\"" ]
+                (Some "app runtime")
+
+        let noLocalSessionDetectedEvent =
+            block
+                SliceBlockKind.Event
+                "NoLocalSessionDetected"
+                []
+                [ "active_location = \"none\""
+                  "pending_draft = \"none\"" ]
+                (Some "app runtime")
+
+        let noLocalSessionVisibleView =
+            block
+                SliceBlockKind.View
+                "NoLocalSessionVisible"
+                []
+                [ "surface_name = \"Splash Screen\""
+                  "visible_message = \"no-local-session\"" ]
+                (Some "app runtime")
+
+        let resolveInitialRouteCommand =
+            block
+                SliceBlockKind.Command
+                "ResolveInitialRoute"
+                []
+                [ "route_candidate = \"need-location\""
+                  "initiated_by = \"system\"" ]
+                (Some "app runtime")
+
+        let initialRouteResolvedEvent =
+            block
+                SliceBlockKind.Event
+                "InitialRouteResolvedToNeedLocation"
+                []
+                [ "resolved_route = \"need-location\""
+                  "first_usable_screen = \"Screen.NewSession - Awaiting Location\"" ]
+                (Some "app runtime")
+
+        let needLocationView =
+            block
+                SliceBlockKind.View
+                "NeedLocation"
+                []
+                [ "screen_state = \"awaiting-location\""
+                  "set_location_enabled = false" ]
+                (Some "interaction")
+
+        let enterLocationTextCommand =
+            block
+                SliceBlockKind.Command
+                "EnterLocationText"
+                []
+                [ "location_name = \"Love's #123 - Springfield, OH\""
+                  "input_source = \"manual-text\"" ]
+                (Some "interaction")
+
+        let locationTextEnteredEvent =
+            block
+                SliceBlockKind.Event
+                "LocationTextEntered"
+                []
+                [ "draft_location = \"Love's #123 - Springfield, OH\""
+                  "set_location_enabled = true" ]
+                (Some "interaction")
+
+        let readyToSetLocationView =
+            block
+                SliceBlockKind.View
+                "ReadyToSetLocation"
+                []
+                [ "screen_state = \"ready-to-set-location\""
+                  "confirm_action = \"available\"" ]
+                (Some "interaction")
+
+        let captureLocationCommandSlice = commandSliceCard 0
+        let currentSessionLocationViewSlice = viewSliceCard 1
+        let logLaundryExpenseCommandSlice = commandSliceCard 2
+        let currentSessionWasherViewSlice = viewSliceCard 3
+
+        let entryFormReadyView =
+            block
+                SliceBlockKind.View
+                "EntryFormReady"
+                []
+                [ "screen_state = \"entry-form-ready\""
+                  "visible_controls = \"machine, quantity, price, payment\"" ]
+                (Some "interaction")
+
+        let selectWasherCommand =
+            block
+                SliceBlockKind.Command
+                "SelectWasher"
+                []
+                [ "expense_kind = \"washer\""
+                  "selection_source = \"machine-chip\"" ]
+                (Some "interaction")
+
+        let washerSelectedEvent =
+            block
+                SliceBlockKind.Event
+                "WasherSelected"
+                []
+                [ "expense_kind = \"washer\""
+                  "selection_state = \"draft-ready\"" ]
+                (Some "interaction")
+
+        let washerDraftView =
+            block
+                SliceBlockKind.View
+                "WasherDraft"
+                []
+                [ "screen_state = \"washer-draft\""
+                  "log_expense_enabled = true" ]
+                (Some "interaction")
+
+        let loggedSuccessView =
+            block
+                SliceBlockKind.View
+                "LoggedSuccess"
+                []
+                [ "screen_state = \"logged-success\""
+                  "feedback_banner = \"visible\"" ]
+                (Some "interaction")
+
+        let launchAppGwt =
+            commandGwt [ gwtClauseText GwtStage.Given "the person chooses LaundryLog from the device" ] launchAppCommand appStartedEvent
+
+        let splashVisibleGwt =
+            viewGwt [ appStartedEvent ] "project the first visible app shell after launch" splashVisibleView
+
+        let runStartupChecksGwt =
+            commandGwt [ gwtClauseBlocks GwtStage.Given [ appStartedEvent ] ] runStartupChecksCommand runtimeChecksStartedEvent
+
+        let runtimeChecksVisibleGwt =
+            viewGwt [ runtimeChecksStartedEvent ] "show the runtime-checking splash state" runtimeChecksVisibleView
+
+        let inspectLocalSessionGwt =
+            commandGwt [ gwtClauseBlocks GwtStage.Given [ runtimeChecksStartedEvent ] ] inspectLocalSessionCommand noLocalSessionDetectedEvent
+
+        let noLocalSessionVisibleGwt =
+            viewGwt [ noLocalSessionDetectedEvent ] "show that no local session or draft was found" noLocalSessionVisibleView
+
+        let resolveInitialRouteGwt =
+            commandGwt [ gwtClauseBlocks GwtStage.Given [ noLocalSessionDetectedEvent ] ] resolveInitialRouteCommand initialRouteResolvedEvent
+
+        let needLocationGwt =
+            viewGwt [ initialRouteResolvedEvent ] "show the first usable need-location screen" needLocationView
+
+        let enterLocationTextGwt =
+            commandGwt [ gwtClauseBlocks GwtStage.Given [ initialRouteResolvedEvent ] ] enterLocationTextCommand locationTextEnteredEvent
+
+        let readyToSetLocationGwt =
+            viewGwt [ locationTextEnteredEvent ] "show the ready-to-confirm location screen state" readyToSetLocationView
+
+        let entryFormReadyGwt =
+            viewGwt
+                [ captureLocationCommandSlice.Event ]
+                "render the first usable entry form after the captured location enters the store"
+                entryFormReadyView
+
+        let selectWasherGwt =
+            commandGwt [ gwtClauseBlocks GwtStage.Given [ captureLocationCommandSlice.Event ] ] selectWasherCommand washerSelectedEvent
+
+        let washerDraftGwt =
+            viewGwt [ washerSelectedEvent ] "project the washer draft back into the visible entry screen" washerDraftView
+
+        let loggedSuccessGwt =
+            viewGwt
+                [ logLaundryExpenseCommandSlice.Event ]
+                "render the logged-success screen after the expense event is stored"
+                loggedSuccessView
+
         { PathId = "PATH1-NM"
           Title = "PATH 1 NM: Fresh First Launch -> Need Location -> First Entry"
           Description =
-            "First ATLAS/NM path surface for LaundryLog. It weaves application lifecycle, runtime orchestration, screen-path state, and AEM business slices into one ordered column flow."
+            "Primary LaundryLog NM path surface. Every column is a universal COMMAND or VIEW slice, and EVENT stays the backbone inside the model rather than a whole-column type."
           ScenarioLabel = "fresh first launch with no known local data"
           Assumptions =
             [ "No saved location is available yet."
               "No active laundry session or pending draft exists."
               "Startup/runtime checks must finish before the first usable screen appears."
               "The initial route should resolve to Need Location before the first entry is composed."
-              "Business-state changes should appear as their own AEM columns rather than being collapsed into the neighboring screen columns." ]
+              "Multiple views may consume the same prior event once that event is already present in the store." ]
           Columns =
-            [ column
-                  "01-app-started"
-                  "AppStarted"
-                  (Some "The user launches the app and the first splash-state surface becomes visible.")
-                  [ "The splash screen becomes visible as the first surface."
-                    "The AppStarted checkpoint becomes active."
-                    "No runtime or route checkpoints are complete yet." ]
+            [ commandColumn
+                  "01-launch-app"
+                  "LaunchApp"
+                  (Some "The user intentionally starts the app from outside the runtime.")
                   ContextGroupKind.AppRuntime
                   NmContextKind.ApplicationLifecycle
                   [ NmLensKind.Lifecycle ]
-                  (Some "System")
+                  (Some "User")
+                  NmAttachmentKind.Trigger
+                  NmTriggerSurface
+                  "App Launch Trigger"
+                  launchAppCommand
+                  appStartedEvent
+                  launchAppGwt
+              viewColumn
+                  "02-splash-visible"
+                  "SplashVisible"
+                  (Some "The first readable app shell appears after the launch event enters the store.")
+                  ContextGroupKind.AppRuntime
+                  NmContextKind.ApplicationLifecycle
+                  [ NmLensKind.Lifecycle ]
+                  None
+                  NmAttachmentKind.Screen
                   (NmBootSurface(bootSurface "01-app-started"))
                   "Splash Screen"
-              column
-                  "02-runtime-checks"
-                  "Runtime Checks"
-                  (Some "Startup/runtime checks begin while the splash surface remains visible.")
-                  [ "The splash message changes to startup checking."
-                    "AppStarted becomes complete."
-                    "Runtime checks becomes the active checkpoint." ]
+                  splashVisibleView
+                  splashVisibleGwt
+              commandColumn
+                  "03-run-startup-checks"
+                  "RunStartupChecks"
+                  (Some "The runtime begins its startup coordination work once the app has started.")
                   ContextGroupKind.AppRuntime
                   NmContextKind.RuntimeOrchestration
                   [ NmLensKind.Runtime ]
                   (Some "System")
+                  NmAttachmentKind.Runtime
+                  NmRuntimeSurface
+                  "Startup Runtime"
+                  runStartupChecksCommand
+                  runtimeChecksStartedEvent
+                  runStartupChecksGwt
+              viewColumn
+                  "04-runtime-checks-view"
+                  "RuntimeChecksVisible"
+                  (Some "The splash surface now reads as an active runtime-checks view.")
+                  ContextGroupKind.AppRuntime
+                  NmContextKind.RuntimeOrchestration
+                  [ NmLensKind.Runtime ]
+                  None
+                  NmAttachmentKind.Screen
                   (NmBootSurface(bootSurface "02-runtime-checks"))
                   "Splash Screen"
-              column
-                  "03-no-local-session"
-                  "No Local Session"
-                  (Some "Fresh-first-launch assumptions are confirmed from local/runtime inspection.")
-                  [ "Runtime checks become complete."
-                    "No known local session becomes the active checkpoint."
-                    "The splash message confirms there is no saved location, active session, or pending draft." ]
+                  runtimeChecksVisibleView
+                  runtimeChecksVisibleGwt
+              commandColumn
+                  "05-inspect-local-session"
+                  "InspectLocalSession"
+                  (Some "The system inspects local storage and runtime state for any known session or draft.")
                   ContextGroupKind.AppRuntime
                   NmContextKind.RuntimeOrchestration
                   [ NmLensKind.Runtime ]
                   (Some "System")
+                  NmAttachmentKind.Runtime
+                  NmRuntimeSurface
+                  "Local Session Runtime"
+                  inspectLocalSessionCommand
+                  noLocalSessionDetectedEvent
+                  inspectLocalSessionGwt
+              viewColumn
+                  "06-no-local-session-view"
+                  "NoLocalSessionVisible"
+                  (Some "The runtime read now makes the empty local-session result explicit.")
+                  ContextGroupKind.AppRuntime
+                  NmContextKind.RuntimeOrchestration
+                  [ NmLensKind.Runtime ]
+                  None
+                  NmAttachmentKind.Screen
                   (NmBootSurface(bootSurface "03-no-local-session"))
                   "Splash Screen"
-              column
-                  "04-route-resolved"
-                  "Route Resolved"
-                  (Some "Runtime orchestration resolves Need Location as the first usable screen.")
-                  [ "All earlier startup checkpoints are complete."
-                    "Route to Need Location becomes the active checkpoint."
-                    "The splash message changes from checking to entering the app." ]
+                  noLocalSessionVisibleView
+                  noLocalSessionVisibleGwt
+              commandColumn
+                  "07-resolve-initial-route"
+                  "ResolveInitialRoute"
+                  (Some "The runtime decides which first usable route should follow the startup checks.")
                   ContextGroupKind.AppRuntime
                   NmContextKind.RuntimeOrchestration
                   [ NmLensKind.Runtime ]
                   (Some "System")
-                  (NmBootSurface(bootSurface "04-route-resolved"))
-                  "Splash Screen"
-              column
-                  "05-need-location"
-                  "Need Location"
-                  (Some "Fresh start with no known location yet.")
-                  [ "The first usable screen replaces the splash surface."
-                    "The location field is empty."
-                    "Set Location remains disabled until a location is entered." ]
+                  NmAttachmentKind.Runtime
+                  NmRuntimeSurface
+                  "Route Resolution Runtime"
+                  resolveInitialRouteCommand
+                  initialRouteResolvedEvent
+                  resolveInitialRouteGwt
+              viewColumn
+                  "08-need-location"
+                  "NeedLocation"
+                  (Some "The first usable user-facing screen appears because the route now resolves to location capture.")
                   ContextGroupKind.Interaction
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
+                  NmAttachmentKind.Screen
                   (NmAppScreenSurface(appScreenSurface "05-need-location"))
                   "Set Location Screen"
-              column
-                  "06-ready-to-set-location"
-                  "Ready To Set Location"
-                  (Some "The user has entered location text and the confirm action is now available.")
-                  [ "The location input now contains the chosen text."
-                    "Set Location becomes enabled."
-                    "The rest of the expense form is still not visible yet." ]
+                  needLocationView
+                  needLocationGwt
+              commandColumn
+                  "09-enter-location-text"
+                  "EnterLocationText"
+                  (Some "The person types a location into the first screen, turning draft text into an explicit modeled command.")
                   ContextGroupKind.Interaction
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
+                  NmAttachmentKind.Screen
                   (NmAppScreenSurface(appScreenSurface "06-ready-to-set-location"))
                   "Set Location Screen"
-              column
-                  "07-capture-laundry-location"
-                  "CaptureLaundryLocation"
-                  (Some "The business command for location capture becomes explicit in the NM flow.")
-                  [ "The entered location draft is now expressed as a command."
-                    "The user action is represented in business terms, not only as screen state."
-                    "A successful command is expected to produce LaundryLocationCaptured." ]
-                  ContextGroupKind.Business
-                  NmContextKind.EventModeling
-                  [ NmLensKind.Aem ]
-                  (Some "User")
-                  (NmAemSliceSurface(Some(appScreenSurface "06-ready-to-set-location"), aemSliceCard 0))
-                  "Set Location Screen"
-              column
-                  "08-current-laundry-session-location"
-                  "CurrentLaundrySession"
-                  (Some "The first business projection after location capture is now explicit.")
-                  [ "The current session view now carries the active location."
-                    "No visible laundry entries exist yet."
-                    "The app can enter the ready-to-log entry form with the business view now established." ]
-                  ContextGroupKind.Business
-                  NmContextKind.EventModeling
-                  [ NmLensKind.Aem ]
-                  None
-                  (NmAemSliceSurface(Some(appScreenSurface "07-entry-form-ready"), aemSliceCard 1))
-                  "Laundry Entry Screen"
-              column
-                  "09-entry-form-ready"
-                  "Entry Form Ready"
-                  (Some "The app enters the main entry surface after the location is captured.")
-                  [ "The main entry screen replaces the location-only screen."
-                    "Machine, quantity, price, and payment controls become visible."
-                    "Log Expense is still blocked until the required entry choices are complete." ]
+                  enterLocationTextCommand
+                  locationTextEnteredEvent
+                  enterLocationTextGwt
+              viewColumn
+                  "10-ready-to-set-location"
+                  "ReadyToSetLocation"
+                  (Some "The screen is now interpreted as ready for the capture-location confirmation action.")
                   ContextGroupKind.Interaction
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "06-ready-to-set-location"))
+                  "Set Location Screen"
+                  readyToSetLocationView
+                  readyToSetLocationGwt
+              commandColumn
+                  "11-capture-laundry-location"
+                  "CaptureLaundryLocation"
+                  (Some "The business command for location capture is now made explicit on the NM path.")
+                  ContextGroupKind.Business
+                  NmContextKind.EventModeling
+                  [ NmLensKind.Aem ]
+                  (Some "User")
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "06-ready-to-set-location"))
+                  "Set Location Screen"
+                  captureLocationCommandSlice.Command
+                  captureLocationCommandSlice.Event
+                  (captureLocationCommandSlice.Gwt |> Option.defaultWith (fun () -> failwith "Expected COMMAND GWT for CaptureLaundryLocation."))
+              viewColumn
+                  "12-current-laundry-session-location"
+                  "CurrentLaundrySession"
+                  (Some "The first business read after location capture now projects the active session location.")
+                  ContextGroupKind.Business
+                  NmContextKind.EventModeling
+                  [ NmLensKind.Aem ]
+                  None
+                  NmAttachmentKind.Screen
                   (NmAppScreenSurface(appScreenSurface "07-entry-form-ready"))
                   "Laundry Entry Screen"
-              column
-                  "10-washer-draft"
-                  "Washer Draft"
-                  (Some "The first expense draft is composed on the main screen.")
-                  [ "Washer becomes the selected machine."
-                    "Card payment details are expanded."
-                    "The draft is complete enough for Log Expense to become available." ]
+                  currentSessionLocationViewSlice.View
+                  (currentSessionLocationViewSlice.Gwt |> Option.defaultWith (fun () -> failwith "Expected VIEW GWT for CurrentLaundrySession location view."))
+              viewColumn
+                  "13-entry-form-ready"
+                  "EntryFormReady"
+                  (Some "The interaction read now shows the first expense-entry screen unlocked by the captured location.")
                   ContextGroupKind.Interaction
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "07-entry-form-ready"))
+                  "Laundry Entry Screen"
+                  entryFormReadyView
+                  entryFormReadyGwt
+              commandColumn
+                  "14-select-washer"
+                  "SelectWasher"
+                  (Some "The person chooses Washer on the entry screen, turning a UI choice into an explicit modeled command.")
+                  ContextGroupKind.Interaction
+                  NmContextKind.ScreenPath
+                  [ NmLensKind.Screen ]
+                  (Some "User")
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "07-entry-form-ready"))
+                  "Laundry Entry Screen"
+                  selectWasherCommand
+                  washerSelectedEvent
+                  selectWasherGwt
+              viewColumn
+                  "15-washer-draft"
+                  "WasherDraft"
+                  (Some "The entry screen is now interpreted as a complete washer draft ready for logging.")
+                  ContextGroupKind.Interaction
+                  NmContextKind.ScreenPath
+                  [ NmLensKind.Screen ]
+                  (Some "User")
+                  NmAttachmentKind.Screen
                   (NmAppScreenSurface(appScreenSurface "08-washer-draft"))
                   "Laundry Entry Screen"
-              column
-                  "11-log-laundry-expense"
+                  washerDraftView
+                  washerDraftGwt
+              commandColumn
+                  "16-log-laundry-expense"
                   "LogLaundryExpense"
-                  (Some "The first washer expense draft is now explicit as a business command.")
-                  [ "The selected machine, quantity, price, and payment are now represented as command data."
-                    "The washer draft is pressure-tested from a business-event perspective."
-                    "A successful command is expected to produce LaundryExpenseLogged." ]
+                  (Some "The washer draft becomes an explicit business command that can produce the stored expense event.")
                   ContextGroupKind.Business
                   NmContextKind.EventModeling
                   [ NmLensKind.Aem ]
                   (Some "User")
-                  (NmAemSliceSurface(Some(appScreenSurface "08-washer-draft"), aemSliceCard 2))
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "08-washer-draft"))
                   "Laundry Entry Screen"
-              column
-                  "12-current-laundry-session-washer"
+                  logLaundryExpenseCommandSlice.Command
+                  logLaundryExpenseCommandSlice.Event
+                  (logLaundryExpenseCommandSlice.Gwt |> Option.defaultWith (fun () -> failwith "Expected COMMAND GWT for LogLaundryExpense."))
+              viewColumn
+                  "17-current-laundry-session-washer"
                   "CurrentLaundrySession"
-                  (Some "The business projection now shows the first logged washer entry.")
-                  [ "The current session view now includes the first visible washer entry."
-                    "The running total changes to reflect the first expense."
-                    "The app is now ready for the next quick entry." ]
+                  (Some "The business read now shows the first logged washer entry in the session projection.")
                   ContextGroupKind.Business
                   NmContextKind.EventModeling
                   [ NmLensKind.Aem ]
                   None
-                  (NmAemSliceSurface(Some(appScreenSurface "09-logged-success"), aemSliceCard 3))
+                  NmAttachmentKind.Screen
+                  (NmAppScreenSurface(appScreenSurface "09-logged-success"))
                   "Laundry Entry Screen"
-              column
-                  "13-logged-success"
-                  "Logged Success"
-                  (Some "The first entry is logged and the surface is ready for the next quick entry.")
-                  [ "A logged-success confirmation appears."
-                    "Session total updates to the new amount."
-                    "Today's entries now shows logged items for continued quick entry." ]
+                  currentSessionWasherViewSlice.View
+                  (currentSessionWasherViewSlice.Gwt |> Option.defaultWith (fun () -> failwith "Expected VIEW GWT for CurrentLaundrySession washer view."))
+              viewColumn
+                  "18-logged-success"
+                  "LoggedSuccess"
+                  (Some "The interaction read now shows the post-log success state ready for the next quick entry.")
                   ContextGroupKind.Interaction
                   NmContextKind.ScreenPath
                   [ NmLensKind.Screen ]
                   (Some "User")
+                  NmAttachmentKind.Screen
                   (NmAppScreenSurface(appScreenSurface "09-logged-success"))
-                  "Laundry Entry Screen" ] }
+                  "Laundry Entry Screen"
+                  loggedSuccessView
+                  loggedSuccessGwt ] }
 
 /// Renders deterministic HTML/CSS NM path documents from the current LaundryLog surfaces.
 [<RequireQualifiedAccess>]
@@ -450,54 +875,50 @@ module NmPathHtmlRenderer =
         |> List.map NmLensKind.domKey
         |> String.concat ","
 
-    let private columnKindLabel =
-        function
-        | { Surface = NmBootSurface _ } -> "BOOT"
-        | { Surface = NmAppScreenSurface _ } -> "SCREEN"
-        | { Surface = NmAemSliceSurface (_, PathSliceCard.CommandSlice _) } -> "COMMAND"
-        | { Surface = NmAemSliceSurface (_, PathSliceCard.ViewSlice _) } -> "VIEW"
+    let private columnKindLabel (columnState: NmColumnState) =
+        NmSliceType.label columnState.SliceType
 
-    let private columnKindDomKey =
-        function
-        | { Surface = NmBootSurface _ } -> "boot"
-        | { Surface = NmAppScreenSurface _ } -> "screen"
-        | { Surface = NmAemSliceSurface (_, PathSliceCard.CommandSlice _) } -> "command"
-        | { Surface = NmAemSliceSurface (_, PathSliceCard.ViewSlice _) } -> "view"
+    let private columnKindDomKey (columnState: NmColumnState) =
+        NmSliceType.domKey columnState.SliceType
 
-    let private nonAemDetailKindLabel =
-        function
-        | { PrimaryContext = NmContextKind.ApplicationLifecycle } -> "TRANSITION"
-        | { PrimaryContext = NmContextKind.RuntimeOrchestration } -> "ORCHESTRATION"
-        | { PrimaryContext = NmContextKind.ScreenPath } -> "INTERACTION"
-        | { PrimaryContext = NmContextKind.EventModeling } -> "STATE"
+    let private attachmentKindLabel (columnState: NmColumnState) =
+        NmAttachmentKind.label columnState.AttachmentKind
 
-    let private screenBoxTitle (columnState: NmColumnState) = columnState.HumanSurfaceTitle
+    let private attachmentBoxTitle (columnState: NmColumnState) = columnState.HumanSurfaceTitle
 
-    let private screenBoxNote =
+    let private attachmentBoxNote =
         function
-        | { PrimaryContext = NmContextKind.ApplicationLifecycle } ->
-            "The visible boot surface linked to this lifecycle step."
-        | { PrimaryContext = NmContextKind.RuntimeOrchestration } ->
-            "The visible boot surface linked to this runtime orchestration step."
-        | { PrimaryContext = NmContextKind.ScreenPath } ->
-            "The user-visible screen surface linked to this path step."
-        | { PrimaryContext = NmContextKind.EventModeling } ->
-            "The linked app surface that frames this Event Modeling slice."
+        | { AttachmentKind = NmAttachmentKind.Trigger } ->
+            "The launch-side attachment that starts this command slice."
+        | { AttachmentKind = NmAttachmentKind.Runtime } ->
+            "The runtime/process attachment that frames this command slice."
+        | { AttachmentKind = NmAttachmentKind.Screen
+            PrimaryContext = NmContextKind.ApplicationLifecycle } ->
+            "The visible boot surface linked to this lifecycle read."
+        | { AttachmentKind = NmAttachmentKind.Screen
+            PrimaryContext = NmContextKind.RuntimeOrchestration } ->
+            "The visible boot surface linked to this runtime read."
+        | { AttachmentKind = NmAttachmentKind.Screen
+            PrimaryContext = NmContextKind.ScreenPath } ->
+            "The user-visible screen surface linked to this slice."
+        | { AttachmentKind = NmAttachmentKind.Screen
+            PrimaryContext = NmContextKind.EventModeling } ->
+            "The linked app surface that frames this business slice."
 
     let private groupMeaning =
         function
         | ContextGroupKind.AppRuntime -> "App Runtime covers startup, lifecycle, route choice, and other app/system mechanics."
         | ContextGroupKind.Interaction -> "Interaction covers user-visible screens and UI progression through the path."
-        | ContextGroupKind.Business -> "Business covers commands, events, and views that express the business truth."
+        | ContextGroupKind.Business -> "Business covers commands, events, and views where the business truth becomes explicit."
 
     let private groupWhyThisColumn (columnState: NmColumnState) =
         match columnState.ContextGroup with
         | ContextGroupKind.AppRuntime ->
-            $"This column is in App Runtime because {columnState.ColumnTitle} is driven by app/system startup or route mechanics."
+            $"This column is in App Runtime because {columnState.ColumnTitle} belongs to startup, lifecycle, or runtime coordination."
         | ContextGroupKind.Interaction ->
-            $"This column is in Interaction because {columnState.ColumnTitle} is represented as a user-visible screen or interaction step."
+            $"This column is in Interaction because {columnState.ColumnTitle} is represented as a user-visible screen or user-facing command or view."
         | ContextGroupKind.Business ->
-            $"This column is in Business because {columnState.ColumnTitle} is expressed in Event Modeling terms rather than only as UI state."
+            $"This column is in Business because {columnState.ColumnTitle} is expressed through Event Modeling command, event, and view terms."
 
     let private contextMeaning =
         function
@@ -513,13 +934,13 @@ module NmPathHtmlRenderer =
     let private contextWhyThisColumn (columnState: NmColumnState) =
         match columnState.PrimaryContext with
         | NmContextKind.ApplicationLifecycle ->
-            $"This column is in ApplicationLifecycle because {columnState.ColumnTitle} marks an app lifecycle phase becoming visible."
+            $"This column is in ApplicationLifecycle because {columnState.ColumnTitle} belongs to the app's launch/lifecycle story."
         | NmContextKind.RuntimeOrchestration ->
-            $"This column is in RuntimeOrchestration because {columnState.ColumnTitle} coordinates checks, route choice, or state handoff."
+            $"This column is in RuntimeOrchestration because {columnState.ColumnTitle} coordinates checks, route choice, or runtime handoff."
         | NmContextKind.ScreenPath ->
-            $"This column is in ScreenPath because {columnState.ColumnTitle} is a user-visible screen or interaction state."
+            $"This column is in ScreenPath because {columnState.ColumnTitle} is a user-visible command or read over the screen path."
         | NmContextKind.EventModeling ->
-            $"This column is in EventModeling because {columnState.ColumnTitle} is represented as a business command or business view."
+            $"This column is in EventModeling because {columnState.ColumnTitle} is represented through Event Modeling command/event/view terms."
 
     let private lensMeaning =
         function
@@ -553,44 +974,46 @@ module NmPathHtmlRenderer =
 
     let private columnClassificationMeaning =
         function
-        | "BOOT" -> "Column Classification · BOOT means this whole NM column is fundamentally about startup or runtime boot behavior."
-        | "SCREEN" -> "Column Classification · SCREEN means this whole NM column is fundamentally about a user-visible screen state in the path."
-        | "COMMAND" -> "Column Classification · COMMAND means this whole NM column is fundamentally about a business command becoming explicit in the model."
-        | "VIEW" -> "Column Classification · VIEW means this whole NM column is fundamentally about a business projection or state view becoming explicit in the model."
+        | "COMMAND" -> "Column Classification · COMMAND means this whole NM column is a change slice. COMMAND slices can begin from a TRIGGER, RUNTIME, or SCREEN attachment and culminate in an EVENT."
+        | "VIEW" -> "Column Classification · VIEW means this whole NM column is a read or interpretation slice. VIEW slices consume prior events through VIEW GWT rather than through a main visible EVENT block."
         | label -> $"Column Classification · {label} marks the whole-column classification for this NM slice."
 
     let private columnClassificationWhyThisColumn (columnState: NmColumnState) =
         function
-        | "BOOT" -> $"This column is classified as BOOT because {columnState.ColumnTitle} is part of the app startup story."
-        | "SCREEN" -> $"This column is classified as SCREEN because {columnState.ColumnTitle} is primarily a user-visible path state."
-        | "COMMAND" -> $"This column is classified as COMMAND because {columnState.ColumnTitle} is represented as a business command in the NM flow."
-        | "VIEW" -> $"This column is classified as VIEW because {columnState.ColumnTitle} is represented as a business projection in the NM flow."
+        | "COMMAND" -> $"This column is classified as COMMAND because {columnState.ColumnTitle} models a change that culminates in an event."
+        | "VIEW" -> $"This column is classified as VIEW because {columnState.ColumnTitle} models a read or interpretation over prior events."
         | label -> $"This column uses {label} as its whole-column classification."
+
+    let private attachmentClassificationMeaning =
+        function
+        | "TRIGGER" -> "Attachment Classification · TRIGGER marks the launch-side attachment that initiates a command slice from outside the runtime."
+        | "RUNTIME" -> "Attachment Classification · RUNTIME marks the runtime/process attachment that frames a system-driven slice."
+        | "SCREEN" -> "Attachment Classification · SCREEN marks the linked app surface that frames or lands a slice."
+        | label -> $"Attachment Classification · {label} marks the attachment kind carried by this slice."
+
+    let private attachmentClassificationWhyThisColumn (columnState: NmColumnState) =
+        function
+        | "TRIGGER" -> $"This attachment is TRIGGER because {columnState.ColumnTitle} starts from an external launch action."
+        | "RUNTIME" -> $"This attachment is RUNTIME because {columnState.ColumnTitle} is framed by app/runtime orchestration rather than by a visible screen."
+        | "SCREEN" -> $"This attachment is SCREEN because {columnState.ColumnTitle} is grounded in a linked app surface."
+        | label -> $"This slice uses {label} as its attachment classification."
 
     let private compartmentClassificationMeaning =
         function
-        | "SCREEN" -> "Compartment Classification · SCREEN marks the linked app surface that frames or illustrates this slice."
-        | "TRANSITION" -> "Compartment Classification · TRANSITION marks the lifecycle change being explained inside this slice."
-        | "ORCHESTRATION" -> "Compartment Classification · ORCHESTRATION marks the runtime coordination or route-resolution logic inside this slice."
-        | "INTERACTION" -> "Compartment Classification · INTERACTION marks the user-visible screen-state change being explained inside this slice."
-        | "COMMAND" -> "Compartment Classification · COMMAND marks the business command block inside this slice."
-        | "VIEW" -> "Compartment Classification · VIEW marks the business projection block inside this slice."
-        | "EVENT" -> "Compartment Classification · EVENT marks the resulting business event block inside this slice."
-        | "command gwt" -> "Compartment Classification · command gwt marks the Given/When/Then rules that govern a business command."
-        | "view gwt" -> "Compartment Classification · view gwt marks the Given/When/Then rules that explain a business projection."
+        | "COMMAND" -> "Compartment Classification · COMMAND marks the modeled change or intent block inside this slice."
+        | "EVENT" -> "Compartment Classification · EVENT marks the backbone event block produced by the modeled change."
+        | "VIEW" -> "Compartment Classification · VIEW marks the modeled read or interpretation block inside this slice."
+        | "COMMAND GWT" -> "Compartment Classification · COMMAND GWT marks the Given/When/Then rule band that governs a command slice."
+        | "VIEW GWT" -> "Compartment Classification · VIEW GWT marks the Given/When/Then rule band that explains a view slice."
         | label -> $"Compartment Classification · {label} marks the kind of compartment shown inside this slice."
 
     let private compartmentClassificationWhyThisColumn (columnState: NmColumnState) =
         function
-        | "SCREEN" -> $"This compartment is SCREEN because it shows the linked app surface for {columnState.ColumnTitle}."
-        | "TRANSITION" -> $"This compartment is TRANSITION because {columnState.ColumnTitle} is being explained as a lifecycle change."
-        | "ORCHESTRATION" -> $"This compartment is ORCHESTRATION because {columnState.ColumnTitle} is being explained as runtime coordination."
-        | "INTERACTION" -> $"This compartment is INTERACTION because {columnState.ColumnTitle} is being explained as a user-visible screen or interaction state."
-        | "COMMAND" -> $"This compartment is COMMAND because {columnState.ColumnTitle} is represented through a business command block."
-        | "VIEW" -> $"This compartment is VIEW because {columnState.ColumnTitle} is represented through a business projection block."
-        | "EVENT" -> $"This compartment is EVENT because {columnState.ColumnTitle} includes the business event that results from the modeled action."
-        | "command gwt" -> $"This compartment is command gwt because {columnState.ColumnTitle} includes the scenario rules that lead into a command."
-        | "view gwt" -> $"This compartment is view gwt because {columnState.ColumnTitle} includes the scenario rules that explain a view projection."
+        | "COMMAND" -> $"This compartment is COMMAND because {columnState.ColumnTitle} models a change or intent."
+        | "EVENT" -> $"This compartment is EVENT because {columnState.ColumnTitle} includes the event backbone produced by that change."
+        | "VIEW" -> $"This compartment is VIEW because {columnState.ColumnTitle} models a read or interpretation over prior events."
+        | "COMMAND GWT" -> $"This compartment is COMMAND GWT because {columnState.ColumnTitle} includes the scenario rules that lead into a command."
+        | "VIEW GWT" -> $"This compartment is VIEW GWT because {columnState.ColumnTitle} includes the scenario rules that explain which prior events justify the view."
         | label -> $"This compartment uses {label} as its local classification."
 
     let private selectedChoiceLabels (optionGroup: OptionGroupState) =
@@ -713,30 +1136,35 @@ module NmPathHtmlRenderer =
         | NmBootSurface bootState -> renderBootThumbnail builder bootState
         | NmAppScreenSurface (NewSessionScreen (_, _, screenState)) -> renderNewSessionThumbnail builder screenState
         | NmAppScreenSurface (EntryFormScreen (_, _, screenState)) -> renderEntryFormThumbnail builder screenState
-        | NmAemSliceSurface (Some(NewSessionScreen (_, _, screenState)), _) -> renderNewSessionThumbnail builder screenState
-        | NmAemSliceSurface (Some(EntryFormScreen (_, _, screenState)), _) -> renderEntryFormThumbnail builder screenState
-        | NmAemSliceSurface (None, _) ->
+        | NmTriggerSurface
+        | NmRuntimeSurface ->
             appendLine builder "<div class=\"nm-thumbnail nm-thumbnail--empty\" data-testid=\"nm-surface-thumbnail\"><div class=\"nm-thumbnail__empty\">No screen linked</div></div>"
 
     let private renderSurfaceFragment =
         function
         | NmBootSurface bootState -> renderBootSurfaceHtml bootState
         | NmAppScreenSurface screenSurface -> ScreenHtmlRenderer.renderSurfaceHtml screenSurface
-        | NmAemSliceSurface (Some topSurface, _) -> ScreenHtmlRenderer.renderSurfaceHtml topSurface
-        | NmAemSliceSurface (None, _) -> "<div class=\"nm-column__surface-empty\">No screen surface linked.</div>"
+        | NmTriggerSurface
+        | NmRuntimeSurface -> "<div class=\"nm-column__surface-empty\">No screen surface linked.</div>"
 
     let private surfaceNativeSize =
         function
         | NmBootSurface _ -> 360, 667
         | NmAppScreenSurface (NewSessionScreen _) -> 360, 667
         | NmAppScreenSurface (EntryFormScreen _) -> 360, 980
-        | NmAemSliceSurface (Some(NewSessionScreen _), _) -> 360, 667
-        | NmAemSliceSurface (Some(EntryFormScreen _), _) -> 360, 980
-        | NmAemSliceSurface (None, _) -> 360, 667
+        | NmTriggerSurface
+        | NmRuntimeSurface -> 360, 667
 
     let private surfaceSizingStyle surfaceState =
         let nativeWidth, nativeHeight = surfaceNativeSize surfaceState
         $" style=\"--nm-surface-native-width: {nativeWidth}px; --nm-surface-native-height: {nativeHeight}px;\""
+
+    let private hasRenderableSurface =
+        function
+        | NmBootSurface _
+        | NmAppScreenSurface _ -> true
+        | NmTriggerSurface
+        | NmRuntimeSurface -> false
 
     let private renderHelpPopover
         (builder: StringBuilder)
@@ -900,55 +1328,6 @@ module NmPathHtmlRenderer =
         |> List.map slotRowDefinition
         |> String.concat " "
 
-    let private renderStructuredDetailBox
-        (builder: StringBuilder)
-        (columnState: NmColumnState)
-        detailKind
-        detailKindDomKey
-        titleText
-        bodyText
-        detailLines
-        technicalLabel
-        dataTestId
-        =
-        appendLine
-            builder
-            $"<section class=\"nm-column__detail-box nm-column__detail-box--{htmlEncode detailKindDomKey}\" data-testid=\"{htmlEncode dataTestId}\" data-detail-kind=\"{htmlEncode detailKindDomKey}\">"
-        appendLine builder "<div class=\"nm-column__detail-topline\">"
-        renderKindPopover
-            builder
-            columnState
-            $"detail-kind-{detailKindDomKey}"
-            detailKind
-            "nm-column__detail-kind"
-            "nm-column-detail-kind"
-            "nm-column-detail-kind-popover"
-            "Compartment Classification"
-            (compartmentClassificationMeaning detailKind)
-            (compartmentClassificationWhyThisColumn columnState detailKind)
-        appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode titleText}</h3>"
-        appendLine builder "</div>"
-        appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
-
-        match bodyText with
-        | Some noteText -> appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode noteText}</p>"
-        | None -> ()
-
-        match technicalLabel with
-        | Some surfaceLabel -> appendLine builder $"<div class=\"nm-column__technical\" data-testid=\"nm-column-technical\">Surface · {htmlEncode surfaceLabel}</div>"
-        | None -> ()
-
-        if not (List.isEmpty detailLines) then
-            appendLine builder "<ul class=\"nm-column__detail-list\">"
-
-            detailLines
-            |> List.iter (fun lineText -> appendLine builder $"<li>{htmlEncode lineText}</li>")
-
-            appendLine builder "</ul>"
-
-        appendLine builder "</div>"
-        appendLine builder "</section>"
-
     let private renderColumnSurfacePreview (builder: StringBuilder) (columnState: NmColumnState) =
         let surfaceSizing = surfaceSizingStyle columnState.Surface
 
@@ -971,12 +1350,26 @@ module NmPathHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "</div>"
 
-    let private renderScreenDetailBox (builder: StringBuilder) (columnState: NmColumnState) =
+    let private renderAttachmentSchematic (builder: StringBuilder) (columnState: NmColumnState) =
+        let schematicCopy =
+            match columnState.AttachmentKind with
+            | NmAttachmentKind.Trigger -> "External launch intent enters the app."
+            | NmAttachmentKind.Runtime -> "System/runtime work frames the next modeled change."
+            | NmAttachmentKind.Screen -> "Linked app surface."
+
         appendLine
             builder
-            "<section class=\"nm-column__detail-box nm-column__detail-box--screen\" data-testid=\"nm-column-screen-box\" data-detail-kind=\"screen\">"
+            $"<div class=\"nm-column__attachment-schematic nm-column__attachment-schematic--{htmlEncode (NmAttachmentKind.domKey columnState.AttachmentKind)}\" data-testid=\"nm-attachment-schematic\">"
+        appendLine builder $"<div class=\"nm-column__attachment-schematic-pill\">{htmlEncode (attachmentKindLabel columnState)}</div>"
+        appendLine builder $"<div class=\"nm-column__attachment-schematic-copy\">{htmlEncode schematicCopy}</div>"
+        appendLine builder "</div>"
+
+    let private renderAttachmentDetailBox (builder: StringBuilder) (columnState: NmColumnState) =
+        appendLine
+            builder
+            $"<section class=\"nm-column__detail-box nm-column__detail-box--attachment nm-column__detail-box--attachment-{htmlEncode (NmAttachmentKind.domKey columnState.AttachmentKind)}\" data-testid=\"nm-column-attachment-box\" data-detail-kind=\"{htmlEncode (NmAttachmentKind.domKey columnState.AttachmentKind)}\">"
         appendLine builder "<div class=\"nm-column__detail-topline\">"
-        appendLine builder "<div class=\"nm-column__detail-label-row\" data-testid=\"nm-column-screen-label-row\">"
+        appendLine builder "<div class=\"nm-column__detail-label-row\" data-testid=\"nm-column-attachment-label-row\">"
 
         match columnState.ActorRoleBadge with
         | Some roleText ->
@@ -993,32 +1386,30 @@ module NmPathHtmlRenderer =
         renderKindPopover
             builder
             columnState
-            "detail-kind-screen"
-            "SCREEN"
+            "attachment-kind"
+            (attachmentKindLabel columnState)
             "nm-column__detail-kind"
             "nm-column-detail-kind"
             "nm-column-detail-kind-popover"
-            "Compartment Classification"
-            (compartmentClassificationMeaning "SCREEN")
-            (compartmentClassificationWhyThisColumn columnState "SCREEN")
-        appendLine builder "</div>"
-        appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode (screenBoxTitle columnState)}</h3>"
-        appendLine builder "</div>"
-        appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
-        appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (screenBoxNote columnState)}</p>"
+            "Attachment Classification"
+            (attachmentClassificationMeaning (attachmentKindLabel columnState))
+            (attachmentClassificationWhyThisColumn columnState (attachmentKindLabel columnState))
 
-        if columnState.PrimaryContext = NmContextKind.EventModeling then
-            appendLine builder "<div class=\"nm-column__screen-meta\" data-testid=\"nm-column-screen-meta\">"
+        if columnState.AttachmentKind = NmAttachmentKind.Screen then
             renderBadgePopover
                 builder
                 columnState.ColumnKey
                 "screen-lens"
                 "ui lens"
-                "ui lens marks the linked app surface that frames the business slice."
-                $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
+                "ui lens marks the linked app surface that frames the slice endpoint or the command attachment."
+                $"This attachment uses ui lens because {columnState.ColumnTitle} is being grounded in a linked app surface."
                 "nm-column__badge--surface-lens"
 
-            appendLine builder "</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode (attachmentBoxTitle columnState)}</h3>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
+        appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (attachmentBoxNote columnState)}</p>"
 
         match columnState.TechnicalSurfaceLabel with
         | Some surfaceLabel ->
@@ -1028,83 +1419,42 @@ module NmPathHtmlRenderer =
         | None -> ()
 
         appendLine builder "</div>"
-        renderColumnSurfacePreview builder columnState
+
+        if hasRenderableSurface columnState.Surface then
+            renderColumnSurfacePreview builder columnState
+        else
+            renderAttachmentSchematic builder columnState
+
         appendLine builder "</section>"
 
-    let private renderNonAemSlots (builder: StringBuilder) (columnState: NmColumnState) =
-        renderColumnSlot builder "screen" "" (fun () -> renderScreenDetailBox builder columnState)
+    let private embeddedSliceOptions = SliceRenderOptions.classicEventModel "NM Embedded Slice"
 
-        renderColumnSlot builder "primary" "" (fun () ->
-            renderStructuredDetailBox
-                builder
-                columnState
-                (nonAemDetailKindLabel columnState)
-                (nonAemDetailKindLabel columnState |> domSlug)
-                columnState.ColumnTitle
-                columnState.ColumnNote
-                columnState.ChangeItems
-                None
-                "nm-column-changes")
+    let private renderBodySlots (builder: StringBuilder) (columnState: NmColumnState) =
+        renderColumnSlot builder "screen" "" (fun () -> renderAttachmentDetailBox builder columnState)
 
-    let private renderEmbeddedAemPrimary (builder: StringBuilder) (sliceCard: PathSliceCard) =
-        match sliceCard with
-        | PathSliceCard.CommandSlice commandSlice ->
-            appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") commandSlice.Command)
-        | PathSliceCard.ViewSlice viewSlice ->
-            appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") viewSlice.View)
+        match columnState.Body with
+        | CommandBody (commandBlock, eventBlock, gwtCardState) ->
+            renderColumnSlot builder "primary" "nm-column__slot--slice" (fun () ->
+                appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml embeddedSliceOptions commandBlock))
 
-    let private renderEmbeddedAemSecondary (builder: StringBuilder) (sliceCard: PathSliceCard) =
-        match sliceCard with
-        | PathSliceCard.CommandSlice commandSlice ->
-            appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") commandSlice.Event)
-        | PathSliceCard.ViewSlice _ -> ()
+            renderColumnSlot builder "secondary" "nm-column__slot--slice" (fun () ->
+                appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml embeddedSliceOptions eventBlock))
 
-    let private renderEmbeddedAemGwt (builder: StringBuilder) (sliceCard: PathSliceCard) =
-        match sliceCard with
-        | PathSliceCard.CommandSlice commandSlice ->
-            match commandSlice.Gwt with
-            | Some gwtCard -> appendLine builder (SliceHtmlRenderer.renderEmbeddedGwtHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") gwtCard)
-            | None -> ()
-        | PathSliceCard.ViewSlice viewSlice ->
-            match viewSlice.Gwt with
-            | Some gwtCard -> appendLine builder (SliceHtmlRenderer.renderEmbeddedGwtHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") gwtCard)
-            | None -> ()
+            renderColumnSlot builder "gwt" "nm-column__slot--slice" (fun () ->
+                appendLine builder (SliceHtmlRenderer.renderEmbeddedGwtHtml embeddedSliceOptions gwtCardState))
 
-    let private hasSecondaryAemSlot =
-        function
-        | PathSliceCard.CommandSlice _ -> true
-        | PathSliceCard.ViewSlice _ -> false
+        | ViewBody (viewBlock, gwtCardState) ->
+            renderColumnSlot builder "primary" "nm-column__slot--slice" (fun () ->
+                appendLine builder (SliceHtmlRenderer.renderEmbeddedBlockHtml embeddedSliceOptions viewBlock))
 
-    let private hasGwtAemSlot =
-        function
-        | PathSliceCard.CommandSlice commandSlice -> commandSlice.Gwt.IsSome
-        | PathSliceCard.ViewSlice viewSlice -> viewSlice.Gwt.IsSome
-
-    let private renderAemSlots (builder: StringBuilder) (columnState: NmColumnState) (sliceCard: PathSliceCard) =
-        renderColumnSlot builder "screen" "" (fun () -> renderScreenDetailBox builder columnState)
-        renderColumnSlot builder "primary" "nm-column__slot--aem" (fun () -> renderEmbeddedAemPrimary builder sliceCard)
-
-        if hasSecondaryAemSlot sliceCard then
-            renderColumnSlot builder "secondary" "nm-column__slot--aem" (fun () -> renderEmbeddedAemSecondary builder sliceCard)
-        elif hasGwtAemSlot sliceCard then
             renderEmptyColumnSlot builder "secondary"
 
-        if hasGwtAemSlot sliceCard then
-            renderColumnSlot builder "gwt" "nm-column__slot--aem" (fun () -> renderEmbeddedAemGwt builder sliceCard)
+            renderColumnSlot builder "gwt" "nm-column__slot--slice" (fun () ->
+                appendLine builder (SliceHtmlRenderer.renderEmbeddedGwtHtml embeddedSliceOptions gwtCardState))
 
-    let private renderedSlotKinds =
-        function
-        | { Surface = NmAemSliceSurface (_, sliceCard) } ->
-            if hasGwtAemSlot sliceCard then
-                [ "header"; "screen"; "primary"; "secondary"; "gwt" ]
-            elif hasSecondaryAemSlot sliceCard then
-                [ "header"; "screen"; "primary"; "secondary" ]
-            else
-                [ "header"; "screen"; "primary" ]
-        | _ -> [ "header"; "screen"; "primary" ]
+    let private renderedSlotKinds _ = [ "header"; "screen"; "primary"; "secondary"; "gwt" ]
 
     let private renderColumn (builder: StringBuilder) (index: int) (columnState: NmColumnState) =
-        let stepNumberText = (index + 1).ToString("00")
         let groupDomKey = ContextGroupKind.domKey columnState.ContextGroup
         let contextDomKey = NmContextKind.domKey columnState.PrimaryContext
         let kindDomKey = columnKindDomKey columnState
@@ -1116,7 +1466,7 @@ module NmPathHtmlRenderer =
         renderColumnSlot builder "header" "" (fun () ->
             appendLine builder "<div class=\"nm-column__header\">"
             renderClassificationRow builder columnState
-            appendLine builder $"<div class=\"nm-column__eyebrow\">Step {stepNumberText} · {htmlEncode columnState.ColumnKey}</div>"
+            appendLine builder $"<div class=\"nm-column__eyebrow\">Step {htmlEncode columnState.ColumnKey}</div>"
             appendLine builder $"<h2 class=\"nm-column__title\">{htmlEncode columnState.ColumnTitle}</h2>"
 
             match columnState.ColumnNote with
@@ -1125,9 +1475,7 @@ module NmPathHtmlRenderer =
 
             appendLine builder "</div>")
 
-        match columnState.Surface with
-        | NmAemSliceSurface (_, sliceCard) -> renderAemSlots builder columnState sliceCard
-        | _ -> renderNonAemSlots builder columnState
+        renderBodySlots builder columnState
 
         appendLine builder "</section>"
 

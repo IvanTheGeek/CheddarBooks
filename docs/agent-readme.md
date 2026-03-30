@@ -91,6 +91,8 @@ For concrete UI, HTML, CSS, and screen-renderer work:
 - inspect the currently generated artifact when one exists
 - for LaundryLog renderer work, keep the checked-in current artifact under [`../workspace/laundrylog/README.md`](../workspace/laundrylog/README.md) refreshed when the related renderer change is committed
 - treat `tmp/` as scratch and the repo workspace as the durable current artifact surface
+- treat the NM path artifact as the active LaundryLog path review surface
+- treat the older screen-path artifact as archived reference only unless the task is specifically about that legacy surface
 - when telling a human where to review current LaundryLog HTML, point them to the tracked `workspace/` artifact first, not `tmp/`, unless the task is specifically about scratch investigation
 - prefer correcting the real code and renderer contract over describing what the UI "should probably be"
 - add or update a regression test when a layout or rendering bug is fixed
@@ -104,6 +106,7 @@ For local F# Interactive artifact generation:
 - for the tracked LaundryLog workspace HTML, use [`../scripts/laundrylog/refresh-workspace-html.sh`](../scripts/laundrylog/refresh-workspace-html.sh) as the usual refresh path
 - for the full LaundryLog renderer/browser verification path, use [`../scripts/laundrylog/verify-workspace-html.sh`](../scripts/laundrylog/verify-workspace-html.sh) so refresh, Expecto, and Playwright run in serial
 - for formal browser verification of tracked LaundryLog HTML behavior, use the Playwright workspace under [`../tests/browser/README.md`](../tests/browser/README.md)
+- the active refresh/verify path is NM-first; do not assume the archived screen-path artifact is still regenerated or browser-tested
 - keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
 - when a long `Expecto` test block suddenly reports offside `let` / unmatched `[` compiler errors, inspect the most recent closing parentheses in the same test block before assuming the indentation is wrong
 - when an interpolated string trips `FS3373` because the expression contains a quoted literal or nested default like `Option.defaultValue "..."`, lift that expression into a nearby `let` binding first instead of forcing the quoted expression directly inside `$\"...\"`

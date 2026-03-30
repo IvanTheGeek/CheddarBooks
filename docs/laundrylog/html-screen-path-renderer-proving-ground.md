@@ -1,5 +1,11 @@
 # LaundryLog HTML Screen Path Renderer Proving Ground
 
+Archived status:
+
+- this page is now a frozen legacy artifact kept for reference
+- it is no longer the active renderer contract
+- it is no longer part of the active refresh or browser-test flow
+
 This note captures the first deterministic HTML/CSS screen-path renderer for LaundryLog.
 
 It is separate from the current Event Modeling path renderer on purpose.
@@ -11,13 +17,10 @@ The current checked-in screen-path artifact lives at:
 - [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 - [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js)
 
-Usual refresh helper:
+Current rule:
 
-- [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
-
-Formal browser harness:
-
-- [`../../tests/browser/README.md`](../../tests/browser/README.md)
+- do not treat this note as the active path-modeling direction
+- use [`html-nm-path-renderer-proving-ground.md`](html-nm-path-renderer-proving-ground.md) for the active path/modeling surface
 
 Scratch copies may still be regenerated under `tmp/`, but the workspace copy is the checked-in current path surface.
 

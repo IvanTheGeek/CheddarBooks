@@ -1,6 +1,6 @@
 # LaundryLog HTML NM Path Renderer Proving Ground
 
-This note tracks the first broader `NM` path surface beside the existing screen-path and AEM path pages.
+This note tracks the active broader `NM` path surface for LaundryLog.
 
 Primary tracked review artifact:
 
@@ -11,7 +11,22 @@ Current purpose:
 - broaden the AEM slice-shell idea into a first ATLAS/NM modeling surface
 - keep one ordered horizontal column per explicit state change
 - allow multiple bounded contexts to appear in one ordered path
-- keep the existing screen-path page as a fallback surface while the NM shape is explored
+- treat NM as the only active path/modeling surface
+
+Current slice law:
+
+- `COMMAND` slices model change
+- `VIEW` slices model read / interpretation
+- `EVENT` is the backbone element inside the model, not a whole-column slice type
+- `COMMAND` slices visibly carry:
+  - optional attachment
+  - `COMMAND`
+  - `EVENT`
+  - `COMMAND GWT`
+- `VIEW` slices visibly carry:
+  - optional attachment
+  - `VIEW`
+  - `VIEW GWT`
 
 Current `PATH1 NM` carries:
 
@@ -67,6 +82,7 @@ Formal browser proof:
 
 - [`../../tests/browser/specs/path1-nm-path.spec.ts`](../../tests/browser/specs/path1-nm-path.spec.ts)
 
-The NM page is intentionally additive right now.
+Legacy note:
 
-It should evolve without removing the existing screen-path artifact until the broader NM shape proves itself useful.
+- the older screen-path artifact remains tracked as archived reference only
+- it is no longer the active renderer/test contract

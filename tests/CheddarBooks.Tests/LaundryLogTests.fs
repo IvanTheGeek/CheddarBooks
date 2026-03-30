@@ -247,8 +247,8 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "slice-card__gwt-row" "Expected each slice to reserve an embedded GWT row."
                   Expect.stringContains htmlDocument "slice-card__gwt-card--command" "Expected command slices to render embedded command GWT cards."
                   Expect.stringContains htmlDocument "slice-card__gwt-card--view" "Expected view slices to render embedded view GWT cards."
-                  Expect.stringContains htmlDocument "command gwt" "Expected command-slice GWT cards."
-                  Expect.stringContains htmlDocument "view gwt" "Expected view-slice GWT cards."
+                  Expect.stringContains htmlDocument "COMMAND GWT" "Expected command-slice GWT cards."
+                  Expect.stringContains htmlDocument "VIEW GWT" "Expected view-slice GWT cards."
                   Expect.stringContains htmlDocument "GIVEN" "Expected the GIVEN stage label in the GWT band."
                   Expect.stringContains htmlDocument "WHEN" "Expected the WHEN stage label in the GWT band."
                   Expect.stringContains htmlDocument "THEN" "Expected the THEN stage label in the GWT band."
@@ -382,224 +382,7 @@ module LaundryLogTests =
                   Expect.isGreaterThan v7PrimaryIndex primaryIndex "Expected the v7 primary name inside the primary surface."
                   Expect.isGreaterThan awaitingIndex v7PrimaryIndex "Expected the awaiting-location variant to appear after the primary surface.")
 
-              testCase "Screen path renderer sequences the first app and screen flow" (fun () ->
-                  let htmlDocument =
-                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
-
-                  Expect.stringContains
-                      htmlDocument
-                      "PATH 1: Fresh First Launch -&gt; Need Location -&gt; First Entry"
-                      "Expected the first screen-path title."
-
-                  Expect.stringContains htmlDocument "AppStarted" "Expected the app/system startup step."
-                  Expect.stringContains htmlDocument "Screen.AppStart - Splash" "Expected the splash startup surface."
-                  Expect.stringContains htmlDocument "Screen.AppStart - Runtime Checks" "Expected the runtime-check startup surface."
-                  Expect.stringContains htmlDocument "Screen.AppStart - Route Resolved" "Expected the route-resolved startup surface."
-                  Expect.stringContains htmlDocument "Screen.NewSession - Awaiting Location" "Expected the need-location screen state."
-                  Expect.stringContains htmlDocument "Screen.EntryForm - Ready At Location" "Expected the ready-at-location screen state."
-                  Expect.stringContains htmlDocument "Screen.EntryForm - Logged Success" "Expected the logged-success path state."
-                  Expect.stringContains htmlDocument "Context · ScreenPath" "Expected the screen-path bounded context badge."
-                  Expect.stringContains htmlDocument "Context · ApplicationLifecycle" "Expected the application-lifecycle bounded context badge."
-                  Expect.stringContains htmlDocument "Context · RuntimeOrchestration" "Expected the runtime-orchestration bounded context badge."
-                  Expect.stringContains htmlDocument "screen path lens" "Expected the screen-path lens badge."
-                  Expect.stringContains htmlDocument "application lifecycle lens" "Expected the application-lifecycle startup lens badge."
-                  Expect.stringContains htmlDocument "app runtime lens" "Expected the app-runtime startup lens badge."
-                  Expect.stringContains htmlDocument "What Changed" "Expected each path step to state what changed."
-                  Expect.stringContains htmlDocument "The first usable screen replaces the splash surface." "Expected path-specific screen change summaries."
-                  Expect.stringContains htmlDocument "data-testid=\"screen-path-document\"" "Expected a stable browser-test hook for the path document."
-                  Expect.stringContains htmlDocument "data-testid=\"path-step\"" "Expected stable browser-test hooks for rendered steps."
-                  Expect.stringContains htmlDocument "data-testid=\"path-step-changes\"" "Expected stable browser-test hooks for step change summaries."
-                  Expect.stringContains htmlDocument "data-step-key=\"01-app-started\"" "Expected the first screen-path step to expose its stable key for browser tests."
-                  Expect.stringContains htmlDocument "fresh first launch with no known local data" "Expected explicit scenario context for the path."
-                  Expect.stringContains htmlDocument "No saved location is available yet." "Expected the first-launch assumptions to be visible in detailed mode.")
-
-              testCase "Screen path renderer includes view controls and headerless splash surfaces" (fun () ->
-                  let htmlDocument =
-                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
-
-                  Expect.stringContains htmlDocument "data-view-mode=\"standard\"" "Expected the path document to carry a default view mode."
-                  Expect.stringContains htmlDocument "data-testid=\"path-view-toggle\"" "Expected stable browser-test hooks for path viewer controls."
-                  Expect.stringContains htmlDocument "data-testid=\"path-lens-toggle\"" "Expected stable browser-test hooks for header lens visibility controls."
-                  Expect.stringContains htmlDocument "data-testid=\"path-scenario\"" "Expected a stable browser-test hook for the scenario disclosure."
-                  Expect.stringContains htmlDocument "data-testid=\"path-scenario-panel\"" "Expected a stable browser-test hook for the scenario detail panel."
-                  Expect.stringContains htmlDocument "lensFilterStorageKey" "Expected lens visibility choices to be stored locally."
-                  Expect.stringContains htmlDocument "step.hidden = !activeLensKeys.includes(stepLensKey);" "Expected header lens toggles to hide or show step columns."
-                  Expect.stringContains htmlDocument "button.dataset.viewMode" "Expected the viewer controls to be wired by script."
-                  Expect.stringContains htmlDocument "<section class=\"ll-phone-screen ll-phone-screen--boot\">" "Expected the splash family to render as a dedicated headerless phone screen."
-                  Expect.stringContains htmlDocument "data-testid=\"boot-check\"" "Expected stable browser-test hooks for boot checkpoint states."
-                  Expect.stringContains htmlDocument "data-status=\"active\"" "Expected active startup checkpoints."
-                  Expect.stringContains htmlDocument "data-status=\"complete\"" "Expected completed startup checkpoints."
-                  Expect.stringContains htmlDocument "Route to Need Location" "Expected route-resolution checkpoint copy in the splash progression.")
-
-              testCase "Screen path renderer adds a synced top horizontal scroll rail" (fun () ->
-                  let htmlDocument =
-                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
-
-                  Expect.stringContains
-                      htmlDocument
-                      "html, body { height: 100%; overflow: hidden; }"
-                      "Expected the browser-level scrollbars to be disabled for the screen-path page."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-stage { min-height: 0; overflow-y: auto; overflow-x: hidden;"
-                      "Expected an internal vertical stage for screen-path rows."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "<button id=\"ll-path-nav-start\" class=\"ll-path-nav-button\" data-testid=\"path-nav-start\""
-                      "Expected a dedicated button for returning to the beginning of the path."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "<button id=\"ll-path-nav-end\" class=\"ll-path-nav-button\" data-testid=\"path-nav-end\""
-                      "Expected a dedicated button for jumping to the end of the path."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-nav-button__chevron--left { transform: rotate(-135deg); }"
-                      "Expected the left navigation buttons to use explicit shaped chevrons instead of text glyphs."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-nav-button__chevron--right { transform: rotate(45deg); }"
-                      "Expected the right navigation buttons to use explicit shaped chevrons instead of text glyphs."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "<div id=\"ll-path-flow-viewport\" class=\"ll-path-flow-viewport\" data-testid=\"path-flow-viewport\">"
-                      "Expected the screen strip to live in its own horizontal viewport."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(360px, 380px); width: max-content;"
-                      "Expected the screen strip to stay a single continuous horizontal grid."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-step[hidden] { display: none !important; }"
-                      "Expected hidden path steps to be removed from layout when lens toggles disable them."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "setSyncedScrollLeft(scrollbar.scrollLeft);"
-                      "Expected the top rail to drive horizontal scrolling of the screen strip through the shared sync helper."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "scrollbar.scrollLeft = clampLeft(viewport.scrollLeft);"
-                      "Expected the rail to stay synced when the screen viewport itself is scrolled."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const scrollByOneColumn = (direction) => {"
-                      "Expected explicit one-column stepping logic for path navigation."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const refreshScrollMetrics = () => {"
-                      "Expected the path buttons to refresh measured scroll targets before stepping."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const firstOffset = steps[0].offsetLeft;"
-                      "Expected navigation to normalize the measured step offsets against the first rendered column."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const contentRightEdge = Math.max(...steps.map((step, index) => normalizedTargets[index] + Math.round(step.getBoundingClientRect().width)));"
-                      "Expected the end-of-content boundary to be measured from the real rendered columns."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const maxStartIndexCandidate = normalizedTargets.findIndex((target) => contentRightEdge - target <= viewport.clientWidth + 1);"
-                      "Expected the last logical whole-column target to be derived from what still fits in the viewport."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);"
-                      "Expected the path viewport to add enough trailing space for the last logical whole-column target."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;"
-                      "Expected the top rail to use the logical whole-column range so the far-right position matches the last readable path column."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const setSyncedScrollLeft = (left) => {"
-                      "Expected the path viewport and top rail to be updated together from one scroll position."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const animateScrollToColumn = (targetLeft) => {"
-                      "Expected button-driven navigation to use an explicit deterministic column animation."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "animationFrameId = window.requestAnimationFrame(tick);"
-                      "Expected the path buttons to animate between whole-column targets with requestAnimationFrame."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "animateScrollToColumn(targets[targetIndex]);"
-                      "Expected the next and previous buttons to land on measured whole-column targets."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "document.fonts.ready.then(() => syncWidth()).catch(() => {});"
-                      "Expected the path to refresh its scroll metrics after fonts settle."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "const scrollToEnd = () => {"
-                      "Expected the end button to use a dedicated logical end-navigation helper."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "animateScrollToColumn(logicalMaxScrollLeft());"
-                      "Expected the end button to use the logical whole-column maximum rather than the native scroll width."
-
-                  Expect.stringContains
-                      htmlDocument
-                      "startButton.disabled = currentLeft <= 2;"
-                      "Expected the beginning button to show a disabled state at the start of the path."
-
-                  Expect.stringContains
-                      htmlDocument
-                      ".ll-path-nav-button:disabled { background: #cbd5e1;"
-                      "Expected inactive navigation buttons to use a stronger disabled visual state.")
-
-              testCase "Screen path renderer includes update monitor controls for local artifacts" (fun () ->
-                  let htmlDocument =
-                      ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
-
-                  Expect.stringContains htmlDocument "Notify Me" "Expected a sticky notify-only update mode."
-                  Expect.stringContains htmlDocument "Auto Refresh" "Expected a sticky auto-refresh update mode."
-                  Expect.stringContains htmlDocument "data-testid=\"path-update-refresh\"" "Expected a stable browser-test hook for the manual refresh button."
-                  Expect.stringContains htmlDocument "data-testid=\"path-update-status\"" "Expected a stable browser-test hook for the update-status surface."
-                  Expect.stringContains htmlDocument "ll-path-update-status" "Expected a visible update-status surface."
-                  Expect.stringContains htmlDocument "window.__llPathUpdateManifest" "Expected the page to read a sidecar manifest script."
-                  Expect.stringContains htmlDocument ".update.js" "Expected the update monitor to target the companion update script."
-                  Expect.stringContains htmlDocument "updateModeStorageKey" "Expected the update preference to be stored locally."
-                  Expect.stringContains htmlDocument "UPDATED AT:" "Expected the update status to render a local-time label."
-                  Expect.stringContains htmlDocument "Intl.DateTimeFormat" "Expected browser-side local-time formatting for the update status."
-                  Expect.stringContains htmlDocument "just now" "Expected browser-side relative-age text for freshly updated artifacts."
-                  Expect.stringContains htmlDocument "window.setInterval(render, 30000);" "Expected the update status relative-age text to refresh continuously."
-                  Expect.stringContains htmlDocument "window.location.reload()" "Expected the page to support explicit refresh.")
-
-              testCase "Screen path renderer emits the sidecar update manifest script" (fun () ->
-                  let manifestScript =
-                      ScreenPathHtmlRenderer.renderUpdateManifestScript
-                          { Version = "screen-path::test"
-                            UpdatedAtUtc = "2026-03-29T12:34:56Z"
-                            PollIntervalMs = 3000 }
-
-                  Expect.stringContains manifestScript "window.__llPathUpdateManifest" "Expected the manifest bootstrap global."
-                  Expect.stringContains manifestScript "screen-path::test" "Expected the manifest version."
-                  Expect.stringContains manifestScript "2026-03-29T12:34:56Z" "Expected the manifest timestamp.")
-
-              testCase "NM path renderer sequences the first ATLAS-style mixed path" (fun () ->
+              testCase "NM path renderer sequences universal COMMAND and VIEW slices" (fun () ->
                   let htmlDocument =
                       NmPathHtmlRenderer.renderDocument (NmPathHtmlExamples.path1FirstLaunchFirstEntry ())
 
@@ -624,9 +407,6 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument ".nm-thumbnail__device" "Expected the NM thumbnail renderer to use a separate bounded device preview."
                   Expect.stringContains htmlDocument ".nm-column__surface-preview" "Expected the NM full-surface slot to keep a dedicated live preview wrapper."
                   Expect.stringContains htmlDocument ".nm-column__surface-rendering { position: absolute;" "Expected the NM preview rendering to be absolutely positioned inside the clipped slot."
-                  Expect.isFalse
-                      (htmlDocument.Contains("<button type=\"button\" class=\"nm-column__surface-button\""))
-                      "Expected the NM preview activator not to be a button, because the surface preview contains nested controls."
                   Expect.stringContains htmlDocument "Lifecycle" "Expected the lifecycle lens toggle."
                   Expect.stringContains htmlDocument "Runtime" "Expected the runtime lens toggle."
                   Expect.stringContains htmlDocument "Screen" "Expected the screen lens toggle."
@@ -647,19 +427,19 @@ module LaundryLogTests =
                   Expect.isFalse (htmlDocument.Contains("Context · ScreenPath")) "Expected the old duplicated lower screen-path context text to be removed."
                   Expect.isFalse (htmlDocument.Contains("Context · EventModeling")) "Expected the old duplicated lower Event Modeling context text to be removed."
                   Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\" data-nm-help-trigger" "Expected whole-column classifications to render as interactive NM help triggers."
-                  Expect.stringContains htmlDocument ">BOOT</button>" "Expected lifecycle/runtime columns to use BOOT as the surface kind."
-                  Expect.stringContains htmlDocument ">SCREEN</button>" "Expected screen-path columns to use SCREEN as the surface kind."
                   Expect.stringContains htmlDocument ">COMMAND</button>" "Expected command columns to use COMMAND as the surface kind."
                   Expect.stringContains htmlDocument ">VIEW</button>" "Expected view columns to use VIEW as the surface kind."
+                  Expect.stringContains htmlDocument ">TRIGGER</button>" "Expected trigger attachments in the launch slice."
+                  Expect.stringContains htmlDocument ">RUNTIME</button>" "Expected runtime attachments in the system-driven command slices."
+                  Expect.stringContains htmlDocument ">SCREEN</button>" "Expected screen attachments in the screen-grounded slices."
                   Expect.stringContains htmlDocument "nm-column--kind-command" "Expected NM command columns to carry a command-kind shell class."
                   Expect.stringContains htmlDocument "nm-column--kind-view" "Expected NM view columns to carry a view-kind shell class."
                   Expect.stringContains htmlDocument ".nm-column--context-event-modeling.nm-column--kind-command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }" "Expected NM command columns to restore the original blue AEM family."
                   Expect.stringContains htmlDocument ".nm-column--context-event-modeling.nm-column--kind-view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }" "Expected NM view columns to restore the original green AEM family."
-                  Expect.isFalse (htmlDocument.Contains("data-testid=\"nm-column-kind\">LIFECYCLE<")) "Expected lens words to stop appearing as the surface kind."
-                  Expect.isFalse (htmlDocument.Contains("data-testid=\"nm-column-kind\">RUNTIME<")) "Expected runtime lens words to stop appearing as the surface kind."
-                  Expect.stringContains htmlDocument "TRANSITION" "Expected lifecycle columns to use the TRANSITION internal box label."
-                  Expect.stringContains htmlDocument "ORCHESTRATION" "Expected runtime columns to use the ORCHESTRATION internal box label."
-                  Expect.stringContains htmlDocument "INTERACTION" "Expected screen-path columns to use the INTERACTION internal box label."
+                  Expect.isFalse (htmlDocument.Contains(">BOOT</button>")) "Expected BOOT to stop being a whole-column classification."
+                  Expect.isFalse (htmlDocument.Contains(">TRANSITION</button>")) "Expected TRANSITION to stop being a visible NM slice classification."
+                  Expect.isFalse (htmlDocument.Contains(">ORCHESTRATION</button>")) "Expected ORCHESTRATION to stop being a visible NM slice classification."
+                  Expect.isFalse (htmlDocument.Contains(">INTERACTION</button>")) "Expected INTERACTION to stop being a visible NM slice classification."
                   Expect.isFalse (htmlDocument.Contains("COMMAND SLICE")) "Expected the NM column shell to replace the old nested AEM command-slice shell."
                   Expect.isFalse (htmlDocument.Contains("VIEW SLICE")) "Expected the NM column shell to replace the old nested AEM view-slice shell."
                   Expect.stringContains htmlDocument "data-slot-kind=\"header\"" "Expected NM columns to emit a shared header slot."
@@ -669,20 +449,22 @@ module LaundryLogTests =
                   Expect.stringContains htmlDocument "data-slot-kind=\"gwt\"" "Expected NM columns to emit a shared gwt slot."
                   Expect.stringContains htmlDocument "--nm-column-template-rows:" "Expected NM columns to emit per-column slot templates."
                   Expect.stringContains htmlDocument "--nm-slot-screen-height" "Expected the NM path to publish shared screen-row sizing variables."
-                  Expect.stringContains htmlDocument "nm-column__slot--aem .slice-block" "Expected flattened AEM blocks to render directly inside the shared NM slots."
-                  Expect.stringContains htmlDocument "ui lens" "Expected the linked-screen lens badge to move into the NM SCREEN compartment for AEM columns."
-                  Expect.stringContains htmlDocument "The business command for location capture becomes explicit in the NM flow." "Expected the AEM command column note above the slice body."
-                  Expect.stringContains htmlDocument "The first business projection after location capture is now explicit." "Expected the AEM view column note above the slice body."
-                  Expect.stringContains htmlDocument ">Splash Screen</h3>" "Expected the SCREEN compartment title to be human-first for startup columns."
+                  Expect.stringContains htmlDocument "COMMAND GWT" "Expected command slices to expose all-caps COMMAND GWT bands."
+                  Expect.stringContains htmlDocument "VIEW GWT" "Expected view slices to expose all-caps VIEW GWT bands."
+                  Expect.stringContains htmlDocument "The business command for location capture is now made explicit on the NM path." "Expected the AEM command column note above the slice body."
+                  Expect.stringContains htmlDocument "The first business read after location capture now projects the active session location." "Expected the AEM view column note above the slice body."
+                  Expect.stringContains htmlDocument ">App Launch Trigger</h3>" "Expected the trigger attachment title to be human-first for the launch slice."
+                  Expect.stringContains htmlDocument ">Startup Runtime</h3>" "Expected runtime attachment titles for startup command slices."
+                  Expect.stringContains htmlDocument ">Splash Screen</h3>" "Expected the screen attachment title to be human-first for startup view columns."
                   Expect.stringContains htmlDocument ">Set Location Screen</h3>" "Expected the SCREEN compartment title to be human-first for location columns."
                   Expect.stringContains htmlDocument ">Laundry Entry Screen</h3>" "Expected the SCREEN compartment title to be human-first for entry columns."
-                  Expect.stringContains htmlDocument "Surface · Screen.NewSession - Ready To Set" "Expected the AEM location-command column to show the linked app surface inside the SCREEN box."
-                  Expect.stringContains htmlDocument "Surface · Screen.EntryForm - Ready At Location" "Expected the AEM view column to show the linked app surface inside the SCREEN box."
-                  Expect.stringContains htmlDocument "Surface · Screen.EntryForm - Washer Draft" "Expected the AEM washer-command column to show the linked app surface inside the SCREEN box."
+                  Expect.stringContains htmlDocument "Screen.NewSession - Ready To Set" "Expected the AEM location-command column to show the linked app surface inside the SCREEN box."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Ready At Location" "Expected the AEM view column to show the linked app surface inside the SCREEN box."
+                  Expect.stringContains htmlDocument "Screen.EntryForm - Washer Draft" "Expected the AEM washer-command column to show the linked app surface inside the SCREEN box."
                   Expect.stringContains htmlDocument "data-pill-type=\"screen-role\"" "Expected NM screen compartments to carry actor badges locally when a column has an actor."
                   Expect.stringContains htmlDocument "data-pill-type=\"screen-lens\"" "Expected AEM screen compartments to carry the linked ui lens badge locally."
                   Expect.isFalse (htmlDocument.Contains("data-pill-type=\"role\"")) "Expected NM actor badges to move out of the header and into the SCREEN compartment."
-                  Expect.stringContains htmlDocument "data-testid=\"nm-column-screen-label-row\"" "Expected SCREEN compartments to expose a stable label row hook."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-column-attachment-label-row\"" "Expected attachment compartments to expose a stable label row hook."
                   Expect.stringContains htmlDocument "data-testid=\"nm-column-pill-popover-close\"" "Expected NM pill explanations to include an explicit close button."
                   Expect.stringContains htmlDocument "data-testid=\"nm-column-kind\"" "Expected whole-column classifications to expose a stable NM help trigger."
                   Expect.stringContains htmlDocument "data-testid=\"nm-column-detail-kind\"" "Expected compartment classifications to expose a stable NM help trigger."
@@ -707,19 +489,24 @@ module LaundryLogTests =
                   Expect.isFalse (htmlDocument.Contains(">Standard<")) "Expected the NM page to drop the Standard view mode entirely."
 
                   let orderedKeys =
-                      [ "01-app-started"
-                        "02-runtime-checks"
-                        "03-no-local-session"
-                        "04-route-resolved"
-                        "05-need-location"
-                        "06-ready-to-set-location"
-                        "07-capture-laundry-location"
-                        "08-current-laundry-session-location"
-                        "09-entry-form-ready"
-                        "10-washer-draft"
-                        "11-log-laundry-expense"
-                        "12-current-laundry-session-washer"
-                        "13-logged-success" ]
+                      [ "01-launch-app"
+                        "02-splash-visible"
+                        "03-run-startup-checks"
+                        "04-runtime-checks-view"
+                        "05-inspect-local-session"
+                        "06-no-local-session-view"
+                        "07-resolve-initial-route"
+                        "08-need-location"
+                        "09-enter-location-text"
+                        "10-ready-to-set-location"
+                        "11-capture-laundry-location"
+                        "12-current-laundry-session-location"
+                        "13-entry-form-ready"
+                        "14-select-washer"
+                        "15-washer-draft"
+                        "16-log-laundry-expense"
+                        "17-current-laundry-session-washer"
+                        "18-logged-success" ]
 
                   let mutable priorIndex = -1
 
@@ -732,12 +519,12 @@ module LaundryLogTests =
                       priorIndex <- currentIndex)
 
                   let firstHeaderMetaIndex = htmlDocument.IndexOf("data-testid=\"nm-column-meta\"")
-                  let firstStepIndex = htmlDocument.IndexOf("Step 01 · 01-app-started")
+                  let firstStepIndex = htmlDocument.IndexOf("Step 01-launch-app")
                   Expect.isGreaterThanOrEqual firstHeaderMetaIndex 0 "Expected the NM classification row to be rendered."
                   Expect.isGreaterThanOrEqual firstStepIndex 0 "Expected the first NM step label."
                   Expect.isLessThan firstHeaderMetaIndex firstStepIndex "Expected the classification row to appear above the step/key line.")
 
-              testCase "NM path trims trailing empty rows while preserving interior spacers for GWT alignment" (fun () ->
+              testCase "NM path applies the universal COMMAND and VIEW slice law" (fun () ->
                   let htmlDocument = NmPathHtmlRenderer.renderDocument (NmPathHtmlExamples.path1FirstLaunchFirstEntry ())
 
                   let columnSegment columnKey nextColumnKey =
@@ -756,30 +543,29 @@ module LaundryLogTests =
 
                       htmlDocument.Substring(startIndex, endIndex - startIndex)
 
-                  let needLocationSegment = columnSegment "05-need-location" (Some "06-ready-to-set-location")
-                  let readyToSetSegment = columnSegment "06-ready-to-set-location" (Some "07-capture-laundry-location")
-                  let viewWithGwtSegment = columnSegment "08-current-laundry-session-location" (Some "09-entry-form-ready")
-                  let interactionEntrySegment = columnSegment "09-entry-form-ready" (Some "10-washer-draft")
+                  let launchCommandSegment = columnSegment "01-launch-app" (Some "02-splash-visible")
+                  let splashViewSegment = columnSegment "02-splash-visible" (Some "03-run-startup-checks")
+                  let businessViewSegment = columnSegment "12-current-laundry-session-location" (Some "13-entry-form-ready")
+                  let interactionViewSegment = columnSegment "13-entry-form-ready" (Some "14-select-washer")
+                  let washerViewSegment = columnSegment "17-current-laundry-session-washer" (Some "18-logged-success")
+                  let loggedSuccessSegment = columnSegment "18-logged-success" None
 
-                  Expect.stringContains needLocationSegment "data-slot-kind=\"header\"" "Expected shorter NM columns to keep the header slot."
-                  Expect.stringContains needLocationSegment "data-slot-kind=\"screen\"" "Expected shorter NM columns to keep the screen slot."
-                  Expect.stringContains needLocationSegment "data-slot-kind=\"primary\"" "Expected shorter NM columns to keep the primary slot."
-                  Expect.isFalse (needLocationSegment.Contains("data-slot-kind=\"secondary\"")) "Expected a screen-plus-primary column to omit a trailing secondary slot."
-                  Expect.isFalse (needLocationSegment.Contains("data-slot-kind=\"gwt\"")) "Expected a screen-plus-primary column to omit a trailing gwt slot."
+                  Expect.stringContains launchCommandSegment "data-detail-kind=\"trigger\"" "Expected the first command slice to use a TRIGGER attachment."
+                  Expect.stringContains launchCommandSegment "slice-block--command" "Expected command slices to render a COMMAND block."
+                  Expect.stringContains launchCommandSegment "slice-block--event" "Expected command slices to render an EVENT block."
+                  Expect.stringContains launchCommandSegment "COMMAND GWT" "Expected command slices to render COMMAND GWT."
+                  Expect.stringContains launchCommandSegment "AppStarted" "Expected the first command slice to culminate in AppStarted."
 
-                  Expect.isFalse (readyToSetSegment.Contains("data-slot-kind=\"secondary\"")) "Expected another short screen column to omit a trailing secondary slot."
-                  Expect.isFalse (readyToSetSegment.Contains("data-slot-kind=\"gwt\"")) "Expected another short screen column to omit a trailing gwt slot."
+                  Expect.stringContains splashViewSegment "data-detail-kind=\"screen\"" "Expected view slices to use a SCREEN attachment when they land on an app surface."
+                  Expect.stringContains splashViewSegment "slice-block--view" "Expected view slices to render a VIEW block."
+                  Expect.isFalse (splashViewSegment.Contains("slice-block--event")) "Expected view slices not to render a main EVENT block."
+                  Expect.stringContains splashViewSegment "VIEW GWT" "Expected view slices to render VIEW GWT."
+                  Expect.stringContains splashViewSegment "AppStarted" "Expected the first view slice to consume AppStarted through VIEW GWT."
 
-                  Expect.stringContains
-                      viewWithGwtSegment
-                      "class=\"nm-column__slot nm-column__slot--secondary nm-column__slot--empty\""
-                      "Expected AEM view columns with GWT content to keep an empty secondary spacer slot."
-
-                  Expect.stringContains viewWithGwtSegment "data-slot-kind=\"gwt\"" "Expected the AEM view column to keep its gwt slot."
-                  Expect.isFalse (viewWithGwtSegment.Contains("slice-block--event")) "Expected the AEM view spacer row to stay empty rather than render an event block."
-
-                  Expect.isFalse (interactionEntrySegment.Contains("data-slot-kind=\"secondary\"")) "Expected the interaction column to stop after the primary row."
-                  Expect.isFalse (interactionEntrySegment.Contains("data-slot-kind=\"gwt\"")) "Expected the interaction column to stop after the primary row.")
+                  Expect.stringContains businessViewSegment "LaundryLocationCaptured" "Expected the business read to consume LaundryLocationCaptured."
+                  Expect.stringContains interactionViewSegment "LaundryLocationCaptured" "Expected the interaction read to fan out from LaundryLocationCaptured as well."
+                  Expect.stringContains washerViewSegment "LaundryExpenseLogged" "Expected the business washer read to consume LaundryExpenseLogged."
+                  Expect.stringContains loggedSuccessSegment "LaundryExpenseLogged" "Expected the success read to fan out from LaundryExpenseLogged as well.")
 
               testCase "NM path renderer emits its sidecar update manifest script" (fun () ->
                   let manifestScript =
