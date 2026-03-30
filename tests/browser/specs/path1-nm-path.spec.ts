@@ -483,12 +483,23 @@ test.describe('PATH1 NM workspace artifact', () => {
     );
     await expect(aemHeaderRolePill).toHaveCount(0);
 
+    const interactionHeaderRolePill = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="05-need-location"] .nm-column__classification [data-testid="nm-column-pill"][data-pill-type="role"]',
+    );
+    await expect(interactionHeaderRolePill).toHaveCount(0);
+
     const aemScreenMeta = page.locator(
       '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-meta"]',
     );
     await expect(aemScreenMeta).toBeVisible();
     await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
     await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-lens"]')).toHaveText('ui lens');
+
+    const interactionScreenMeta = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-meta"]',
+    );
+    await expect(interactionScreenMeta).toBeVisible();
+    await expect(interactionScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
 
     const lifecycleContextPill = lifecycleColumn.locator('[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]');
     const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
@@ -504,7 +515,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(runtimeContextPopover).toContainText('RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.');
     await expect(runtimeContextPopover).toContainText('Runtime Checks coordinates checks, route choice, or state handoff.');
 
-    const userRolePill = page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-pill"][data-pill-type="role"][data-pill-label="User"]');
+    const userRolePill = page.locator('[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-pill"][data-pill-type="screen-role"][data-pill-label="User"]');
     const userRolePopover = popoverForPill(userRolePill);
     await userRolePill.click();
     await expect(userRolePopover).toBeVisible();

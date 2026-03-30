@@ -753,19 +753,6 @@ module NmPathHtmlRenderer =
                 (lensWhyThisColumn columnState lensKind)
                 "nm-column__badge--lens")
 
-        match columnState.ActorRoleBadge with
-        | Some roleBadge when columnState.PrimaryContext <> NmContextKind.EventModeling ->
-            renderBadgePopover
-                builder
-                columnState.ColumnKey
-                "role"
-                roleBadge
-                (roleMeaning roleBadge)
-                (roleWhyThisColumn columnState roleBadge)
-                "nm-column__badge--role"
-        | None -> ()
-        | Some _ -> ()
-
         appendLine builder "</div>"
         appendLine builder "</div>"
         appendLine builder "</div>"
@@ -867,11 +854,13 @@ module NmPathHtmlRenderer =
         appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
         appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (screenBoxNote columnState)}</p>"
 
-        match columnState.PrimaryContext, columnState.ActorRoleBadge with
-        | NmContextKind.EventModeling, roleBadge ->
+        let shouldRenderScreenMeta =
+            columnState.ActorRoleBadge.IsSome || columnState.PrimaryContext = NmContextKind.EventModeling
+
+        if shouldRenderScreenMeta then
             appendLine builder "<div class=\"nm-column__screen-meta\" data-testid=\"nm-column-screen-meta\">"
 
-            match roleBadge with
+            match columnState.ActorRoleBadge with
             | Some roleText ->
                 renderBadgePopover
                     builder
@@ -883,17 +872,17 @@ module NmPathHtmlRenderer =
                     "nm-column__badge--role"
             | None -> ()
 
-            renderBadgePopover
-                builder
-                columnState.ColumnKey
-                "screen-lens"
-                "ui lens"
-                "ui lens marks the linked app surface that frames the business slice."
-                $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
-                "nm-column__badge--surface-lens"
+            if columnState.PrimaryContext = NmContextKind.EventModeling then
+                renderBadgePopover
+                    builder
+                    columnState.ColumnKey
+                    "screen-lens"
+                    "ui lens"
+                    "ui lens marks the linked app surface that frames the business slice."
+                    $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
+                    "nm-column__badge--surface-lens"
 
             appendLine builder "</div>"
-        | _ -> ()
 
         match columnState.TechnicalSurfaceLabel with
         | Some surfaceLabel ->
