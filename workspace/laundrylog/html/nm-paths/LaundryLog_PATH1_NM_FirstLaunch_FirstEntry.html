@@ -342,7 +342,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__pill-wrap[data-open="true"] { z-index: 80; }
 .nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.01em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }
 .nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }
-.nm-column__badge--interactive { appearance: none; -webkit-appearance: none; }
+.nm-column__badge--interactive { appearance: none; -webkit-appearance: none; cursor: pointer; }
 .nm-column__badge--interactive:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
 .nm-column__badge--role { text-transform: none; }
 .nm-column__pill-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }
@@ -493,10 +493,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-01-app-started-group-app-runtime">App Runtime</button>
-<div id="nm-pill-popover-01-app-started-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-01-app-started-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">App Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -507,10 +507,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ApplicationLifecycle" aria-describedby="nm-pill-popover-01-app-started-context-applicationlifecycle">ApplicationLifecycle</button>
-<div id="nm-pill-popover-01-app-started-context-applicationlifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-01-app-started-context-applicationlifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ApplicationLifecycle</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -526,10 +526,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Lifecycle" aria-describedby="nm-pill-popover-01-app-started-lens-lifecycle">Lifecycle</button>
-<div id="nm-pill-popover-01-app-started-lens-lifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-01-app-started-lens-lifecycle" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Lifecycle</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -554,16 +554,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="System" aria-describedby="nm-pill-popover-01-app-started-screen-role-system">System</button>
-<div id="nm-pill-popover-01-app-started-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-01-app-started-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">System</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; System means the app/runtime is acting at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is System because AppStarted happens through app/runtime work rather than direct user input.</p>
+<p class="nm-column__pill-popover-text">This actor is System because AppStarted happens through app/runtime work rather than direct user input.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -669,10 +669,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-02-runtime-checks-group-app-runtime">App Runtime</button>
-<div id="nm-pill-popover-02-runtime-checks-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-02-runtime-checks-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">App Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -683,10 +683,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-02-runtime-checks-context-runtimeorchestration">RuntimeOrchestration</button>
-<div id="nm-pill-popover-02-runtime-checks-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-02-runtime-checks-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -702,10 +702,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-02-runtime-checks-lens-runtime">Runtime</button>
-<div id="nm-pill-popover-02-runtime-checks-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-02-runtime-checks-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -730,16 +730,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="System" aria-describedby="nm-pill-popover-02-runtime-checks-screen-role-system">System</button>
-<div id="nm-pill-popover-02-runtime-checks-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-02-runtime-checks-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">System</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; System means the app/runtime is acting at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is System because Runtime Checks happens through app/runtime work rather than direct user input.</p>
+<p class="nm-column__pill-popover-text">This actor is System because Runtime Checks happens through app/runtime work rather than direct user input.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -845,10 +845,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-03-no-local-session-group-app-runtime">App Runtime</button>
-<div id="nm-pill-popover-03-no-local-session-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-03-no-local-session-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">App Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -859,10 +859,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-03-no-local-session-context-runtimeorchestration">RuntimeOrchestration</button>
-<div id="nm-pill-popover-03-no-local-session-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-03-no-local-session-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -878,10 +878,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-03-no-local-session-lens-runtime">Runtime</button>
-<div id="nm-pill-popover-03-no-local-session-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-03-no-local-session-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -906,16 +906,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="System" aria-describedby="nm-pill-popover-03-no-local-session-screen-role-system">System</button>
-<div id="nm-pill-popover-03-no-local-session-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-03-no-local-session-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">System</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; System means the app/runtime is acting at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is System because No Local Session happens through app/runtime work rather than direct user input.</p>
+<p class="nm-column__pill-popover-text">This actor is System because No Local Session happens through app/runtime work rather than direct user input.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1021,10 +1021,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="App Runtime" aria-describedby="nm-pill-popover-04-route-resolved-group-app-runtime">App Runtime</button>
-<div id="nm-pill-popover-04-route-resolved-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-04-route-resolved-group-app-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">App Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1035,10 +1035,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="RuntimeOrchestration" aria-describedby="nm-pill-popover-04-route-resolved-context-runtimeorchestration">RuntimeOrchestration</button>
-<div id="nm-pill-popover-04-route-resolved-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-04-route-resolved-context-runtimeorchestration" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">RuntimeOrchestration</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1054,10 +1054,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Runtime" aria-describedby="nm-pill-popover-04-route-resolved-lens-runtime">Runtime</button>
-<div id="nm-pill-popover-04-route-resolved-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-04-route-resolved-lens-runtime" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Runtime</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1082,16 +1082,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="System" aria-describedby="nm-pill-popover-04-route-resolved-screen-role-system">System</button>
-<div id="nm-pill-popover-04-route-resolved-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-04-route-resolved-screen-role-system" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">System</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; System means the app/runtime is acting at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is System because Route Resolved happens through app/runtime work rather than direct user input.</p>
+<p class="nm-column__pill-popover-text">This actor is System because Route Resolved happens through app/runtime work rather than direct user input.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1197,10 +1197,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-05-need-location-group-interaction">Interaction</button>
-<div id="nm-pill-popover-05-need-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-05-need-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Interaction</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1211,10 +1211,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-05-need-location-context-screenpath">ScreenPath</button>
-<div id="nm-pill-popover-05-need-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-05-need-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ScreenPath</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1230,10 +1230,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-05-need-location-lens-screen">Screen</button>
-<div id="nm-pill-popover-05-need-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-05-need-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Screen</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1258,16 +1258,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-05-need-location-screen-role-user">User</button>
-<div id="nm-pill-popover-05-need-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-05-need-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because Need Location depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because Need Location depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1367,10 +1367,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-06-ready-to-set-location-group-interaction">Interaction</button>
-<div id="nm-pill-popover-06-ready-to-set-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-06-ready-to-set-location-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Interaction</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1381,10 +1381,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-06-ready-to-set-location-context-screenpath">ScreenPath</button>
-<div id="nm-pill-popover-06-ready-to-set-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-06-ready-to-set-location-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ScreenPath</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1400,10 +1400,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-06-ready-to-set-location-lens-screen">Screen</button>
-<div id="nm-pill-popover-06-ready-to-set-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-06-ready-to-set-location-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Screen</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1428,16 +1428,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-06-ready-to-set-location-screen-role-user">User</button>
-<div id="nm-pill-popover-06-ready-to-set-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-06-ready-to-set-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because Ready To Set Location depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because Ready To Set Location depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1537,10 +1537,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-07-capture-laundry-location-group-business">Business</button>
-<div id="nm-pill-popover-07-capture-laundry-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-07-capture-laundry-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Business</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1551,10 +1551,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-07-capture-laundry-location-context-eventmodeling">EventModeling</button>
-<div id="nm-pill-popover-07-capture-laundry-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-07-capture-laundry-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">EventModeling</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1570,10 +1570,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-07-capture-laundry-location-lens-aem">AEM</button>
-<div id="nm-pill-popover-07-capture-laundry-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-07-capture-laundry-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">AEM</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1598,16 +1598,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-07-capture-laundry-location-screen-role-user">User</button>
-<div id="nm-pill-popover-07-capture-laundry-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-07-capture-laundry-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because CaptureLaundryLocation depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because CaptureLaundryLocation depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -1619,10 +1619,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
 <button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-07-capture-laundry-location-screen-lens-ui-lens">ui lens</button>
-<div id="nm-pill-popover-07-capture-laundry-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div id="nm-pill-popover-07-capture-laundry-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">ui lens</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1865,10 +1865,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-08-current-laundry-session-location-group-business">Business</button>
-<div id="nm-pill-popover-08-current-laundry-session-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-08-current-laundry-session-location-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Business</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1879,10 +1879,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-08-current-laundry-session-location-context-eventmodeling">EventModeling</button>
-<div id="nm-pill-popover-08-current-laundry-session-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-08-current-laundry-session-location-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">EventModeling</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1898,10 +1898,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-08-current-laundry-session-location-lens-aem">AEM</button>
-<div id="nm-pill-popover-08-current-laundry-session-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-08-current-laundry-session-location-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">AEM</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -1933,10 +1933,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
 <button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-08-current-laundry-session-location-screen-lens-ui-lens">ui lens</button>
-<div id="nm-pill-popover-08-current-laundry-session-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div id="nm-pill-popover-08-current-laundry-session-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">ui lens</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2238,10 +2238,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-09-entry-form-ready-group-interaction">Interaction</button>
-<div id="nm-pill-popover-09-entry-form-ready-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-09-entry-form-ready-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Interaction</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2252,10 +2252,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-09-entry-form-ready-context-screenpath">ScreenPath</button>
-<div id="nm-pill-popover-09-entry-form-ready-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-09-entry-form-ready-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ScreenPath</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2271,10 +2271,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-09-entry-form-ready-lens-screen">Screen</button>
-<div id="nm-pill-popover-09-entry-form-ready-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-09-entry-form-ready-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Screen</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2299,16 +2299,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-09-entry-form-ready-screen-role-user">User</button>
-<div id="nm-pill-popover-09-entry-form-ready-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-09-entry-form-ready-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because Entry Form Ready depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because Entry Form Ready depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2493,10 +2493,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-10-washer-draft-group-interaction">Interaction</button>
-<div id="nm-pill-popover-10-washer-draft-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-10-washer-draft-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Interaction</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2507,10 +2507,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-10-washer-draft-context-screenpath">ScreenPath</button>
-<div id="nm-pill-popover-10-washer-draft-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-10-washer-draft-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ScreenPath</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2526,10 +2526,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-10-washer-draft-lens-screen">Screen</button>
-<div id="nm-pill-popover-10-washer-draft-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-10-washer-draft-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Screen</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2554,16 +2554,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-10-washer-draft-screen-role-user">User</button>
-<div id="nm-pill-popover-10-washer-draft-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-10-washer-draft-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because Washer Draft depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because Washer Draft depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2751,10 +2751,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-11-log-laundry-expense-group-business">Business</button>
-<div id="nm-pill-popover-11-log-laundry-expense-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-11-log-laundry-expense-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Business</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2765,10 +2765,10 @@ Log Expense
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-11-log-laundry-expense-context-eventmodeling">EventModeling</button>
-<div id="nm-pill-popover-11-log-laundry-expense-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-11-log-laundry-expense-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">EventModeling</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2784,10 +2784,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-11-log-laundry-expense-lens-aem">AEM</button>
-<div id="nm-pill-popover-11-log-laundry-expense-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-11-log-laundry-expense-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">AEM</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -2812,16 +2812,16 @@ Log Expense
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-11-log-laundry-expense-screen-role-user">User</button>
-<div id="nm-pill-popover-11-log-laundry-expense-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-11-log-laundry-expense-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because LogLaundryExpense depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because LogLaundryExpense depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -2833,10 +2833,10 @@ Log Expense
 <div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
 <button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-11-log-laundry-expense-screen-lens-ui-lens">ui lens</button>
-<div id="nm-pill-popover-11-log-laundry-expense-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div id="nm-pill-popover-11-log-laundry-expense-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">ui lens</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3238,10 +3238,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Business" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-group-business">Business</button>
-<div id="nm-pill-popover-12-current-laundry-session-washer-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-12-current-laundry-session-washer-group-business" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Business</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3252,10 +3252,10 @@ Log Expense
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="EventModeling" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-context-eventmodeling">EventModeling</button>
-<div id="nm-pill-popover-12-current-laundry-session-washer-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-12-current-laundry-session-washer-context-eventmodeling" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">EventModeling</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3271,10 +3271,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="AEM" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-lens-aem">AEM</button>
-<div id="nm-pill-popover-12-current-laundry-session-washer-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-12-current-laundry-session-washer-lens-aem" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">AEM</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3306,10 +3306,10 @@ Log Expense
 <div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
 <button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-screen-lens-ui-lens">ui lens</button>
-<div id="nm-pill-popover-12-current-laundry-session-washer-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div id="nm-pill-popover-12-current-laundry-session-washer-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">ui lens</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3635,10 +3635,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--primary" data-testid="nm-column-meta">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="group">
 <button class="nm-column__badge nm-column__badge--group" type="button" data-testid="nm-column-pill" data-pill-type="group" data-pill-label="Interaction" aria-describedby="nm-pill-popover-13-logged-success-group-interaction">Interaction</button>
-<div id="nm-pill-popover-13-logged-success-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="tooltip">
+<div id="nm-pill-popover-13-logged-success-group-interaction" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="group" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Context Group badge</div>
+<div class="nm-column__pill-popover-label">Context Group</div>
 <div class="nm-column__pill-popover-title">Interaction</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3649,10 +3649,10 @@ Log Expense
 </div>
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="context">
 <button class="nm-column__badge nm-column__badge--context" type="button" data-testid="nm-column-pill" data-pill-type="context" data-pill-label="ScreenPath" aria-describedby="nm-pill-popover-13-logged-success-context-screenpath">ScreenPath</button>
-<div id="nm-pill-popover-13-logged-success-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="tooltip">
+<div id="nm-pill-popover-13-logged-success-context-screenpath" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="context" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Bounded Context badge</div>
+<div class="nm-column__pill-popover-label">Bounded Context</div>
 <div class="nm-column__pill-popover-title">ScreenPath</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3668,10 +3668,10 @@ Log Expense
 <div class="nm-column__meta nm-column__meta--secondary">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="lens">
 <button class="nm-column__badge nm-column__badge--lens" type="button" data-testid="nm-column-pill" data-pill-type="lens" data-pill-label="Screen" aria-describedby="nm-pill-popover-13-logged-success-lens-screen">Screen</button>
-<div id="nm-pill-popover-13-logged-success-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="tooltip">
+<div id="nm-pill-popover-13-logged-success-lens-screen" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="lens" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Lens badge</div>
+<div class="nm-column__pill-popover-label">Lens</div>
 <div class="nm-column__pill-popover-title">Screen</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
@@ -3696,16 +3696,16 @@ Log Expense
 <div class="nm-column__detail-label-row" data-testid="nm-column-screen-label-row">
 <div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
 <button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-13-logged-success-screen-role-user">User</button>
-<div id="nm-pill-popover-13-logged-success-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div id="nm-pill-popover-13-logged-success-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="dialog" aria-modal="false">
 <div class="nm-column__pill-popover-header">
 <div class="nm-column__pill-popover-heading">
-<div class="nm-column__pill-popover-label">Actor badge</div>
+<div class="nm-column__pill-popover-label">Actor</div>
 <div class="nm-column__pill-popover-title">User</div>
 </div>
 <button class="nm-column__pill-popover-close" type="button" data-testid="nm-column-pill-popover-close" aria-label="Close explanation">Close</button>
 </div>
 <p class="nm-column__pill-popover-text">Actor &#183; User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This actor badge is User because Logged Success depends on or expresses a direct user action.</p>
+<p class="nm-column__pill-popover-text">This actor is User because Logged Success depends on or expresses a direct user action.</p>
 </div>
 </div>
 <span class="nm-column__detail-kind">SCREEN</span>
@@ -4276,15 +4276,27 @@ document.addEventListener('DOMContentLoaded', function () {
     overlay.hidden = true;
     overlaySurface.innerHTML = '';
   };
-  const closePillPopovers = () => {
-    pillWraps.forEach((wrap) => { delete wrap.dataset.open; });
+  const closePillPopovers = (includePinned = true) => {
+    pillWraps.forEach((wrap) => {
+      if (!includePinned && wrap.dataset.pinned === 'true') { return; }
+      delete wrap.dataset.open;
+      delete wrap.dataset.pinned;
+    });
   };
-  const openPillPopover = (pillWrap) => {
+  const openPillPopover = (pillWrap, pinned = false) => {
+    if (!pinned) {
+      const anotherPinnedPopoverIsOpen = pillWraps.some((wrap) => wrap !== pillWrap && wrap.dataset.pinned === 'true');
+      if (anotherPinnedPopoverIsOpen) { return; }
+    }
     pillWraps.forEach((wrap) => {
       if (wrap === pillWrap) {
         wrap.dataset.open = 'true';
+        if (pinned) {
+          wrap.dataset.pinned = 'true';
+        }
       } else {
         delete wrap.dataset.open;
+        delete wrap.dataset.pinned;
       }
     });
   };
@@ -4292,11 +4304,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const pill = pillWrap.querySelector('[data-testid="nm-column-pill"]');
     const closeButton = pillWrap.querySelector('[data-testid="nm-column-pill-popover-close"]');
     pillWrap.addEventListener('mouseenter', () => openPillPopover(pillWrap));
-    pillWrap.addEventListener('mouseleave', () => closePillPopovers());
+    pillWrap.addEventListener('mouseleave', () => {
+      if (pillWrap.dataset.pinned === 'true') { return; }
+      delete pillWrap.dataset.open;
+    });
     pillWrap.addEventListener('focusin', () => openPillPopover(pillWrap));
     pillWrap.addEventListener('focusout', () => {
       window.requestAnimationFrame(() => {
-        if (!pillWrap.contains(document.activeElement)) {
+        if (!pillWrap.contains(document.activeElement) && pillWrap.dataset.pinned !== 'true') {
           delete pillWrap.dataset.open;
         }
       });
@@ -4305,14 +4320,20 @@ document.addEventListener('DOMContentLoaded', function () {
       pill.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        openPillPopover(pillWrap);
+        if (pillWrap.dataset.pinned === 'true') {
+          delete pillWrap.dataset.open;
+          delete pillWrap.dataset.pinned;
+          return;
+        }
+        openPillPopover(pillWrap, true);
       });
     }
     if (closeButton) {
       closeButton.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        closePillPopovers();
+        delete pillWrap.dataset.open;
+        delete pillWrap.dataset.pinned;
       });
     }
   });
@@ -4434,8 +4455,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330181554898";
-  const currentArtifactUpdatedAt = "2026-03-30T18:15:54Z";
+  const currentArtifactVersion = "nm-path::20260330182304974";
+  const currentArtifactUpdatedAt = "2026-03-30T18:23:04Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

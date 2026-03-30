@@ -522,7 +522,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
     await lifecycleContextPill.hover();
     await expect(lifecycleContextPopover).toBeVisible();
-    await expect(lifecycleContextPopover).toContainText('Bounded Context badge');
+    await expect(lifecycleContextPopover).toContainText('Bounded Context');
     await expect(lifecycleContextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
     await expect(lifecycleContextPopover).toContainText('AppStarted marks an app lifecycle phase becoming visible.');
 
@@ -530,7 +530,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     const runtimeContextPopover = popoverForPill(runtimeContextPill);
     await runtimeContextPill.hover();
     await expect(runtimeContextPopover).toBeVisible();
-    await expect(runtimeContextPopover).toContainText('Bounded Context badge');
+    await expect(runtimeContextPopover).toContainText('Bounded Context');
     await expect(runtimeContextPopover).toContainText('RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.');
     await expect(runtimeContextPopover).toContainText('Runtime Checks coordinates checks, route choice, or state handoff.');
 
@@ -538,9 +538,11 @@ test.describe('PATH1 NM workspace artifact', () => {
     const userRolePopover = popoverForPill(userRolePill);
     await userRolePill.click();
     await expect(userRolePopover).toBeVisible();
-    await expect(userRolePopover).toContainText('Actor badge');
+    await expect(userRolePopover).toContainText('Actor');
     await expect(userRolePopover).toContainText('Actor · User means the human is acting through the UI at this point in the path.');
-    await expect(userRolePopover).toContainText('This actor badge is User because Need Location depends on or expresses a direct user action.');
+    await expect(userRolePopover).toContainText('This actor is User because Need Location depends on or expresses a direct user action.');
+    await page.mouse.move(2, 2);
+    await expect(userRolePopover).toBeVisible();
     await userRolePopover.getByTestId('nm-column-pill-popover-close').click();
     await expect(userRolePopover).toBeHidden();
 
@@ -550,7 +552,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     const aemScreenLensPopover = popoverForPill(aemScreenLensPill);
     await aemScreenLensPill.click();
     await expect(aemScreenLensPopover).toBeVisible();
-    await expect(aemScreenLensPopover).toContainText('Lens badge');
+    await expect(aemScreenLensPopover).toContainText('Lens');
     await expect(aemScreenLensPopover).toContainText('ui lens marks the linked app surface that frames the business slice.');
     await expect(aemScreenLensPopover).toContainText('CaptureLaundryLocation is being grounded in the app surface around the business slice.');
   });
