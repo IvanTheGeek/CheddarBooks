@@ -11,6 +11,7 @@ Use it for:
 
 Current target:
 
+- [`../../workspace/laundrylog/html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html`](../../workspace/laundrylog/html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html)
 - [`../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](../../workspace/laundrylog/html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 
 Usual local flow:

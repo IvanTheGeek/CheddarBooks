@@ -16,6 +16,8 @@ Current structure:
 
 - `html/aem-paths/`
   Adam/Event Modeling (`AEM`) HTML path artifacts
+- `html/nm-paths/`
+  broader `NM` / ATLAS-style modeling path artifacts
 - `html/screen-paths/`
   ordered screen-path HTML artifacts
 - `html/screens/`
@@ -51,6 +53,7 @@ Working rule:
 
 Current first review targets:
 
+- [`html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html`](html/nm-paths/LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html)
 - [`html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html`](html/screen-paths/LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.html)
 - [`html/screens/LaundryLog_ScreenComponents.html`](html/screens/LaundryLog_ScreenComponents.html)
 - [`html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html`](html/aem-paths/LaundryLog_PATH1_CommandSlice_ViewSlice.html)

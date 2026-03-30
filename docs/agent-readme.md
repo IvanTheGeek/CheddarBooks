@@ -107,6 +107,7 @@ For local F# Interactive artifact generation:
 - keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
 - when using Playwright MCP for tracked local HTML, do not target `file://` first; the MCP browser sandbox blocks `file:` URLs, so serve the tracked workspace HTML over local HTTP and point MCP there
 - when a checked-in helper script exists for a recurring build/test/refresh/verify flow, treat that script as the default AI entry point rather than rebuilding the command sequence ad hoc
+- when rendering a live HTML preview of a surface that already contains interactive controls, do not wrap the whole preview in a literal `<button>`; use a non-button activator wrapper or a separate expand control so the browser does not corrupt the DOM by auto-fixing nested interactive HTML
 
 ## Verification Discipline
 

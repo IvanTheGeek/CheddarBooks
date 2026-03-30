@@ -24,8 +24,13 @@ let writeFile (path: string) (content: string) =
 
 let utcNow = DateTime.UtcNow
 
-let updateState =
+let updateState : ScreenPathUpdateState =
     { Version = String.Format("screen-path::{0:yyyyMMddHHmmssfff}", utcNow)
+      UpdatedAtUtc = utcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+      PollIntervalMs = 3000 }
+
+let nmUpdateState : NmPathUpdateState =
+    { Version = String.Format("nm-path::{0:yyyyMMddHHmmssfff}", utcNow)
       UpdatedAtUtc = utcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
       PollIntervalMs = 3000 }
 
@@ -41,12 +46,19 @@ let screenHtml =
         (ScreenHtmlExamples.laundryLogBaseScreens ())
 
 let screenPathState = ScreenPathHtmlExamples.path1StartupToFirstEntry ()
+let nmPathState = NmPathHtmlExamples.path1FirstLaunchFirstEntry ()
 
 let screenPathHtml =
     ScreenPathHtmlRenderer.renderDocumentWithUpdateState screenPathState (Some updateState)
 
 let screenPathUpdateManifest =
     ScreenPathHtmlRenderer.renderUpdateManifestScript updateState
+
+let nmPathHtml =
+    NmPathHtmlRenderer.renderDocumentWithUpdateState nmPathState (Some nmUpdateState)
+
+let nmPathUpdateManifest =
+    NmPathHtmlRenderer.renderUpdateManifestScript nmUpdateState
 
 let aemPathFile =
     Path.Combine(workspaceRoot, "aem-paths", "LaundryLog_PATH1_CommandSlice_ViewSlice.html")
@@ -60,14 +72,25 @@ let screenPathFile =
 let screenPathUpdateFile =
     Path.Combine(workspaceRoot, "screen-paths", "LaundryLog_PATH1_AppStarted_NeedLocation_FirstEntry.update.js")
 
+let nmPathFile =
+    Path.Combine(workspaceRoot, "nm-paths", "LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.html")
+
+let nmPathUpdateFile =
+    Path.Combine(workspaceRoot, "nm-paths", "LaundryLog_PATH1_NM_FirstLaunch_FirstEntry.update.js")
+
 writeFile aemPathFile aemPathHtml
 writeFile screenFile screenHtml
 writeFile screenPathFile screenPathHtml
 writeFile screenPathUpdateFile screenPathUpdateManifest
+writeFile nmPathFile nmPathHtml
+writeFile nmPathUpdateFile nmPathUpdateManifest
 
 printfn "Refreshed workspace HTML artifacts:"
 printfn "- %s" aemPathFile
 printfn "- %s" screenFile
 printfn "- %s" screenPathFile
 printfn "- %s" screenPathUpdateFile
+printfn "- %s" nmPathFile
+printfn "- %s" nmPathUpdateFile
 printfn "Screen path update version: %s" updateState.Version
+printfn "NM path update version: %s" nmUpdateState.Version

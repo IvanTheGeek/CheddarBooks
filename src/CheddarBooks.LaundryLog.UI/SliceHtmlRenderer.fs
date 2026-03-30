@@ -1072,6 +1072,24 @@ module SliceHtmlRenderer =
         appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"
         appendLine builder "</style>"
 
+    /// Returns the current self-contained style block used by the slice renderer.
+    let renderStyleBlock () =
+        let builder = StringBuilder()
+        renderStyles builder
+        builder.ToString()
+
+    /// Returns the current script block used by the slice renderer.
+    let renderScriptBlock () =
+        let builder = StringBuilder()
+        renderScript builder
+        builder.ToString()
+
+    /// Renders one slice card as an embeddable HTML fragment.
+    let renderSliceCardHtml options (sliceCard: PathSliceCard) =
+        let builder = StringBuilder()
+        renderSliceCard builder options sliceCard
+        builder.ToString()
+
     /// Renders a full self-contained HTML document for the supplied PATH row.
     let renderDocument options (pathRow: PathRowState) =
         let builder = StringBuilder()
@@ -1101,7 +1119,7 @@ module SliceHtmlRenderer =
         appendLine builder "</section>"
 
         appendLine builder "</main>"
-        renderScript builder
+        appendLine builder (renderScriptBlock ())
         appendLine builder "</body>"
         appendLine builder "</html>"
 

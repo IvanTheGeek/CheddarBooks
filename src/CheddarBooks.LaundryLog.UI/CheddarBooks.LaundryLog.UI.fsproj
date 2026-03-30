@@ -16,6 +16,7 @@
     <Compile Include="ScreenPathHtmlRenderer.fs" />
     <Compile Include="SliceStateMappings.fs" />
     <Compile Include="SliceHtmlRenderer.fs" />
+    <Compile Include="NmPathHtmlRenderer.fs" />
     <Compile Include="LaundryLogShell.fs" />
   </ItemGroup>
 </Project>

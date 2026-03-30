@@ -1,0 +1,3058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry</title>
+<style>
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: #f8f9fa; color: #2d3748; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+.ll-document { padding: 14px 16px 28px; max-width: 1040px; margin: 0 auto; }
+.ll-document__header { margin-bottom: 14px; display: flex; flex-direction: column; gap: 3px; }
+.ll-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }
+.ll-document__title { margin: 0; font-size: 0.96rem; line-height: 1.06; font-weight: 700; }
+.ll-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; }
+.ll-primary-surface { display: flex; justify-content: center; margin-bottom: 22px; }
+.ll-primary-surface .ll-screen-surface { width: 100%; max-width: 380px; }
+.ll-primary-surface .ll-phone-screen { max-width: 380px; }
+.ll-primary-surface .ll-screen-surface__name { font-size: 0.68rem; }
+.ll-primary-surface .ll-screen-surface__note { font-size: 0.74rem; }
+.ll-supporting-surfaces { display: flex; flex-direction: column; gap: 10px; }
+.ll-supporting-surfaces__title { margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
+.ll-screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 320px)); gap: 18px; align-items: start; }
+.ll-screen-surface { display: flex; flex-direction: column; gap: 8px; }
+.ll-screen-surface__name { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }
+.ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }
+.ll-phone-screen { width: 100%; max-width: 360px; min-height: 667px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; gap: 0; }
+.ll-phone-screen--tall { min-height: 980px; }
+.ll-screen-body { padding: 0.85rem; }
+.ll-location-context { margin: 0 0 1rem; color: #64748b; font-size: 0.82rem; font-weight: 600; }
+.ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 0.9rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }
+.ll-header__text { display: flex; flex-direction: column; gap: 0.125rem; }
+.ll-header__title { margin: 0; font-size: 1.5rem; font-weight: 700; line-height: 1.05; }
+.ll-header__subtitle { margin: 0; font-size: 0.75rem; opacity: 0.95; font-weight: 500; color: rgba(255,255,255,0.95); }
+.ll-header__badge { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3); }
+.ll-panel { background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.625rem; }
+.ll-panel--compact { padding: 0.8rem; }
+.ll-panel--location { gap: 0.5rem; }
+.ll-panel__title { margin: 0; font-size: 0.875rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.ll-field__label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-location-section { display: flex; gap: 0.625rem; align-items: stretch; }
+.ll-location-input { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ll-location-info { font-size: 0.68rem; color: #64748b; margin-top: 0.2rem; font-weight: 500; }
+.ll-text-input { width: 100%; padding: 0.85rem 0.9rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; font-size: 0.95rem; color: #2d3748; transition: border-color 0.2s; font-weight: 500; }
+.ll-text-input:focus { outline: none; border-color: #ffcc80; }
+.ll-text-input::placeholder { color: #8aa0b7; }
+.ll-gps-button { flex: 0 0 56px; width: 56px; min-height: 52px; border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.ll-gps-button:active { transform: scale(0.97); background: #fff8e1; border-color: #ffcc80; }
+.ll-primary-action-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.15rem; }
+.ll-button { width: 100%; border: none; border-radius: 0.75rem; min-height: 60px; padding: 0.85rem 1rem; font-size: 1.02rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.45rem; }
+.ll-button:disabled { cursor: not-allowed; }
+.ll-button--primary { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; box-shadow: 0 4px 12px rgba(255, 204, 128, 0.4); }
+.ll-button--supporting { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }
+.ll-button--secondary { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }
+.ll-button--disabled { background: #cbd5e1; color: #475569; box-shadow: none; }
+.ll-button--success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }
+.ll-option-group { display: grid; gap: 0.625rem; }
+.ll-option-group--machine { grid-template-columns: repeat(3, 1fr); }
+.ll-option-group--payment { grid-template-columns: repeat(2, 1fr); }
+.ll-option-group--detail { grid-template-columns: repeat(2, 1fr); margin-top: 0.25rem; }
+.ll-chip { border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; color: #475569; cursor: pointer; transition: all 0.2s; }
+.ll-chip--tile { min-height: 58px; padding: 0.75rem 0.45rem; font-size: 0.875rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.18rem; }
+.ll-option-group--payment .ll-chip--tile { min-height: 54px; padding: 0.65rem 0.4rem; }
+.ll-chip--detail { min-height: 48px; padding: 0.75rem 0.6rem; font-size: 0.82rem; font-weight: 600; }
+.ll-chip--selected { background: #fff8e1; border-color: #ffcc80; color: #f57c00; }
+.ll-chip__icon { font-size: 1rem; line-height: 1; }
+.ll-chip__label { line-height: 1.1; }
+.ll-two-up { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.ll-stepper { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }
+.ll-stepper__button { width: 72px; height: 72px; border: none; background: #ffcc80; color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3); }
+.ll-stepper__button:active { transform: scale(0.95); background: #ffb74d; }
+.ll-stepper__value { font-size: 3rem; font-weight: 700; color: #2d3748; min-width: 80px; width: 80px; text-align: center; padding: 0.5rem; border: 3px solid transparent; border-radius: 0.5rem; background: transparent; }
+.ll-money-input-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr) 72px; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.ll-money-input { display: flex; align-items: center; justify-content: center; gap: 0.25rem; min-width: 0; border: 0; background: transparent; overflow: visible; }
+.ll-money-input__currency { font-size: 1.5rem; font-weight: 700; color: #64748b; padding: 0; }
+.ll-money-input__field { width: 100%; max-width: 140px; min-width: 0; padding: 0.875rem 0.5rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #2d3748; text-align: center; background: white; }
+.ll-quarter-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.ll-quarter-button { width: 72px; height: 72px; border: none; background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%); color: #4a4a4a; border-radius: 50%; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; border: 3px solid #a8a8a8; position: relative; font-family: 'Courier New', monospace; }
+.ll-quarter-button::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; border: 1px dashed rgba(128, 128, 128, 0.3); }
+.ll-quarter-button__sign { font-size: 1.25rem; font-weight: 900; margin-right: -0.125rem; z-index: 1; }
+.ll-quarter-button__coin { font-size: 1.125rem; font-weight: 700; z-index: 1; }
+.ll-quarter-button:active { transform: scale(0.95); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); }
+.ll-quick-fill-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
+.ll-chip--quick-fill { padding: 0.875rem 0.5rem; border: 2px solid #ffcc80; background: #fff8e1; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 600; color: #f57c00; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ll-chip__amount { font-size: 0.9375rem; font-weight: 600; }
+.ll-chip__subtext { font-size: 0.625rem; opacity: 0.8; display: block; margin-top: 0.25rem; }
+.ll-entry-total { background: #f1f5f9; padding: 1rem; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.ll-entry-total__label { font-size: 0.875rem; font-weight: 600; color: #64748b; }
+.ll-entry-total__amount { font-size: 1.75rem; font-weight: 700; color: #2d3748; }
+.ll-button--submit { min-height: 56px; padding-top: 0.7rem; padding-bottom: 0.7rem; }
+.ll-status-chip-row { display: grid; grid-template-columns: repeat(var(--status-chip-count, 1), minmax(0, 1fr)); gap: 0.3rem; align-items: center; width: 100%; }
+.ll-status-chip { min-width: 0; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.22rem; padding: 0.28rem 0.5rem; background: rgba(255, 255, 255, 0.92); border-radius: 999px; font-size: 0.74rem; font-weight: 600; color: #475569; box-shadow: none; line-height: 1; white-space: nowrap; }
+.ll-status-chip__icon { opacity: 0.9; }
+.ll-status-chip__label { min-width: 0; color: inherit; overflow: hidden; text-overflow: ellipsis; }
+.ll-status-chip__mark { font-weight: 800; font-size: 0.68rem; }
+.ll-status-chip--ready .ll-status-chip__mark { color: #16a34a; }
+.ll-status-chip--needs-attention .ll-status-chip__mark { color: #dc2626; }
+.ll-summary-bar { width: 100%; max-width: 100%; box-sizing: border-box; background: #fff8e1; padding: 0.8rem 1rem; border: 2px solid #ffcc80; display: flex; justify-content: space-between; align-items: center; margin: 0.6rem 0 1.2rem; border-radius: 0.5rem; }
+.ll-summary-bar__label { font-size: 0.875rem; font-weight: 600; color: #f57c00; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-summary-bar__value { font-size: 1.5rem; font-weight: 700; color: #f57c00; }
+.ll-feedback-banner { border-radius: 0.75rem; background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 700; }
+.ll-recent-entries { margin-top: 0; }
+.ll-recent-entries__title { font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-entry-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.ll-entry-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #cbd5e1; }
+.ll-entry-card__topline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.ll-entry-card__title { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }
+.ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }
+.ll-entry-card__detail { margin: 0; font-size: 0.8125rem; color: #64748b; font-weight: 500; }
+.ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }
+@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }
+</style>
+
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif; }
+.path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.34rem; --slice-description-height: 1.04rem; --property-value-indent: 1.2rem; --gwt-row-height: 148px; padding: 8px 10px 10px; }
+.path-document__header { max-width: none; margin-bottom: 8px; }
+.path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }
+.path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }
+.path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }
+.path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }
+.path-document__action:hover { background: rgba(255, 255, 255, 1.0); }
+.path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }
+.path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }
+.path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }
+.path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }
+.path-document__gwt-ref { border: 1px solid #c7d7ea; border-radius: 8px; background: rgba(255,255,255,0.8); padding: 3px 4px 4px; display: flex; flex-direction: column; gap: 2px; }
+.path-document__gwt-ref--command { background: rgba(74, 150, 255, 0.12); border-color: #8bc3ff; }
+.path-document__gwt-ref--event { background: rgba(255, 167, 57, 0.14); border-color: #ffb777; }
+.path-document__gwt-ref--view { background: rgba(103, 229, 130, 0.14); border-color: #78e39d; }
+.path-document__gwt-ref-topline { display: flex; justify-content: flex-end; }
+.path-document__gwt-ref-kind { display: inline-flex; align-items: center; justify-content: center; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.path-document__gwt-ref-title { border-radius: 2px 2px 0 0; padding: 3px 5px; font-size: 0.56rem; font-weight: 600; line-height: 1.15; color: #ffffff; background: #0ea5e9; }
+.path-document__gwt-ref--event .path-document__gwt-ref-title { background: #f97316; }
+.path-document__gwt-ref--view .path-document__gwt-ref-title { background: #22c55e; }
+.path-document__gwt-ref-properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; }
+.path-document__gwt-ref-properties-panel[open] { gap: 2px; }
+.path-document__gwt-ref-properties-panel > summary { display: none; list-style: none; cursor: pointer; }
+.path-document__gwt-ref-properties-panel > summary::-webkit-details-marker { display: none; }
+.path-document__gwt-ref-properties-summary { display: none; }
+.path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }
+.path-document__gwt-ref-properties-panel:not([open]) .path-document__gwt-ref-properties { display: none; }
+.path-document__gwt-ref-properties--hidden { display: none; }
+.path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }
+.path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }
+.path-document__gwt-ref-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }
+.path-document__gwt-ref-footer-left { display: flex; align-items: flex-end; }
+.path-document__gwt-ref-footer-right { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }
+.path-document__gwt-ref-toggle { border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; border-radius: 999px; padding: 1px 6px; font-size: 0.48rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }
+.path-document__gwt-ref-toggle:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; grid-column: span 1; }
+.slice-card--wide { grid-column: span 2; }
+.slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }
+.slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }
+.slice-card__header, .slice-card__body { display: contents; }
+.slice-card__topline { grid-row: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.slice-card__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }
+.slice-card__width-action { width: 22px; height: 22px; border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.96); color: #27435c; border-radius: 999px; padding: 0; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: -6px; margin-bottom: -6px; box-shadow: 0 2px 6px rgba(10, 27, 49, 0.12); }
+.slice-card__width-action:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }
+.slice-card__title { grid-row: 2; margin: 3px 0 0; font-size: 0.82rem; line-height: 1.04; overflow: visible; }
+.slice-card__description { grid-row: 3; margin: 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; overflow: visible; }
+.slice-card__row { display: flex; flex-direction: column; min-height: 0; }
+.slice-card__row--screen { grid-row: 4; }
+.slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }
+.slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }
+.slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 6px; margin-top: 2px; }
+.slice-card__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+.slice-card__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }
+.slice-card__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }
+.slice-card__gwt-topline { display: flex; justify-content: flex-start; }
+.slice-card__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.slice-card__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }
+.slice-card__row > .slice-block { flex: 1; }
+.slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }
+.slice-card__slot--row-fill { flex: 1; }
+.slice-block { display: flex; flex-direction: column; gap: 3px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; }
+.slice-block--screen { min-height: var(--screen-row-height); box-sizing: border-box; background: rgba(255, 255, 255, 0.78); border-color: #c8dcff; }
+.slice-block--command { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(74, 150, 255, 0.18); border-color: #8bc3ff; }
+.slice-block--event { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(255, 167, 57, 0.2); border-color: #ffb777; }
+.slice-block--view { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(103, 229, 130, 0.18); border-color: #78e39d; }
+.slice-block__topline { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto; row-gap: 5px; min-height: 0; }
+.slice-block__badges { display: flex; flex-direction: row; justify-content: flex-end; gap: 4px; grid-row: 1; }
+.slice-block__title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; overflow-wrap: normal; word-break: normal; hyphens: none; grid-row: 2; }
+.slice-block--screen .slice-block__title { font-weight: 400; font-size: 0.64rem; white-space: nowrap; }
+.slice-block__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4a647f; white-space: nowrap; box-sizing: border-box; }
+.slice-block__badge--kind { padding: 2px 6px; border-radius: 4px; border-color: #bfcad7; background: #cbd5e1; font-size: 0.5rem; letter-spacing: 0.06em; color: #1e293b; }
+.slice-block__snapshot { min-height: var(--screen-snapshot-height); border-radius: 10px; border: 1px dashed #c7d7ea; background: linear-gradient(180deg, #eef4fb 0%, #e7eef7 100%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; color: #7087a0; font-size: 0.7rem; font-weight: 600; }
+.slice-block__properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; flex: 0 0 auto; min-height: 0; }
+.slice-block__properties-panel[open] { gap: 3px; }
+.slice-block__properties-panel > summary { display: none; list-style: none; cursor: pointer; }
+.slice-block__properties-panel > summary::-webkit-details-marker { display: none; }
+.slice-block__properties-summary { display: none; }
+.slice-block__properties { display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.32); border-radius: 9px; padding: 6px 7px 5px; min-height: 48px; overflow: visible; }
+.slice-block__properties-panel:not([open]) .slice-block__properties { display: none; }
+.slice-block__properties--hidden { min-height: 0; padding: 0; background: transparent; }
+.slice-block__property-line { font-family: "IBM Plex Mono", "Cascadia Mono", "Consolas", monospace; font-size: 0.58rem; line-height: 1.18; color: #27435c; }
+.slice-block__property-line--inline { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.slice-block__property-line--stacked { display: flex; flex-direction: column; }
+.slice-block__property-key { white-space: nowrap; }
+.slice-block__property-value { overflow-wrap: break-word; word-break: normal; }
+.slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }
+.slice-card--wide .slice-block__property-line--stacked { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 0.3rem; }
+.slice-card--wide .slice-block__property-line--stacked .slice-block__property-value { padding-left: 0; }
+.slice-block__footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }
+.slice-block__footer-left { display: flex; align-items: flex-end; }
+.slice-block__footer-right { display: flex; align-items: flex-end; gap: 4px; margin-left: auto; }
+.slice-block__footer-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: none; white-space: nowrap; cursor: pointer; }
+.slice-block__footer-toggle:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }
+@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }
+@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }
+</style>
+
+<style>
+html, body { height: 100%; overflow: hidden; }
+body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%); color: #0d2440; font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif; }
+.nm-path-document { --nm-column-width: 316px; --nm-surface-scale: 0.34; --nm-surface-slot-height: 228px; height: 100vh; padding: 14px 16px 18px; display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; }
+.nm-path-document[data-surface-mode="thumbnail"] { --nm-surface-scale: 0.34; --nm-surface-slot-height: 228px; }
+.nm-path-document[data-surface-mode="full"] { --nm-surface-scale: 0.48; --nm-surface-slot-height: 320px; }
+.nm-path-document__header { display: flex; flex-direction: column; gap: 6px; }
+.nm-path-document__topline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; }
+.nm-path-document__title-zone { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.nm-path-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }
+.nm-path-document__title { margin: 0; font-size: 0.98rem; line-height: 1.06; font-weight: 700; }
+.nm-path-document__context { align-self: flex-start; min-width: 0; }
+.nm-path-document__context > summary { list-style: none; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.42rem 0.72rem; border-radius: 999px; background: #f8fafc; border: 1px solid #dbe5f1; cursor: pointer; color: #0f172a; }
+.nm-path-document__context > summary::-webkit-details-marker { display: none; }
+.nm-path-document__context-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+.nm-path-document__context-title { font-size: 0.74rem; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34vw; }
+.nm-path-document__context-panel { margin-top: 0.55rem; padding: 0.72rem 0.85rem; border-radius: 0.95rem; background: #f8fafc; border: 1px solid #dbe5f1; display: grid; gap: 0.45rem; max-width: 62rem; }
+.nm-path-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; }
+.nm-path-document__assumptions { margin: 0; padding-left: 1rem; display: grid; gap: 0.18rem; color: #475569; font-size: 0.72rem; line-height: 1.28; }
+.nm-path-document__header-controls { display: flex; gap: 0.9rem; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; }
+.nm-path-document__control-group { display: flex; flex-direction: column; gap: 0.28rem; align-items: flex-start; }
+.nm-path-document__control-label { font-size: 0.63rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+.nm-path-document__control-buttons { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.nm-path-toggle, .nm-path-update-toggle, .nm-path-update-refresh { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.7rem; font-weight: 700; padding: 0.42rem 0.72rem; cursor: pointer; }
+.nm-path-toggle:hover, .nm-path-update-toggle:hover, .nm-path-update-refresh:hover:not(:disabled) { border-color: #94a3b8; }
+.nm-path-toggle.is-active, .nm-path-update-toggle.is-active { background: #0e5883; border-color: #0e5883; color: #ffffff; }
+.nm-path-update-refresh { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); border-color: #ffb74d; color: #ffffff; }
+.nm-path-update-refresh:disabled { background: #e2e8f0; border-color: #cbd5e1; color: #94a3b8; cursor: default; }
+.nm-path-document__update-status { font-size: 0.7rem; line-height: 1.2; color: #64748b; }
+.nm-path-document__update-status[data-state="available"] { color: #9a3412; font-weight: 700; }
+.nm-path-document__update-status[data-state="error"] { color: #b91c1c; }
+.nm-path-document__update-status[data-state="auto"] { color: #0e5883; font-weight: 700; }
+.nm-path-document[data-view-mode="summary"] .nm-path-document__context-panel, .nm-path-document[data-view-mode="summary"] .nm-column__note, .nm-path-document[data-view-mode="summary"] .nm-column__meta, .nm-path-document[data-view-mode="summary"] .nm-column__technical, .nm-path-document[data-view-mode="summary"] .nm-column__changes, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__name, .nm-path-document[data-view-mode="summary"] .ll-screen-surface__note { display: none; }
+.nm-path-scroll-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 4px 4px 8px; background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.98) 72%, rgba(255, 255, 255, 0.92) 100%); }
+.nm-path-nav-button { width: 42px; height: 42px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(255, 183, 77, 0.32); }
+.nm-path-nav-button:hover:not(:disabled) { filter: brightness(0.98); }
+.nm-path-nav-button:active:not(:disabled) { transform: scale(0.96); }
+.nm-path-nav-button:disabled { background: #cbd5e1; color: #94a3b8; cursor: default; box-shadow: none; }
+.nm-path-nav-button__icon { display: inline-flex; align-items: center; justify-content: center; gap: 0.12rem; line-height: 1; }
+.nm-path-nav-button__bar { width: 3px; height: 15px; border-radius: 999px; background: currentColor; flex: 0 0 auto; }
+.nm-path-nav-button__chevron { width: 11px; height: 11px; border-top: 3px solid currentColor; border-right: 3px solid currentColor; flex: 0 0 auto; }
+.nm-path-nav-button__chevron--right { transform: rotate(45deg); }
+.nm-path-nav-button__chevron--left { transform: rotate(-135deg); }
+.nm-path-scrollbar { overflow-x: auto; overflow-y: hidden; scrollbar-gutter: stable both-edges; }
+.nm-path-scrollbar__content { height: 1px; }
+.nm-path-stage { min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 0 4px 12px; }
+.nm-path-flow-viewport { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }
+.nm-path-flow-viewport::-webkit-scrollbar { display: none; }
+.nm-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(var(--nm-column-width), var(--nm-column-width)); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }
+.nm-column { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 8px 8px 10px; min-height: 0; }
+.nm-column[hidden] { display: none !important; }
+.nm-column--app-runtime { background: linear-gradient(180deg, #e5eefb 0%, #f7fbff 100%); }
+.nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }
+.nm-column--business { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); }
+.nm-column__header { display: flex; flex-direction: column; gap: 4px; }
+.nm-column__topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.nm-column__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }
+.nm-column__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }
+.nm-column__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
+.nm-column__title { margin: 0; font-size: 0.84rem; line-height: 1.05; font-weight: 700; color: #0f172a; }
+.nm-column__note { margin: 0; font-size: 0.7rem; line-height: 1.22; color: #556b85; min-height: 2.35em; }
+.nm-column__surface-slot { display: flex; flex-direction: column; }
+.nm-column__surface-button { display: block; border: 0; background: transparent; padding: 0; cursor: zoom-in; text-align: left; border-radius: 18px; }
+.nm-column__surface-button:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
+.nm-column__surface-frame { --nm-surface-native-width: 360px; --nm-surface-native-height: 667px; position: relative; border-radius: 16px; border: 2px solid rgba(111, 135, 163, 0.35); background: rgba(255, 255, 255, 0.8); overflow: hidden; height: var(--nm-surface-slot-height); min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding: 8px; }
+.nm-column__surface-preview { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 12px; }
+.nm-column__surface-rendering { position: absolute; top: 0; left: 50%; width: var(--nm-surface-native-width); min-height: var(--nm-surface-native-height); margin-left: calc(var(--nm-surface-native-width) / -2); transform: scale(var(--nm-surface-scale)); transform-origin: top center; pointer-events: none; }
+.nm-column__surface-empty { min-height: 140px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.78rem; font-weight: 600; }
+.nm-column__body { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+.nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4a647f; white-space: nowrap; }
+.nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }
+.nm-column__badge--role { text-transform: none; }
+.nm-column__technical { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }
+.nm-column__changes { display: grid; gap: 0.25rem; padding: 0.55rem 0.7rem; border-radius: 0.85rem; background: rgba(255, 255, 255, 0.72); border: 1px solid #dce5ef; }
+.nm-column__changes-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+.nm-column__changes-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.16rem; color: #475569; font-size: 0.7rem; line-height: 1.25; }
+.nm-column__aem-detail { display: flex; flex-direction: column; }
+.nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }
+.nm-column__aem-row .slice-card { width: 100%; }
+.nm-column__aem-row .slice-card__title { font-size: 0.78rem; }
+.nm-column__aem-row .slice-card__description { font-size: 0.62rem; }
+.nm-column__aem-row .slice-card__gwt-row { margin-top: 0; }
+.nm-surface-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.66); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 40; }
+.nm-surface-overlay.is-open { display: flex; }
+.nm-surface-overlay__dialog { width: min(92vw, 520px); max-height: 92vh; background: #f8fafc; border-radius: 20px; box-shadow: 0 20px 44px rgba(15, 23, 42, 0.34); display: flex; flex-direction: column; overflow: hidden; }
+.nm-surface-overlay__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0.9rem 1rem; border-bottom: 1px solid #dbe5f1; background: #ffffff; }
+.nm-surface-overlay__title { margin: 0; font-size: 0.88rem; font-weight: 700; color: #0f172a; }
+.nm-surface-overlay__close { border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 999px; padding: 0.4rem 0.75rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+.nm-surface-overlay__body { padding: 1rem; overflow: auto; }
+.nm-surface-overlay__surface { display: flex; justify-content: center; }
+.nm-surface-overlay__surface .nm-column__surface-rendering { position: static; top: auto; left: auto; margin-left: 0; transform: none !important; width: var(--nm-surface-native-width, auto); min-height: 0; pointer-events: auto; }
+.nm-surface-overlay__surface .ll-screen-surface { width: 100%; max-width: 380px; }
+.nm-surface-overlay__surface .ll-phone-screen { max-width: 380px; min-height: auto; }
+.ll-panel--boot { min-height: 520px; justify-content: center; }
+.ll-boot-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.85rem; padding: 2rem 1rem; }
+.ll-boot-state__icon { width: 88px; height: 88px; border-radius: 1.25rem; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); display: flex; align-items: center; justify-content: center; font-size: 2.6rem; box-shadow: 0 8px 20px rgba(255, 183, 77, 0.35); }
+.ll-boot-state__title { margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f172a; }
+.ll-boot-state__subtitle { margin: 0; font-size: 0.82rem; line-height: 1.35; color: #64748b; max-width: 26ch; }
+.ll-boot-state__checks { width: 100%; display: flex; flex-direction: column; gap: 0.45rem; }
+.ll-boot-state__check { padding: 0.65rem 0.8rem; border-radius: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.76rem; font-weight: 600; color: #475569; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.55rem; align-items: center; text-align: left; }
+.ll-boot-state__check-glyph { font-size: 0.88rem; line-height: 1; }
+.ll-boot-state__check--pending { background: #f8fafc; color: #94a3b8; }
+.ll-boot-state__check--active { background: #fff7ed; border-color: #fdba74; color: #9a3412; }
+.ll-boot-state__check--complete { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+@media (max-width: 980px) { .nm-path-document { padding-left: 12px; padding-right: 12px; } .nm-path-document__topline { grid-template-columns: 1fr; } .nm-path-document__header-controls { justify-content: flex-start; } .nm-path-document__context-title { max-width: 72vw; } .nm-path-flow { grid-auto-columns: minmax(292px, 84vw); } }
+</style>
+</head>
+<body>
+<div id="nm-surface-overlay" class="nm-surface-overlay" data-testid="nm-surface-overlay" hidden>
+<div class="nm-surface-overlay__dialog">
+<div class="nm-surface-overlay__header">
+<h2 id="nm-surface-overlay-title" class="nm-surface-overlay__title">Surface</h2>
+<button id="nm-surface-overlay-close" class="nm-surface-overlay__close" data-testid="nm-surface-overlay-close" type="button">Close</button>
+</div>
+<div class="nm-surface-overlay__body">
+<div id="nm-surface-overlay-surface" class="nm-surface-overlay__surface"></div>
+</div>
+</div>
+</div>
+<main class="nm-path-document" data-testid="nm-path-document" data-view-mode="detailed" data-surface-mode="thumbnail">
+<header class="nm-path-document__header">
+<div class="nm-path-document__topline">
+<div class="nm-path-document__title-zone">
+<div class="nm-path-document__eyebrow">PATH1-NM nm path</div>
+<h1 class="nm-path-document__title">PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry</h1>
+<details class="nm-path-document__context" data-testid="nm-path-scenario" open>
+<summary data-testid="nm-path-scenario-summary">
+<span class="nm-path-document__context-label">Scenario</span>
+<span class="nm-path-document__context-title">fresh first launch with no known local data</span>
+</summary>
+<div class="nm-path-document__context-panel" data-testid="nm-path-scenario-panel">
+<p class="nm-path-document__description">First ATLAS/NM path surface for LaundryLog. It weaves application lifecycle, runtime orchestration, screen-path state, and AEM business slices into one ordered column flow.</p>
+<ul class="nm-path-document__assumptions">
+<li>No saved location is available yet.</li>
+<li>No active laundry session or pending draft exists.</li>
+<li>Startup/runtime checks must finish before the first usable screen appears.</li>
+<li>The initial route should resolve to Need Location before the first entry is composed.</li>
+<li>Business-state changes should appear as their own AEM columns rather than being collapsed into the neighboring screen columns.</li>
+</ul>
+</div>
+</details>
+</div>
+<div class="nm-path-document__header-controls">
+<section class="nm-path-document__control-group" aria-label="Path viewer controls">
+<div class="nm-path-document__control-label">View</div>
+<div class="nm-path-document__control-buttons">
+<button class="nm-path-toggle nm-path-view-toggle" type="button" data-testid="nm-path-view-toggle" data-view-mode="summary" aria-pressed="false">Summary</button>
+<button class="nm-path-toggle nm-path-view-toggle is-active" type="button" data-testid="nm-path-view-toggle" data-view-mode="detailed" aria-pressed="true">Detailed</button>
+</div>
+</section>
+<section class="nm-path-document__control-group" aria-label="Lens visibility controls">
+<div class="nm-path-document__control-label">Lenses</div>
+<div class="nm-path-document__control-buttons">
+<button class="nm-path-toggle nm-path-lens-toggle is-active" type="button" data-testid="nm-path-lens-toggle" data-lens-key="lifecycle" aria-pressed="true">Lifecycle</button>
+<button class="nm-path-toggle nm-path-lens-toggle is-active" type="button" data-testid="nm-path-lens-toggle" data-lens-key="runtime" aria-pressed="true">Runtime</button>
+<button class="nm-path-toggle nm-path-lens-toggle is-active" type="button" data-testid="nm-path-lens-toggle" data-lens-key="screen" aria-pressed="true">Screen</button>
+<button class="nm-path-toggle nm-path-lens-toggle is-active" type="button" data-testid="nm-path-lens-toggle" data-lens-key="aem" aria-pressed="true">AEM</button>
+</div>
+</section>
+<section class="nm-path-document__control-group" aria-label="Surface presentation controls">
+<div class="nm-path-document__control-label">Surface</div>
+<div class="nm-path-document__control-buttons">
+<button class="nm-path-toggle nm-path-surface-toggle is-active" type="button" data-testid="nm-path-surface-toggle" data-surface-mode="thumbnail" aria-pressed="true">Thumbnail</button>
+<button class="nm-path-toggle nm-path-surface-toggle" type="button" data-testid="nm-path-surface-toggle" data-surface-mode="full" aria-pressed="false">Full</button>
+</div>
+</section>
+<section class="nm-path-document__control-group" aria-label="Path update controls">
+<div class="nm-path-document__control-label">Updates</div>
+<div class="nm-path-document__control-buttons">
+<button class="nm-path-update-toggle" type="button" data-testid="nm-path-update-toggle" data-update-mode="notify" aria-pressed="true">Notify Me</button>
+<button class="nm-path-update-toggle" type="button" data-testid="nm-path-update-toggle" data-update-mode="auto" aria-pressed="false">Auto Refresh</button>
+<button id="nm-path-refresh-now" class="nm-path-update-refresh" data-testid="nm-path-update-refresh" type="button" hidden>Refresh Now</button>
+</div>
+<div id="nm-path-update-status" class="nm-path-document__update-status" aria-live="polite"></div>
+</section>
+</div>
+</div>
+</header>
+<section class="nm-path-scroll-controls">
+<button id="nm-path-nav-start" class="nm-path-nav-button" data-testid="nm-path-nav-start" type="button" aria-label="Back to beginning"><span class="nm-path-nav-button__icon" aria-hidden="true"><span class="nm-path-nav-button__bar"></span><span class="nm-path-nav-button__bar"></span><span class="nm-path-nav-button__chevron nm-path-nav-button__chevron--left"></span></span></button>
+<button id="nm-path-nav-previous" class="nm-path-nav-button" data-testid="nm-path-nav-previous" type="button" aria-label="Show the previous column"><span class="nm-path-nav-button__icon" aria-hidden="true"><span class="nm-path-nav-button__bar"></span><span class="nm-path-nav-button__chevron nm-path-nav-button__chevron--left"></span></span></button>
+<div id="nm-path-scrollbar" class="nm-path-scrollbar" data-testid="nm-path-scrollbar" aria-label="NM path horizontal scroll rail">
+<div id="nm-path-scrollbar-content" class="nm-path-scrollbar__content"></div>
+</div>
+<button id="nm-path-nav-next" class="nm-path-nav-button" data-testid="nm-path-nav-next" type="button" aria-label="Show the next column"><span class="nm-path-nav-button__icon" aria-hidden="true"><span class="nm-path-nav-button__chevron nm-path-nav-button__chevron--right"></span><span class="nm-path-nav-button__bar"></span></span></button>
+<button id="nm-path-nav-end" class="nm-path-nav-button" data-testid="nm-path-nav-end" type="button" aria-label="Go to end"><span class="nm-path-nav-button__icon" aria-hidden="true"><span class="nm-path-nav-button__chevron nm-path-nav-button__chevron--right"></span><span class="nm-path-nav-button__bar"></span><span class="nm-path-nav-button__bar"></span></span></button>
+</section>
+<section class="nm-path-stage">
+<div id="nm-path-flow-viewport" class="nm-path-flow-viewport" data-testid="nm-path-flow-viewport">
+<section id="nm-path-flow" class="nm-path-flow" data-testid="nm-path-flow">
+<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="01-app-started" data-lens-keys="lifecycle">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">LIFECYCLE</span>
+</div>
+<div class="nm-column__eyebrow">Step 01 · 01-app-started</div>
+<h2 class="nm-column__title">AppStarted</h2>
+<p class="nm-column__note">The user launches the app and the first splash-state surface becomes visible.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="AppStarted" role="button" tabindex="0" aria-label="Expand AppStarted surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.AppStart - Splash</div>
+<p class="ll-screen-surface__note">fresh first launch before runtime checks complete</p>
+<section class="ll-phone-screen ll-phone-screen--boot">
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--boot">
+<div class="ll-boot-state">
+<div class="ll-boot-state__icon">🧺</div>
+<h3 class="ll-boot-state__title">Starting LaundryLog</h3>
+<p class="ll-boot-state__subtitle">Preparing the first-launch startup sequence.</p>
+<div class="ll-boot-state__checks">
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="AppStarted observed">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
+<span class="ll-boot-state__check-label">AppStarted observed</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Runtime checks running">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">Runtime checks running</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="No known local session">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">No known local session</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">Route to Need Location</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ApplicationLifecycle</span>
+<span class="nm-column__badge nm-column__badge--lens">Lifecycle</span>
+<span class="nm-column__badge nm-column__badge--role">System</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.AppStart - Splash</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The splash screen becomes visible as the first surface.</li>
+<li>The AppStarted checkpoint becomes active.</li>
+<li>No runtime or route checkpoints are complete yet.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-lens-keys="runtime">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">RUNTIME</span>
+</div>
+<div class="nm-column__eyebrow">Step 02 · 02-runtime-checks</div>
+<h2 class="nm-column__title">Runtime Checks</h2>
+<p class="nm-column__note">Startup/runtime checks begin while the splash surface remains visible.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Runtime Checks" role="button" tabindex="0" aria-label="Expand Runtime Checks surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.AppStart - Runtime Checks</div>
+<p class="ll-screen-surface__note">first-launch runtime checks are in progress</p>
+<section class="ll-phone-screen ll-phone-screen--boot">
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--boot">
+<div class="ll-boot-state">
+<div class="ll-boot-state__icon">🧺</div>
+<h3 class="ll-boot-state__title">Checking startup requirements</h3>
+<p class="ll-boot-state__subtitle">Inspecting local state, offline readiness, and runtime startup conditions.</p>
+<div class="ll-boot-state__checks">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">AppStarted observed</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="Runtime checks running">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
+<span class="ll-boot-state__check-label">Runtime checks running</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="No known local session">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">No known local session</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">Route to Need Location</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
+<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
+<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
+<span class="nm-column__badge nm-column__badge--role">System</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.AppStart - Runtime Checks</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The splash message changes to startup checking.</li>
+<li>AppStarted becomes complete.</li>
+<li>Runtime checks becomes the active checkpoint.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="03-no-local-session" data-lens-keys="runtime">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">RUNTIME</span>
+</div>
+<div class="nm-column__eyebrow">Step 03 · 03-no-local-session</div>
+<h2 class="nm-column__title">No Local Session</h2>
+<p class="nm-column__note">Fresh-first-launch assumptions are confirmed from local/runtime inspection.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="No Local Session" role="button" tabindex="0" aria-label="Expand No Local Session surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.AppStart - No Local Session</div>
+<p class="ll-screen-surface__note">fresh first launch confirmed from local/runtime checks</p>
+<section class="ll-phone-screen ll-phone-screen--boot">
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--boot">
+<div class="ll-boot-state">
+<div class="ll-boot-state__icon">🧺</div>
+<h3 class="ll-boot-state__title">No local session found</h3>
+<p class="ll-boot-state__subtitle">No saved location, active session, or pending expense draft was discovered.</p>
+<div class="ll-boot-state__checks">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">AppStarted observed</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="Runtime checks running">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">Runtime checks running</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="No known local session">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
+<span class="ll-boot-state__check-label">No known local session</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
+<span class="ll-boot-state__check-label">Route to Need Location</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
+<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
+<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
+<span class="nm-column__badge nm-column__badge--role">System</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.AppStart - No Local Session</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>Runtime checks become complete.</li>
+<li>No known local session becomes the active checkpoint.</li>
+<li>The splash message confirms there is no saved location, active session, or pending draft.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="04-route-resolved" data-lens-keys="runtime">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">RUNTIME</span>
+</div>
+<div class="nm-column__eyebrow">Step 04 · 04-route-resolved</div>
+<h2 class="nm-column__title">Route Resolved</h2>
+<p class="nm-column__note">Runtime orchestration resolves Need Location as the first usable screen.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Route Resolved" role="button" tabindex="0" aria-label="Expand Route Resolved surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.AppStart - Route Resolved</div>
+<p class="ll-screen-surface__note">runtime routes the app to the first usable screen</p>
+<section class="ll-phone-screen ll-phone-screen--boot">
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--boot">
+<div class="ll-boot-state">
+<div class="ll-boot-state__icon">🧺</div>
+<h3 class="ll-boot-state__title">Routing to Need Location</h3>
+<p class="ll-boot-state__subtitle">Startup checks are complete and the first-launch path is ready to enter the app.</p>
+<div class="ll-boot-state__checks">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">AppStarted observed</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="Runtime checks running">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">Runtime checks running</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="No known local session">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
+<span class="ll-boot-state__check-label">No known local session</span>
+</div>
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="Route to Need Location">
+<span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
+<span class="ll-boot-state__check-label">Route to Need Location</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">App Runtime</span>
+<span class="nm-column__badge nm-column__badge--context">Context · RuntimeOrchestration</span>
+<span class="nm-column__badge nm-column__badge--lens">Runtime</span>
+<span class="nm-column__badge nm-column__badge--role">System</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.AppStart - Route Resolved</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>All earlier startup checkpoints are complete.</li>
+<li>Route to Need Location becomes the active checkpoint.</li>
+<li>The splash message changes from checking to entering the app.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="05-need-location" data-lens-keys="screen">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">SCREEN</span>
+</div>
+<div class="nm-column__eyebrow">Step 05 · 05-need-location</div>
+<h2 class="nm-column__title">Need Location</h2>
+<p class="nm-column__note">Fresh start with no known location yet.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Need Location" role="button" tabindex="0" aria-label="Expand Need Location surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.NewSession - Awaiting Location</div>
+<p class="ll-screen-surface__note">manual location entry before the first expense</p>
+<section class="ll-phone-screen">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" placeholder="Enter location...">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--primary" data-control-id="set-location" disabled>Set Location</button>
+</div>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Interaction</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
+<span class="nm-column__badge nm-column__badge--lens">Screen</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.NewSession - Awaiting Location</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The first usable screen replaces the splash surface.</li>
+<li>The location field is empty.</li>
+<li>Set Location remains disabled until a location is entered.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-lens-keys="screen">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">SCREEN</span>
+</div>
+<div class="nm-column__eyebrow">Step 06 · 06-ready-to-set-location</div>
+<h2 class="nm-column__title">Ready To Set Location</h2>
+<p class="nm-column__note">The user has entered location text and the confirm action is now available.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Ready To Set Location" role="button" tabindex="0" aria-label="Expand Ready To Set Location surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
+<p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
+<section class="ll-phone-screen">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Enter location...">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--primary" data-control-id="set-location">Set Location</button>
+</div>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Interaction</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
+<span class="nm-column__badge nm-column__badge--lens">Screen</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.NewSession - Ready To Set</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The location input now contains the chosen text.</li>
+<li>Set Location becomes enabled.</li>
+<li>The rest of the expense form is still not visible yet.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-lens-keys="aem">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">COMMAND</span>
+</div>
+<div class="nm-column__eyebrow">Step 07 · 07-capture-laundry-location</div>
+<h2 class="nm-column__title">CaptureLaundryLocation</h2>
+<p class="nm-column__note">The business command for location capture becomes explicit in the NM flow.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CaptureLaundryLocation" role="button" tabindex="0" aria-label="Expand CaptureLaundryLocation surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 667px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
+<p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
+<section class="ll-phone-screen">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Enter location...">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--primary" data-control-id="set-location">Set Location</button>
+</div>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Business</span>
+<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
+<span class="nm-column__badge nm-column__badge--lens">AEM</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · CommandSlice.Capture Laundry Location</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The entered location draft is now expressed as a command.</li>
+<li>The user action is represented in business terms, not only as screen state.</li>
+<li>A successful command is expected to produce LaundryLocationCaptured.</li>
+</ul>
+</div>
+<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
+<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
+<article class="slice-card slice-card--command">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">COMMAND SLICE</div>
+</div>
+<h2 class="slice-card__title">Capture Laundry Location</h2>
+<p class="slice-card__description">manual location entry starts the path</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<section class="slice-block slice-block--screen">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">Set Location Screen</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--meta">User</span>
+<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
+</div>
+</div>
+<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">ui lens</span>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--command">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CaptureLaundryLocation</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">COMMAND</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--event">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LaundryLocationCaptured</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">EVENT</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--command">
+<div class="slice-card__gwt-topline">
+<span class="slice-card__gwt-kind">command gwt</span>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">no active laundry location has been captured yet</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--command">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">COMMAND</span>
+</div>
+<div class="path-document__gwt-ref-title">CaptureLaundryLocation</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">EVENT</span>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+
+</section>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-lens-keys="aem">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">VIEW</span>
+</div>
+<div class="nm-column__eyebrow">Step 08 · 08-current-laundry-session-location</div>
+<h2 class="nm-column__title">CurrentLaundrySession</h2>
+<p class="nm-column__note">The first business projection after location capture is now explicit.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CurrentLaundrySession" role="button" tabindex="0" aria-label="Expand CurrentLaundrySession surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
+<p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-expense" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Business</span>
+<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
+<span class="nm-column__badge nm-column__badge--lens">AEM</span>
+</div>
+<div class="nm-column__technical">Surface · ViewSlice.Current Laundry Session</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The current session view now carries the active location.</li>
+<li>No visible laundry entries exist yet.</li>
+<li>The app can enter the ready-to-log entry form with the business view now established.</li>
+</ul>
+</div>
+<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
+<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
+<article class="slice-card slice-card--view">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">VIEW SLICE</div>
+</div>
+<h2 class="slice-card__title">Current Laundry Session</h2>
+<p class="slice-card__description">ready to log the first washer expense</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--view">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CurrentLaundrySession</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">VIEW</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$0.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[]&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">classic em</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--view">
+<div class="slice-card__gwt-topline">
+<span class="slice-card__gwt-kind">view gwt</span>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">EVENT</span>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">project the current laundry session for the active location</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--view">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">VIEW</span>
+</div>
+<div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$0.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[]&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+
+</section>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-lens-keys="screen">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">SCREEN</span>
+</div>
+<div class="nm-column__eyebrow">Step 09 · 09-entry-form-ready</div>
+<h2 class="nm-column__title">Entry Form Ready</h2>
+<p class="nm-column__note">The app enters the main entry surface after the location is captured.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Entry Form Ready" role="button" tabindex="0" aria-label="Expand Entry Form Ready surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
+<p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-expense" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Interaction</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
+<span class="nm-column__badge nm-column__badge--lens">Screen</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.EntryForm - Ready At Location</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The main entry screen replaces the location-only screen.</li>
+<li>Machine, quantity, price, and payment controls become visible.</li>
+<li>Log Expense is still blocked until the required entry choices are complete.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="10-washer-draft" data-lens-keys="screen">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">SCREEN</span>
+</div>
+<div class="nm-column__eyebrow">Step 10 · 10-washer-draft</div>
+<h2 class="nm-column__title">Washer Draft</h2>
+<p class="nm-column__note">The first expense draft is composed on the main screen.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Washer Draft" role="button" tabindex="0" aria-label="Expand Washer Draft surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
+<p class="ll-screen-surface__note">first expense draft inside the current location context</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+<div class="ll-field">
+<div class="ll-field__label">Choose Card</div>
+<div class="ll-option-group ll-option-group--detail">
+<button type="button" class="ll-chip ll-chip--detail ll-chip--selected" data-choice-id="card-visa-1234">Visa •1234</button>
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-business-8890">Business MC •8890</button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--primary" data-control-id="log-expense">
+Log Expense
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Interaction</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
+<span class="nm-column__badge nm-column__badge--lens">Screen</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.EntryForm - Washer Draft</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>Washer becomes the selected machine.</li>
+<li>Card payment details are expanded.</li>
+<li>The draft is complete enough for Log Expense to become available.</li>
+</ul>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-lens-keys="aem">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">COMMAND</span>
+</div>
+<div class="nm-column__eyebrow">Step 11 · 11-log-laundry-expense</div>
+<h2 class="nm-column__title">LogLaundryExpense</h2>
+<p class="nm-column__note">The first washer expense draft is now explicit as a business command.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="LogLaundryExpense" role="button" tabindex="0" aria-label="Expand LogLaundryExpense surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
+<p class="ll-screen-surface__note">first expense draft inside the current location context</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+<div class="ll-field">
+<div class="ll-field__label">Choose Card</div>
+<div class="ll-option-group ll-option-group--detail">
+<button type="button" class="ll-chip ll-chip--detail ll-chip--selected" data-choice-id="card-visa-1234">Visa •1234</button>
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-business-8890">Business MC •8890</button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--primary" data-control-id="log-expense">
+Log Expense
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Business</span>
+<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
+<span class="nm-column__badge nm-column__badge--lens">AEM</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · CommandSlice.Log Washer Expense</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The selected machine, quantity, price, and payment are now represented as command data.</li>
+<li>The washer draft is pressure-tested from a business-event perspective.</li>
+<li>A successful command is expected to produce LaundryExpenseLogged.</li>
+</ul>
+</div>
+<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
+<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
+<article class="slice-card slice-card--command">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">COMMAND SLICE</div>
+</div>
+<h2 class="slice-card__title">Log Washer Expense</h2>
+<p class="slice-card__description">first expense recorded in the active location</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<section class="slice-block slice-block--screen">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">Log Expense Screen - Ready</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--meta">User</span>
+<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
+</div>
+</div>
+<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">ui lens</span>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--command">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LogLaundryExpense</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">COMMAND</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--event">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LaundryExpenseLogged</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">EVENT</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--command">
+<div class="slice-card__gwt-topline">
+<span class="slice-card__gwt-kind">command gwt</span>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">EVENT</span>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--command">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">COMMAND</span>
+</div>
+<div class="path-document__gwt-ref-title">LogLaundryExpense</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">EVENT</span>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+
+</section>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-lens-keys="aem">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">VIEW</span>
+</div>
+<div class="nm-column__eyebrow">Step 12 · 12-current-laundry-session-washer</div>
+<h2 class="nm-column__title">CurrentLaundrySession</h2>
+<p class="nm-column__note">The business projection now shows the first logged washer entry.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="CurrentLaundrySession" role="button" tabindex="0" aria-label="Expand CurrentLaundrySession surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
+<p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.25</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-feedback-banner" data-control-id="entry-logged">✓ Entry logged — $5.00 &#183; CASH</div>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--success" data-control-id="log-expense">
+✓ Logged!
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$5.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<div class="ll-entry-list">
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$3.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:10</h4>
+</div>
+<p class="ll-entry-card__detail">1 Washer @ $3.00 • Cash</p>
+</article>
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$2.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:13</h4>
+</div>
+<p class="ll-entry-card__detail">1 Dryer @ $2.00 • Cash</p>
+</article>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Business</span>
+<span class="nm-column__badge nm-column__badge--context">Context · EventModeling</span>
+<span class="nm-column__badge nm-column__badge--lens">AEM</span>
+</div>
+<div class="nm-column__technical">Surface · ViewSlice.Current Laundry Session</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>The current session view now includes the first visible washer entry.</li>
+<li>The running total changes to reflect the first expense.</li>
+<li>The app is now ready for the next quick entry.</li>
+</ul>
+</div>
+<div class="nm-column__aem-detail" data-testid="nm-aem-detail">
+<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
+<article class="slice-card slice-card--view">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">VIEW SLICE</div>
+</div>
+<h2 class="slice-card__title">Current Laundry Session</h2>
+<p class="slice-card__description">washer entry is visible in the current session</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--view">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CurrentLaundrySession</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--kind">VIEW</span>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00]&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">classic em</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--view">
+<div class="slice-card__gwt-topline">
+<span class="slice-card__gwt-kind">view gwt</span>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">EVENT</span>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">project the current laundry session over visible entries</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--view">
+<div class="path-document__gwt-ref-topline">
+<span class="path-document__gwt-ref-kind">VIEW</span>
+</div>
+<div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00]&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+
+</section>
+</div>
+</div>
+</section>
+<section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="13-logged-success" data-lens-keys="screen">
+<div class="nm-column__header">
+<div class="nm-column__topline">
+<span class="nm-column__app-pill">LaundryLog</span>
+<span class="nm-column__kind">SCREEN</span>
+</div>
+<div class="nm-column__eyebrow">Step 13 · 13-logged-success</div>
+<h2 class="nm-column__title">Logged Success</h2>
+<p class="nm-column__note">The first entry is logged and the surface is ready for the next quick entry.</p>
+</div>
+<div class="nm-column__surface-slot">
+<div class="nm-column__surface-button" data-testid="nm-surface-open" data-action="open-surface-overlay" data-surface-label="Logged Success" role="button" tabindex="0" aria-label="Expand Logged Success surface">
+<div class="nm-column__surface-frame" style="--nm-surface-native-width: 360px; --nm-surface-native-height: 980px;">
+<div class="nm-column__surface-preview">
+<div class="nm-column__surface-rendering">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
+<p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.25</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-feedback-banner" data-control-id="entry-logged">✓ Entry logged — $5.00 &#183; CASH</div>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--success" data-control-id="log-expense">
+✓ Logged!
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$5.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<div class="ll-entry-list">
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$3.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:10</h4>
+</div>
+<p class="ll-entry-card__detail">1 Washer @ $3.00 • Cash</p>
+</article>
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$2.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:13</h4>
+</div>
+<p class="ll-entry-card__detail">1 Dryer @ $2.00 • Cash</p>
+</article>
+</div>
+</section>
+</div>
+</section>
+</article>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="nm-column__body">
+<div class="nm-column__meta" data-testid="nm-column-meta">
+<span class="nm-column__badge nm-column__badge--group">Interaction</span>
+<span class="nm-column__badge nm-column__badge--context">Context · ScreenPath</span>
+<span class="nm-column__badge nm-column__badge--lens">Screen</span>
+<span class="nm-column__badge nm-column__badge--role">User</span>
+</div>
+<div class="nm-column__technical">Surface · Screen.EntryForm - Logged Success</div>
+<div class="nm-column__changes" data-testid="nm-column-changes">
+<div class="nm-column__changes-label">What Changed</div>
+<ul class="nm-column__changes-list">
+<li>A logged-success confirmation appears.</li>
+<li>Session total updates to the new amount.</li>
+<li>Today&#39;s entries now shows logged items for continued quick entry.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+</div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const expandButton = document.querySelector('[data-action="expand-properties"]');
+  const collapseButton = document.querySelector('[data-action="collapse-properties"]');
+  const expandWidthButton = document.querySelector('[data-action="expand-width"]');
+  const collapseWidthButton = document.querySelector('[data-action="collapse-width"]');
+  const rowElements = Array.from(document.querySelectorAll('.path-document__row'));
+  const updatePropertyToggles = function () {
+    document.querySelectorAll('[data-action="toggle-block-properties"]').forEach(function (button) {
+      const block = button.closest('.slice-block');
+      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;
+      const expanded = !!panel && panel.open;
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-action="toggle-gwt-properties"]').forEach(function (button) {
+      const ref = button.closest('.path-document__gwt-ref');
+      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;
+      const expanded = !!panel && panel.open;
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+  };
+  const updateRowWidthState = function (rowElement) {
+    const baseColumns = Number(rowElement.getAttribute('data-base-columns') || '0');
+    const expandedSlices = rowElement.querySelectorAll('.slice-card--wide').length;
+    rowElement.style.setProperty('--current-slice-columns', String(baseColumns + expandedSlices));
+    rowElement.querySelectorAll('[data-action="toggle-slice-width"]').forEach(function (button) {
+      const sliceCard = button.closest('.slice-card');
+      const expanded = !!sliceCard && sliceCard.classList.contains('slice-card--wide');
+      button.textContent = expanded ? '←' : '→';
+      button.setAttribute('title', expanded ? 'Collapse slice width' : 'Expand slice width');
+      button.setAttribute('aria-label', expanded ? 'Collapse slice width' : 'Expand slice width');
+      button.setAttribute('aria-pressed', expanded ? 'true' : 'false');
+    });
+  };
+  if (expandButton) {
+    expandButton.addEventListener('click', function () {
+      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {
+        panel.open = true;
+      });
+      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {
+        panel.open = true;
+      });
+      updatePropertyToggles();
+    });
+  }
+  if (collapseButton) {
+    collapseButton.addEventListener('click', function () {
+      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {
+        panel.open = false;
+      });
+      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {
+        panel.open = false;
+      });
+      updatePropertyToggles();
+    });
+  }
+  if (expandWidthButton) {
+    expandWidthButton.addEventListener('click', function () {
+      rowElements.forEach(function (rowElement) {
+        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {
+          sliceCard.classList.add('slice-card--wide');
+        });
+        updateRowWidthState(rowElement);
+      });
+    });
+  }
+  if (collapseWidthButton) {
+    collapseWidthButton.addEventListener('click', function () {
+      rowElements.forEach(function (rowElement) {
+        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {
+          sliceCard.classList.remove('slice-card--wide');
+        });
+        updateRowWidthState(rowElement);
+      });
+    });
+  }
+  document.querySelectorAll('[data-action="toggle-block-properties"]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const block = button.closest('.slice-block');
+      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;
+      if (!panel) { return; }
+      panel.open = !panel.open;
+      updatePropertyToggles();
+    });
+  });
+  document.querySelectorAll('[data-action="toggle-gwt-properties"]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const ref = button.closest('.path-document__gwt-ref');
+      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;
+      if (!panel) { return; }
+      panel.open = !panel.open;
+      updatePropertyToggles();
+    });
+  });
+  rowElements.forEach(function (rowElement) {
+    updateRowWidthState(rowElement);
+    rowElement.querySelectorAll('[data-action="toggle-slice-width"]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const sliceCard = button.closest('.slice-card');
+        if (!sliceCard) { return; }
+        sliceCard.classList.toggle('slice-card--wide');
+        updateRowWidthState(rowElement);
+      });
+    });
+  });
+  updatePropertyToggles();
+});
+</script>
+
+<script>
+(function () {
+  const pathDocument = document.querySelector('.nm-path-document');
+  const scenarioDetails = document.querySelector('[data-testid="nm-path-scenario"]');
+  const scrollbar = document.getElementById('nm-path-scrollbar');
+  const scrollbarContent = document.getElementById('nm-path-scrollbar-content');
+  const viewport = document.getElementById('nm-path-flow-viewport');
+  const flow = document.getElementById('nm-path-flow');
+  const startButton = document.getElementById('nm-path-nav-start');
+  const previousButton = document.getElementById('nm-path-nav-previous');
+  const nextButton = document.getElementById('nm-path-nav-next');
+  const endButton = document.getElementById('nm-path-nav-end');
+  const viewModeButtons = Array.from(document.querySelectorAll('.nm-path-view-toggle'));
+  const lensButtons = Array.from(document.querySelectorAll('.nm-path-lens-toggle'));
+  const surfaceButtons = Array.from(document.querySelectorAll('.nm-path-surface-toggle'));
+  const columnElements = Array.from(document.querySelectorAll('.nm-column'));
+  const updateModeButtons = Array.from(document.querySelectorAll('.nm-path-update-toggle'));
+  const updateStatus = document.getElementById('nm-path-update-status');
+  const refreshButton = document.getElementById('nm-path-refresh-now');
+  const overlay = document.getElementById('nm-surface-overlay');
+  const overlayTitle = document.getElementById('nm-surface-overlay-title');
+  const overlaySurface = document.getElementById('nm-surface-overlay-surface');
+  const overlayClose = document.getElementById('nm-surface-overlay-close');
+  const updateModeStorageKey = 'll-nm-path-update-mode::path1-nm';
+  const lensFilterStorageKey = 'll-nm-path-lenses::path1-nm';
+  const surfaceModeStorageKey = 'll-nm-path-surface::path1-nm';
+  const defaultLensKeys = ['lifecycle', 'runtime', 'screen', 'aem'];
+  const defaultSurfaceMode = 'thumbnail';
+  const applyViewMode = (mode) => {
+    if (!pathDocument) { return; }
+    const normalizedMode = mode === 'summary' ? 'summary' : 'detailed';
+    pathDocument.dataset.viewMode = normalizedMode;
+    viewModeButtons.forEach((button) => {
+      const isActive = button.dataset.viewMode === normalizedMode;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    if (scenarioDetails) { scenarioDetails.open = normalizedMode === 'detailed'; }
+  };
+  const readStoredLensKeys = () => {
+    try {
+      const raw = window.localStorage.getItem(lensFilterStorageKey);
+      if (!raw) { return defaultLensKeys.slice(); }
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) { return defaultLensKeys.slice(); }
+      const normalized = parsed.filter((value, index, array) => typeof value === 'string' && defaultLensKeys.includes(value) && array.indexOf(value) === index);
+      return normalized.length > 0 ? normalized : defaultLensKeys.slice();
+    } catch (_) {
+      return defaultLensKeys.slice();
+    }
+  };
+  const persistLensKeys = (lensKeys) => {
+    try { window.localStorage.setItem(lensFilterStorageKey, JSON.stringify(lensKeys)); } catch (_) { }
+  };
+  const setSyncedScrollLeft = (left) => {
+    const clampedLeft = clampLeft(left);
+    syncingScroll = true;
+    viewport.scrollLeft = clampedLeft;
+    scrollbar.scrollLeft = clampedLeft;
+    syncingScroll = false;
+    updateButtonState();
+  };
+  const cancelScrollAnimation = () => {
+    if (animationFrameId !== 0) {
+      window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = 0;
+    }
+    animatingScroll = false;
+  };
+  const updateButtonState = () => {
+    const currentLeft = viewport.scrollLeft;
+    const currentMax = logicalMaxScrollLeft();
+    if (startButton) { startButton.disabled = currentLeft <= 2; }
+    if (previousButton) { previousButton.disabled = currentLeft <= 2; }
+    if (nextButton) { nextButton.disabled = currentLeft >= currentMax - 2; }
+    if (endButton) { endButton.disabled = currentLeft >= currentMax - 2; }
+  };
+  const readStoredSurfaceMode = () => {
+    try { return window.localStorage.getItem(surfaceModeStorageKey) || defaultSurfaceMode; } catch (_) { return defaultSurfaceMode; }
+  };
+  const persistSurfaceMode = (mode) => {
+    try { window.localStorage.setItem(surfaceModeStorageKey, mode); } catch (_) { }
+  };
+  const applySurfaceMode = (mode) => {
+    if (!pathDocument) { return; }
+    const normalizedMode = mode === 'full' ? 'full' : 'thumbnail';
+    pathDocument.dataset.surfaceMode = normalizedMode;
+    persistSurfaceMode(normalizedMode);
+    surfaceButtons.forEach((button) => {
+      const isActive = button.dataset.surfaceMode === normalizedMode;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  };
+  const applyLensFilters = (lensKeys) => {
+    const activeLensKeys = lensKeys.filter((value, index, array) => defaultLensKeys.includes(value) && array.indexOf(value) === index);
+    if (activeLensKeys.length === 0) { return; }
+    if (pathDocument) { pathDocument.dataset.activeLenses = activeLensKeys.join(','); }
+    lensButtons.forEach((button) => {
+      const isActive = activeLensKeys.includes(button.dataset.lensKey || '');
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    columnElements.forEach((column) => {
+      const lensKeys = (column.dataset.lensKeys || '').split(',').filter(Boolean);
+      const shouldShow = lensKeys.some((lensKey) => activeLensKeys.includes(lensKey));
+      column.hidden = !shouldShow;
+    });
+    persistLensKeys(activeLensKeys);
+    window.requestAnimationFrame(() => syncWidth());
+  };
+  const stepIndexAtOrBefore = (targets, currentLeft) => {
+    let index = 0;
+    for (let i = 0; i < targets.length; i += 1) {
+      if (targets[i] <= currentLeft + 4) { index = i; }
+    }
+    return index;
+  };
+  let syncingScroll = false;
+  let animatingScroll = false;
+  let animationFrameId = 0;
+  let currentStepMetrics = { targets: [0], logicalMaxTarget: 0 };
+  const baseFlowPaddingRight = flow ? (parseFloat(window.getComputedStyle(flow).paddingRight) || 0) : 0;
+  const measureStepMetrics = () => {
+    const columns = Array.from(flow.querySelectorAll('.nm-column')).filter((column) => !column.hidden);
+    if (columns.length === 0) { return { targets: [0], logicalMaxTarget: 0 }; }
+    const firstOffset = columns[0].offsetLeft;
+    const normalizedTargets = columns.map((column) => Math.max(0, Math.round(column.offsetLeft - firstOffset)));
+    const contentRightEdge = Math.max(...columns.map((column, index) => normalizedTargets[index] + Math.round(column.getBoundingClientRect().width)));
+    const maxStartIndexCandidate = normalizedTargets.findIndex((target) => contentRightEdge - target <= ((viewport?.clientWidth ?? 0) + 1));
+    const maxStartIndex = maxStartIndexCandidate >= 0 ? maxStartIndexCandidate : Math.max(0, normalizedTargets.length - 1);
+    const targets = normalizedTargets.slice(0, maxStartIndex + 1);
+    const logicalMaxTarget = targets.length > 0 ? targets[targets.length - 1] : 0;
+    return { targets, logicalMaxTarget };
+  };
+  const logicalMaxScrollLeft = () => currentStepMetrics.logicalMaxTarget;
+  const clampLeft = (left) => Math.max(0, Math.min(left, logicalMaxScrollLeft()));
+  const syncWidth = () => {
+    if (!flow || !viewport || !scrollbar || !scrollbarContent) { return; }
+    flow.style.paddingRight = `${baseFlowPaddingRight}px`;
+    currentStepMetrics = measureStepMetrics();
+    const nativeMaxScroll = Math.max(0, flow.scrollWidth - viewport.clientWidth);
+    const extraTrailingSpace = Math.max(0, currentStepMetrics.logicalMaxTarget - nativeMaxScroll);
+    flow.style.paddingRight = `${baseFlowPaddingRight + extraTrailingSpace}px`;
+    scrollbarContent.style.width = `${Math.ceil(scrollbar.offsetWidth + currentStepMetrics.logicalMaxTarget)}px`;
+    if (!syncingScroll) { scrollbar.scrollLeft = clampLeft(viewport.scrollLeft); }
+    updateButtonState();
+  };
+  const refreshScrollMetrics = () => {
+    syncWidth();
+    return currentStepMetrics;
+  };
+  const animateScrollToColumn = (targetLeft) => {
+    const startLeft = viewport.scrollLeft;
+    const endLeft = clampLeft(targetLeft);
+    if (Math.abs(endLeft - startLeft) <= 1) {
+      setSyncedScrollLeft(endLeft);
+      return;
+    }
+    cancelScrollAnimation();
+    animatingScroll = true;
+    const durationMs = 240;
+    const startedAt = window.performance.now();
+    const easeInOutQuad = (progress) => progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+    const tick = (now) => {
+      const progress = Math.min(1, (now - startedAt) / durationMs);
+      const easedProgress = easeInOutQuad(progress);
+      const nextLeft = Math.round(startLeft + ((endLeft - startLeft) * easedProgress));
+      setSyncedScrollLeft(nextLeft);
+      if (progress < 1) {
+        animationFrameId = window.requestAnimationFrame(tick);
+      } else {
+        animationFrameId = 0;
+        animatingScroll = false;
+        setSyncedScrollLeft(endLeft);
+      }
+    };
+    animationFrameId = window.requestAnimationFrame(tick);
+  };
+  const scrollToStart = () => { refreshScrollMetrics(); animateScrollToColumn(0); };
+  const scrollToEnd = () => { refreshScrollMetrics(); animateScrollToColumn(logicalMaxScrollLeft()); };
+  const scrollByOneColumn = (direction) => {
+    const targets = refreshScrollMetrics().targets;
+    if (targets.length === 0) { return; }
+    const currentIndex = stepIndexAtOrBefore(targets, viewport.scrollLeft);
+    const targetIndex = Math.max(0, Math.min(targets.length - 1, currentIndex + direction));
+    animateScrollToColumn(targets[targetIndex]);
+  };
+  viewModeButtons.forEach((button) => {
+    button.addEventListener('click', () => applyViewMode(button.dataset.viewMode || 'detailed'));
+  });
+  lensButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const clickedLensKey = button.dataset.lensKey || '';
+      const currentLensKeys = readStoredLensKeys();
+      const isActive = currentLensKeys.includes(clickedLensKey);
+      const nextLensKeys = isActive
+        ? (currentLensKeys.length > 1 ? currentLensKeys.filter((lensKey) => lensKey !== clickedLensKey) : currentLensKeys)
+        : currentLensKeys.concat(clickedLensKey);
+      applyLensFilters(nextLensKeys);
+    });
+  });
+  surfaceButtons.forEach((button) => {
+    button.addEventListener('click', () => applySurfaceMode(button.dataset.surfaceMode || defaultSurfaceMode));
+  });
+  if (startButton) { startButton.addEventListener('click', scrollToStart); }
+  if (previousButton) { previousButton.addEventListener('click', () => scrollByOneColumn(-1)); }
+  if (nextButton) { nextButton.addEventListener('click', () => scrollByOneColumn(1)); }
+  if (endButton) { endButton.addEventListener('click', scrollToEnd); }
+  if (scrollbar) {
+    scrollbar.addEventListener('scroll', () => {
+      if (syncingScroll || animatingScroll) { return; }
+      cancelScrollAnimation();
+      setSyncedScrollLeft(scrollbar.scrollLeft);
+    });
+  }
+  if (viewport) {
+    viewport.addEventListener('scroll', () => {
+      if (syncingScroll || animatingScroll) { return; }
+      cancelScrollAnimation();
+      syncingScroll = true;
+      scrollbar.scrollLeft = clampLeft(viewport.scrollLeft);
+      syncingScroll = false;
+      updateButtonState();
+    });
+  }
+  const openOverlay = (surfaceActivator) => {
+    if (!overlay || !overlaySurface || !overlayTitle) { return; }
+    const rendering = surfaceActivator.querySelector('.nm-column__surface-rendering');
+    if (!rendering) { return; }
+    overlaySurface.innerHTML = '';
+    overlaySurface.appendChild(rendering.cloneNode(true));
+    overlayTitle.textContent = surfaceActivator.dataset.surfaceLabel || 'Surface';
+    overlay.classList.add('is-open');
+    overlay.hidden = false;
+  };
+  const closeOverlay = () => {
+    if (!overlay || !overlaySurface) { return; }
+    overlay.classList.remove('is-open');
+    overlay.hidden = true;
+    overlaySurface.innerHTML = '';
+  };
+  document.querySelectorAll('[data-action="open-surface-overlay"]').forEach((surfaceActivator) => {
+    surfaceActivator.addEventListener('click', () => openOverlay(surfaceActivator));
+    surfaceActivator.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openOverlay(surfaceActivator);
+      }
+    });
+  });
+  if (overlayClose) { overlayClose.addEventListener('click', closeOverlay); }
+  if (overlay) {
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) { closeOverlay(); }
+    });
+  }
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { closeOverlay(); }
+  });
+  const setUpdateStatus = (message, state) => {
+    if (!updateStatus) { return; }
+    updateStatus.textContent = message;
+    if (state) { updateStatus.dataset.state = state; } else { delete updateStatus.dataset.state; }
+  };
+  const setRefreshPending = (isPending) => {
+    if (!refreshButton) { return; }
+    refreshButton.disabled = !isPending;
+    refreshButton.hidden = !isPending;
+  };
+  const readStoredUpdateMode = () => {
+    try { return window.localStorage.getItem(updateModeStorageKey) || 'notify'; } catch (_) { return 'notify'; }
+  };
+  const persistUpdateMode = (mode) => {
+    try { window.localStorage.setItem(updateModeStorageKey, mode); } catch (_) { }
+  };
+  const applyUpdateMode = (mode) => {
+    const normalizedMode = mode === 'auto' ? 'auto' : 'notify';
+    if (pathDocument) { pathDocument.dataset.updateMode = normalizedMode; }
+    persistUpdateMode(normalizedMode);
+    updateModeButtons.forEach((button) => {
+      const isActive = button.dataset.updateMode === normalizedMode;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+    return normalizedMode;
+  };
+  updateModeButtons.forEach((button) => {
+    button.addEventListener('click', () => applyUpdateMode(button.dataset.updateMode || 'notify'));
+  });
+  applyViewMode((pathDocument && pathDocument.dataset.viewMode) || 'detailed');
+  applySurfaceMode(readStoredSurfaceMode());
+  applyLensFilters(readStoredLensKeys());
+  applyUpdateMode(readStoredUpdateMode());
+  syncWidth();
+  window.requestAnimationFrame(() => syncWidth());
+  window.addEventListener('resize', syncWidth);
+  window.addEventListener('load', syncWidth);
+  if (window.ResizeObserver && flow) {
+    new ResizeObserver(syncWidth).observe(flow);
+  }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => syncWidth()).catch(() => {});
+  }
+  const currentArtifactVersion = "nm-path::20260330104200369";
+  const currentArtifactUpdatedAt = "2026-03-30T10:42:00Z";
+  const updatePollIntervalMs = 3000;
+  let pendingUpdateManifest = null;
+  let updateCheckInFlight = false;
+  const buildUpdateManifestUrl = () => {
+    const pathName = window.location.pathname;
+    const manifestPath = /\.html?$/i.test(pathName) ? pathName.replace(/\.html?$/i, '.update.js') : `${pathName}.update.js`;
+    return `${manifestPath}?ts=${Date.now()}`;
+  };
+  const loadUpdateManifest = () => {
+    return new Promise((resolve, reject) => {
+      delete window.__llNmPathUpdateManifest;
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = buildUpdateManifestUrl();
+      script.onload = () => {
+        const manifest = window.__llNmPathUpdateManifest || null;
+        script.remove();
+        resolve(manifest);
+      };
+      script.onerror = () => {
+        script.remove();
+        reject(new Error('update manifest unavailable'));
+      };
+      document.head.appendChild(script);
+    });
+  };
+  const maybeApplyPendingUpdate = () => {
+    if (!pendingUpdateManifest) { return; }
+    if (readStoredUpdateMode() === 'auto') {
+      setUpdateStatus(`Update detected (${pendingUpdateManifest.updatedAt || 'new build'}) — refreshing…`, 'auto');
+      window.location.reload();
+    }
+  };
+  const checkForArtifactUpdate = async () => {
+    if (updateCheckInFlight) { return; }
+    updateCheckInFlight = true;
+    try {
+      const manifest = await loadUpdateManifest();
+      if (!manifest || !manifest.version) {
+        setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+        return;
+      }
+      if (manifest.version !== currentArtifactVersion) {
+        pendingUpdateManifest = manifest;
+        setRefreshPending(true);
+        setUpdateStatus(`Update available (${manifest.updatedAt || 'new build'}).`, 'available');
+        maybeApplyPendingUpdate();
+      } else if (!pendingUpdateManifest) {
+        setRefreshPending(false);
+        setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+      }
+    } catch (_) {
+      setUpdateStatus('Update monitor unavailable for this artifact.', 'error');
+    } finally {
+      updateCheckInFlight = false;
+    }
+  };
+  if (refreshButton) {
+    refreshButton.addEventListener('click', () => window.location.reload());
+  }
+  updateModeButtons.forEach((button) => {
+    button.addEventListener('click', maybeApplyPendingUpdate);
+  });
+  setRefreshPending(false);
+  setUpdateStatus(`Up to date (${currentArtifactUpdatedAt}).`, null);
+  checkForArtifactUpdate();
+  window.setInterval(checkForArtifactUpdate, updatePollIntervalMs);
+})();
+</script>
+</main>
+</body>
+</html>

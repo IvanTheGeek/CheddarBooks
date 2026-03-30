@@ -594,6 +594,86 @@ module LaundryLogTests =
                   Expect.stringContains manifestScript "screen-path::test" "Expected the manifest version."
                   Expect.stringContains manifestScript "2026-03-29T12:34:56Z" "Expected the manifest timestamp.")
 
+              testCase "NM path renderer sequences the first ATLAS-style mixed path" (fun () ->
+                  let htmlDocument =
+                      NmPathHtmlRenderer.renderDocument (NmPathHtmlExamples.path1FirstLaunchFirstEntry ())
+
+                  Expect.stringContains
+                      htmlDocument
+                      "PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry"
+                      "Expected the first NM path title."
+
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-document\"" "Expected a stable browser-test hook for the NM path document."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-column\"" "Expected stable browser-test hooks for NM columns."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-view-toggle\"" "Expected stable browser-test hooks for NM view toggles."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-lens-toggle\"" "Expected stable browser-test hooks for NM lens toggles."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-surface-toggle\"" "Expected stable browser-test hooks for surface-mode toggles."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-surface-open\"" "Expected stable browser-test hooks for opening expanded surface overlays."
+                  Expect.stringContains htmlDocument "data-testid=\"nm-surface-overlay\"" "Expected the NM path to provide a surface overlay."
+                  Expect.stringContains htmlDocument ".nm-column__surface-preview" "Expected the NM surface slot to render through a dedicated preview wrapper."
+                  Expect.stringContains htmlDocument ".nm-column__surface-rendering { position: absolute;" "Expected the NM preview rendering to be absolutely positioned inside the clipped slot."
+                  Expect.isFalse
+                      (htmlDocument.Contains("<button type=\"button\" class=\"nm-column__surface-button\""))
+                      "Expected the NM preview activator not to be a button, because the surface preview contains nested controls."
+                  Expect.stringContains htmlDocument "Lifecycle" "Expected the lifecycle lens toggle."
+                  Expect.stringContains htmlDocument "Runtime" "Expected the runtime lens toggle."
+                  Expect.stringContains htmlDocument "Screen" "Expected the screen lens toggle."
+                  Expect.stringContains htmlDocument "AEM" "Expected the AEM lens toggle."
+                  Expect.stringContains htmlDocument "Thumbnail" "Expected the thumbnail surface mode control."
+                  Expect.stringContains htmlDocument "Full" "Expected the full surface mode control."
+                  Expect.stringContains htmlDocument "Context · ApplicationLifecycle" "Expected lifecycle bounded-context metadata."
+                  Expect.stringContains htmlDocument "Context · RuntimeOrchestration" "Expected runtime bounded-context metadata."
+                  Expect.stringContains htmlDocument "Context · ScreenPath" "Expected screen-path bounded-context metadata."
+                  Expect.stringContains htmlDocument "Context · EventModeling" "Expected Event Modeling bounded-context metadata."
+                  Expect.stringContains htmlDocument "App Runtime" "Expected the runtime context group badge."
+                  Expect.stringContains htmlDocument "Interaction" "Expected the interaction context group badge."
+                  Expect.stringContains htmlDocument "Business" "Expected the business context group badge."
+                  Expect.stringContains htmlDocument "COMMAND SLICE" "Expected embedded AEM command slices in the NM path."
+                  Expect.stringContains htmlDocument "VIEW SLICE" "Expected embedded AEM view slices in the NM path."
+                  Expect.stringContains htmlDocument "The entered location draft is now expressed as a command." "Expected the AEM business change summary."
+                  Expect.stringContains htmlDocument "The current session view now includes the first visible washer entry." "Expected the post-command projection change summary."
+                  Expect.stringContains htmlDocument "Surface · CommandSlice.Capture Laundry Location" "Expected the technical surface label for the first embedded command slice."
+                  Expect.stringContains htmlDocument "Surface · ViewSlice.Current Laundry Session" "Expected the technical surface label for embedded view slices."
+                  Expect.stringContains htmlDocument "data-view-mode=\"detailed\"" "Expected Detailed to be the default NM working view."
+                  Expect.stringContains htmlDocument "data-surface-mode=\"thumbnail\"" "Expected Thumbnail to be the default NM surface presentation."
+                  Expect.isFalse (htmlDocument.Contains(">Standard<")) "Expected the NM page to drop the Standard view mode entirely."
+
+                  let orderedKeys =
+                      [ "01-app-started"
+                        "02-runtime-checks"
+                        "03-no-local-session"
+                        "04-route-resolved"
+                        "05-need-location"
+                        "06-ready-to-set-location"
+                        "07-capture-laundry-location"
+                        "08-current-laundry-session-location"
+                        "09-entry-form-ready"
+                        "10-washer-draft"
+                        "11-log-laundry-expense"
+                        "12-current-laundry-session-washer"
+                        "13-logged-success" ]
+
+                  let mutable priorIndex = -1
+
+                  orderedKeys
+                  |> List.iter (fun columnKey ->
+                      let marker = $"data-column-key=\"{columnKey}\""
+                      let currentIndex = htmlDocument.IndexOf(marker)
+                      Expect.isGreaterThanOrEqual currentIndex 0 $"Expected the NM column '{columnKey}' in the rendered HTML."
+                      Expect.isGreaterThan currentIndex priorIndex $"Expected '{columnKey}' to appear after the previous NM column."
+                      priorIndex <- currentIndex))
+
+              testCase "NM path renderer emits its sidecar update manifest script" (fun () ->
+                  let manifestScript =
+                      NmPathHtmlRenderer.renderUpdateManifestScript
+                          { Version = "nm-path::test"
+                            UpdatedAtUtc = "2026-03-30T04:49:52Z"
+                            PollIntervalMs = 3000 }
+
+                  Expect.stringContains manifestScript "window.__llNmPathUpdateManifest" "Expected the NM manifest bootstrap global."
+                  Expect.stringContains manifestScript "nm-path::test" "Expected the NM manifest version."
+                  Expect.stringContains manifestScript "2026-03-30T04:49:52Z" "Expected the NM manifest timestamp.")
+
               testCase "Screen renderer uses the reusable LaundryLog component blocks" (fun () ->
                   let htmlDocument =
                       ScreenHtmlRenderer.renderDocument
