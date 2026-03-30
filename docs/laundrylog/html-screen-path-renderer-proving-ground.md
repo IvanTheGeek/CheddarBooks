@@ -145,6 +145,7 @@ Working rule:
 - the header controls decide which lens families are currently visible
 - each visible step still states its own bounded context and lens explicitly
 - the page should not force one permanently fixed lens mix
+- when a path step uses authored layout like `.ll-path-step { display: flex; ... }`, do not rely on the browser's default `[hidden]` behavior alone; the renderer should emit an explicit author rule such as `.ll-path-step[hidden] { display: none !important; }` so filtered lens steps are actually removed from layout
 
 ## Step Metadata Hierarchy
 

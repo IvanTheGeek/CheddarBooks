@@ -113,6 +113,17 @@ async function readBootStatuses(page, stepKey: string): Promise<string[]> {
     .evaluateAll((elements) => elements.map((element) => element.getAttribute('data-status') || ''));
 }
 
+async function expectStepRemovedFromLayout(page, stepKey: string): Promise<void> {
+  const step = page.locator(`[data-testid="path-step"][data-step-key="${stepKey}"]`);
+  await expect(step).toBeHidden();
+  await expect(step).toHaveAttribute('hidden', '');
+  await expect
+    .poll(async () =>
+      step.evaluate((element) => window.getComputedStyle(element as HTMLElement).display),
+    )
+    .toBe('none');
+}
+
 test.describe('PATH1 screen path workspace artifact', () => {
   test('next and previous move by whole logical columns and keep the rail in sync', async ({ page }) => {
     await page.goto(path1HttpPath);
@@ -163,8 +174,8 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await clickLens(page, 'screen-path');
     await expect.poll(async () => (await readPathMetrics(page)).visibleStepKeys).toEqual(['01-app-started']);
     await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toBeVisible();
-    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toHaveAttribute('hidden', '');
-    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
+    await expectStepRemovedFromLayout(page, '02-runtime-checks');
+    await expectStepRemovedFromLayout(page, '05-need-location');
 
     await clickLens(page, 'app-runtime');
     await expect
@@ -172,15 +183,15 @@ test.describe('PATH1 screen path workspace artifact', () => {
       .toEqual(['01-app-started', '02-runtime-checks', '03-no-local-session', '04-route-resolved']);
     await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toBeVisible();
     await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
-    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
+    await expectStepRemovedFromLayout(page, '05-need-location');
 
     await clickLens(page, 'application-lifecycle');
     await expect
       .poll(async () => (await readPathMetrics(page)).visibleStepKeys)
       .toEqual(['02-runtime-checks', '03-no-local-session', '04-route-resolved']);
-    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toHaveAttribute('hidden', '');
+    await expectStepRemovedFromLayout(page, '01-app-started');
     await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
-    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
+    await expectStepRemovedFromLayout(page, '05-need-location');
 
     await clickLens(page, 'screen-path');
     await expect
@@ -218,7 +229,7 @@ test.describe('PATH1 screen path workspace artifact', () => {
     );
     await expect(page.locator('[data-testid="path-lens-toggle"][data-lens-key="app-runtime"]')).toHaveClass(/is-active/);
     await expect(page.locator('[data-testid="path-lens-toggle"][data-lens-key="screen-path"]')).toHaveClass(/is-active/);
-    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toHaveAttribute('hidden', '');
+    await expectStepRemovedFromLayout(page, '01-app-started');
     await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
     await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toBeVisible();
   });

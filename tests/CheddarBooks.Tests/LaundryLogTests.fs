@@ -477,6 +477,11 @@ module LaundryLogTests =
 
                   Expect.stringContains
                       htmlDocument
+                      ".ll-path-step[hidden] { display: none !important; }"
+                      "Expected hidden path steps to be removed from layout when lens toggles disable them."
+
+                  Expect.stringContains
+                      htmlDocument
                       "setSyncedScrollLeft(scrollbar.scrollLeft);"
                       "Expected the top rail to drive horizontal scrolling of the screen strip through the shared sync helper."
 

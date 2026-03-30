@@ -420,6 +420,7 @@ module ScreenPathHtmlRenderer =
         appendLine builder ".ll-path-flow-viewport::-webkit-scrollbar { display: none; }"
         appendLine builder ".ll-path-flow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(360px, 380px); width: max-content; gap: 18px; align-items: start; padding: 4px 4px 18px; }"
         appendLine builder ".ll-path-step { display: flex; flex-direction: column; gap: 8px; }"
+        appendLine builder ".ll-path-step[hidden] { display: none !important; }"
         appendLine builder ".ll-path-step__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }"
         appendLine builder ".ll-path-step__title { margin: 0; font-size: 0.82rem; line-height: 1.15; font-weight: 700; color: #0f172a; }"
         appendLine builder ".ll-path-step__note { margin: 0; font-size: 0.72rem; line-height: 1.28; color: #64748b; min-height: 2.4em; }"
