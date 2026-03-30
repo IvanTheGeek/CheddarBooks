@@ -608,6 +608,9 @@ module LaundryLogTests =
                       "PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry"
                       "Expected the first NM path title."
 
+                  Expect.stringContains htmlDocument "data-testid=\"nm-path-app-pill\"" "Expected a stable browser-test hook for the NM header app pill."
+                  Expect.stringContains htmlDocument ">LaundryLog</span>" "Expected the NM header to identify the app under review."
+                  Expect.isFalse (htmlDocument.Contains("nm-column__app-pill")) "Expected the repeated outer-column app pill to move into the NM page header."
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-document\"" "Expected a stable browser-test hook for the NM path document."
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-column\"" "Expected stable browser-test hooks for NM columns."
                   Expect.stringContains htmlDocument "data-testid=\"nm-path-view-toggle\"" "Expected stable browser-test hooks for NM view toggles."

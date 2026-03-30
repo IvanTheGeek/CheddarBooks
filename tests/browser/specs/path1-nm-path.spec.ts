@@ -163,6 +163,8 @@ test.describe('PATH1 NM workspace artifact', () => {
   test('next and end navigation move by whole logical columns and keep the rail synchronized', async ({ page }) => {
     await page.goto(nmPathHttpPath);
     await expect(page.getByRole('heading', { name: 'PATH 1 NM: Fresh First Launch -> Need Location -> First Entry' })).toBeVisible();
+    await expect(page.getByTestId('nm-path-app-pill')).toHaveText('LaundryLog');
+    await expect(page.locator('.nm-column__app-pill')).toHaveCount(0);
 
     const initialMetrics = await readNmPathMetrics(page);
 

@@ -225,6 +225,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-path-document__header { display: flex; flex-direction: column; gap: 6px; }
 .nm-path-document__topline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; }
 .nm-path-document__title-zone { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.nm-path-document__identity-row { display: flex; align-items: center; gap: 0.55rem; min-width: 0; flex-wrap: wrap; }
+.nm-path-document__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 0.28rem 0.68rem; border-radius: 999px; background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: #ffffff; font-size: 0.68rem; font-weight: 700; line-height: 1; box-shadow: 0 2px 8px rgba(255, 183, 77, 0.24); }
 .nm-path-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }
 .nm-path-document__title { margin: 0; font-size: 0.98rem; line-height: 1.06; font-weight: 700; }
 .nm-path-document__context { align-self: flex-start; min-width: 0; }
@@ -271,8 +273,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column--interaction { background: linear-gradient(180deg, #eef8f1 0%, #fbfffc 100%); }
 .nm-column--business { background: linear-gradient(180deg, #f4f6fa 0%, #ffffff 100%); }
 .nm-column__header { display: flex; flex-direction: column; gap: 4px; }
-.nm-column__topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.nm-column__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }
+.nm-column__topline { display: flex; align-items: flex-start; justify-content: flex-end; gap: 10px; }
 .nm-column__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }
 .nm-column__eyebrow { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #94a3b8; }
 .nm-column__title { margin: 0; font-size: 0.84rem; line-height: 1.05; font-weight: 700; color: #0f172a; }
@@ -340,7 +341,10 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <header class="nm-path-document__header">
 <div class="nm-path-document__topline">
 <div class="nm-path-document__title-zone">
+<div class="nm-path-document__identity-row">
+<span class="nm-path-document__app-pill" data-testid="nm-path-app-pill">LaundryLog</span>
 <div class="nm-path-document__eyebrow">PATH1-NM nm path</div>
+</div>
 <h1 class="nm-path-document__title">PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry</h1>
 <details class="nm-path-document__context" data-testid="nm-path-scenario" open>
 <summary data-testid="nm-path-scenario-summary">
@@ -410,7 +414,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="01-app-started" data-lens-keys="lifecycle">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">LIFECYCLE</span>
 </div>
 <div class="nm-column__eyebrow">Step 01 · 01-app-started</div>
@@ -482,7 +485,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="02-runtime-checks" data-lens-keys="runtime">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">RUNTIME</span>
 </div>
 <div class="nm-column__eyebrow">Step 02 · 02-runtime-checks</div>
@@ -554,7 +556,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="03-no-local-session" data-lens-keys="runtime">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">RUNTIME</span>
 </div>
 <div class="nm-column__eyebrow">Step 03 · 03-no-local-session</div>
@@ -626,7 +627,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--app-runtime" data-testid="nm-path-column" data-column-key="04-route-resolved" data-lens-keys="runtime">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">RUNTIME</span>
 </div>
 <div class="nm-column__eyebrow">Step 04 · 04-route-resolved</div>
@@ -698,7 +698,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="05-need-location" data-lens-keys="screen">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 05 · 05-need-location</div>
@@ -767,7 +766,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="06-ready-to-set-location" data-lens-keys="screen">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 06 · 06-ready-to-set-location</div>
@@ -836,7 +834,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="07-capture-laundry-location" data-lens-keys="aem">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">COMMAND</span>
 </div>
 <div class="nm-column__eyebrow">Step 07 · 07-capture-laundry-location</div>
@@ -1096,7 +1093,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="08-current-laundry-session-location" data-lens-keys="aem">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">VIEW</span>
 </div>
 <div class="nm-column__eyebrow">Step 08 · 08-current-laundry-session-location</div>
@@ -1390,7 +1386,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="09-entry-form-ready" data-lens-keys="screen">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 09 · 09-entry-form-ready</div>
@@ -1535,7 +1530,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="10-washer-draft" data-lens-keys="screen">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 10 · 10-washer-draft</div>
@@ -1683,7 +1677,6 @@ Log Expense
 <section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="11-log-laundry-expense" data-lens-keys="aem">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">COMMAND</span>
 </div>
 <div class="nm-column__eyebrow">Step 11 · 11-log-laundry-expense</div>
@@ -2094,7 +2087,6 @@ Log Expense
 <section class="nm-column nm-column--business" data-testid="nm-path-column" data-column-key="12-current-laundry-session-washer" data-lens-keys="aem">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">VIEW</span>
 </div>
 <div class="nm-column__eyebrow">Step 12 · 12-current-laundry-session-washer</div>
@@ -2412,7 +2404,6 @@ Log Expense
 <section class="nm-column nm-column--interaction" data-testid="nm-path-column" data-column-key="13-logged-success" data-lens-keys="screen">
 <div class="nm-column__header">
 <div class="nm-column__topline">
-<span class="nm-column__app-pill">LaundryLog</span>
 <span class="nm-column__kind">SCREEN</span>
 </div>
 <div class="nm-column__eyebrow">Step 13 · 13-logged-success</div>
@@ -3030,8 +3021,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330110937626";
-  const currentArtifactUpdatedAt = "2026-03-30T11:09:37Z";
+  const currentArtifactVersion = "nm-path::20260330111611292";
+  const currentArtifactUpdatedAt = "2026-03-30T11:16:11Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;
