@@ -373,7 +373,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <div class="nm-path-document__eyebrow">PATH1-NM nm path</div>
 </div>
 <h1 class="nm-path-document__title">PATH 1 NM: Fresh First Launch -&gt; Need Location -&gt; First Entry</h1>
-<details class="nm-path-document__context" data-testid="nm-path-scenario" open>
+<details class="nm-path-document__context" data-testid="nm-path-scenario">
 <summary data-testid="nm-path-scenario-summary">
 <span class="nm-path-document__context-label">Scenario</span>
 <span class="nm-path-document__context-title">fresh first launch with no known local data</span>
@@ -3640,8 +3640,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330141226418";
-  const currentArtifactUpdatedAt = "2026-03-30T14:12:26Z";
+  const currentArtifactVersion = "nm-path::20260330141724631";
+  const currentArtifactUpdatedAt = "2026-03-30T14:17:24Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

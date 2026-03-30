@@ -1372,7 +1372,7 @@ module NmPathHtmlRenderer =
         appendLine builder $"<div class=\"nm-path-document__eyebrow\">{htmlEncode pathState.PathId} nm path</div>"
         appendLine builder "</div>"
         appendLine builder $"<h1 class=\"nm-path-document__title\">{htmlEncode pathState.Title}</h1>"
-        appendLine builder "<details class=\"nm-path-document__context\" data-testid=\"nm-path-scenario\" open>"
+        appendLine builder "<details class=\"nm-path-document__context\" data-testid=\"nm-path-scenario\">"
         appendLine builder "<summary data-testid=\"nm-path-scenario-summary\">"
         appendLine builder "<span class=\"nm-path-document__context-label\">Scenario</span>"
         appendLine builder $"<span class=\"nm-path-document__context-title\">{htmlEncode pathState.ScenarioLabel}</span>"

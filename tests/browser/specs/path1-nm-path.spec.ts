@@ -272,16 +272,17 @@ test.describe('PATH1 NM workspace artifact', () => {
 
     const runtimeColumn = page.locator('[data-testid="nm-path-column"][data-column-key="02-runtime-checks"]');
     const scenarioDisclosure = page.locator('[data-testid="nm-path-scenario"]');
+    await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
+
     await clickNmViewMode(page, 'summary');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'summary');
     await expect(runtimeColumn.locator('[data-testid="nm-column-meta"]')).toBeHidden();
     await expect(runtimeColumn.locator('[data-testid="nm-column-changes"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
     await expect(runtimeColumn.locator('[data-testid="nm-column-screen-box"] [data-testid="nm-column-detail-copy"]')).toBeHidden();
     await expect(runtimeColumn.locator('[data-testid="nm-surface-open"]')).toBeVisible();
-    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
-
-    await page.locator('[data-testid="nm-path-scenario-summary"]').click();
     await expect(scenarioDisclosure).not.toHaveAttribute('open', '');
+    await expect(page.getByTestId('nm-path-scenario-panel')).toBeHidden();
 
     await clickNmViewMode(page, 'detailed');
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'detailed');
@@ -299,6 +300,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.getByTestId('nm-path-document')).toHaveAttribute('data-view-mode', 'detailed');
     await expect(page.locator('[data-testid="nm-path-lens-toggle"][data-lens-key="lifecycle"]')).not.toHaveClass(/is-active/);
     await expect(page.locator('[data-testid="nm-path-lens-toggle"][data-lens-key="aem"]')).not.toHaveClass(/is-active/);
+    await expect(page.locator('[data-testid="nm-path-scenario"]')).not.toHaveAttribute('open', '');
     await expectNmColumnRemovedFromLayout(page, '01-app-started');
     await expectNmColumnRemovedFromLayout(page, '07-capture-laundry-location');
   });
