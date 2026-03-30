@@ -102,9 +102,11 @@ For local F# Interactive artifact generation:
 - treat `dotnet fsi <<'EOF' ... EOF` as a scratch-only fallback, not the usual path
 - if the artifact generation is recurring, prefer a checked-in helper script over ad hoc shell-wrapped REPL input
 - for the tracked LaundryLog workspace HTML, use [`../scripts/laundrylog/refresh-workspace-html.sh`](../scripts/laundrylog/refresh-workspace-html.sh) as the usual refresh path
+- for the full LaundryLog renderer/browser verification path, use [`../scripts/laundrylog/verify-workspace-html.sh`](../scripts/laundrylog/verify-workspace-html.sh) so refresh, Expecto, and Playwright run in serial
 - for formal browser verification of tracked LaundryLog HTML behavior, use the Playwright workspace under [`../tests/browser/README.md`](../tests/browser/README.md)
 - keep `Expecto` as the primary F# model/renderer test runner and use Playwright for browser-only truth such as DOM interaction, scrolling, visibility, and storage-backed UI state
 - when using Playwright MCP for tracked local HTML, do not target `file://` first; the MCP browser sandbox blocks `file:` URLs, so serve the tracked workspace HTML over local HTTP and point MCP there
+- when a checked-in helper script exists for a recurring build/test/refresh/verify flow, treat that script as the default AI entry point rather than rebuilding the command sequence ad hoc
 
 ## Verification Discipline
 
@@ -116,6 +118,11 @@ When verifying .NET work in this repo:
   - or just `dotnet run --project ...` by itself
 
 This avoids transient output-copy races in `bin/Debug/net10.0/` that can look like repo problems when they are really verification-command overlap.
+
+For the LaundryLog HTML/browser surface specifically:
+
+- do not kick off refresh, Expecto, and Playwright in parallel
+- use the checked-in verify helper so the tracked artifact is regenerated first and the browser suite does not race on stale HTML
 
 ## Scratch Versus Durable Docs
 

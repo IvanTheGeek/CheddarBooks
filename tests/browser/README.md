@@ -17,6 +17,8 @@ Usual local flow:
 
 1. refresh the tracked workspace HTML after renderer changes
    - [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
+   - or use the full serial verify helper:
+     - [`../../scripts/laundrylog/verify-workspace-html.sh`](../../scripts/laundrylog/verify-workspace-html.sh)
 2. install browser-test dependencies
    - `cd tests/browser && npm install`
 3. install the managed Chromium browser
@@ -42,3 +44,4 @@ Short rule:
 
 - manual review may still use `file://` when helpful
 - formal Playwright browser work should use local HTTP
+- when running the full LaundryLog verification path, prefer the checked-in verify helper so artifact refresh finishes before Playwright starts

@@ -274,6 +274,12 @@ module ScreenPathHtmlRenderer =
         | Active -> "ll-boot-state__check--active"
         | Complete -> "ll-boot-state__check--complete"
 
+    let private bootCheckStatusDomKey =
+        function
+        | Pending -> "pending"
+        | Active -> "active"
+        | Complete -> "complete"
+
     let private bootCheckStatusGlyph =
         function
         | Pending -> "○"
@@ -304,9 +310,10 @@ module ScreenPathHtmlRenderer =
         bootState.BootChecks
         |> List.iter (fun checkState ->
             let statusClass = bootCheckStatusClass checkState.Status
+            let statusDomKey = bootCheckStatusDomKey checkState.Status
             let statusGlyph = bootCheckStatusGlyph checkState.Status
 
-            appendLine builder $"<div class=\"ll-boot-state__check {statusClass}\">"
+            appendLine builder $"<div class=\"ll-boot-state__check {statusClass}\" data-testid=\"boot-check\" data-status=\"{statusDomKey}\" data-check-label=\"{htmlEncode checkState.Label}\">"
             appendLine builder $"<span class=\"ll-boot-state__check-glyph\" aria-hidden=\"true\">{statusGlyph}</span>"
             appendLine builder $"<span class=\"ll-boot-state__check-label\">{htmlEncode checkState.Label}</span>"
             appendLine builder "</div>")
@@ -756,12 +763,12 @@ module ScreenPathHtmlRenderer =
         appendLine builder "<div class=\"ll-path-document__title-zone\">"
         appendLine builder $"<div class=\"ll-path-document__eyebrow\">{htmlEncode screenPathState.PathId} screen path</div>"
         appendLine builder $"<h1 class=\"ll-path-document__title\">{htmlEncode screenPathState.Title}</h1>"
-        appendLine builder "<details class=\"ll-path-document__context\">"
-        appendLine builder "<summary>"
+        appendLine builder "<details class=\"ll-path-document__context\" data-testid=\"path-scenario\">"
+        appendLine builder "<summary data-testid=\"path-scenario-summary\">"
         appendLine builder "<span class=\"ll-path-document__context-label\">Scenario</span>"
         appendLine builder $"<span class=\"ll-path-document__context-title\">{htmlEncode screenPathState.ScenarioLabel}</span>"
         appendLine builder "</summary>"
-        appendLine builder "<div class=\"ll-path-document__context-panel\">"
+        appendLine builder "<div class=\"ll-path-document__context-panel\" data-testid=\"path-scenario-panel\">"
         appendLine builder $"<p class=\"ll-path-document__description\">{htmlEncode screenPathState.Description}</p>"
         appendLine builder "<ul class=\"ll-path-document__assumptions\">"
 
@@ -777,9 +784,9 @@ module ScreenPathHtmlRenderer =
         appendLine builder "<section class=\"ll-path-document__view-controls\" aria-label=\"Path viewer controls\">"
         appendLine builder "<div class=\"ll-path-document__view-label\">View</div>"
         appendLine builder "<div class=\"ll-path-document__view-buttons\">"
-        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-view-mode=\"summary\" aria-pressed=\"false\">Summary</button>"
-        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-view-mode=\"standard\" aria-pressed=\"true\">Standard</button>"
-        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-view-mode=\"detailed\" aria-pressed=\"false\">Detailed</button>"
+        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-testid=\"path-view-toggle\" data-view-mode=\"summary\" aria-pressed=\"false\">Summary</button>"
+        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-testid=\"path-view-toggle\" data-view-mode=\"standard\" aria-pressed=\"true\">Standard</button>"
+        appendLine builder "<button class=\"ll-path-view-toggle\" type=\"button\" data-testid=\"path-view-toggle\" data-view-mode=\"detailed\" aria-pressed=\"false\">Detailed</button>"
         appendLine builder "</div>"
         appendLine builder "</section>"
         appendLine builder "<section class=\"ll-path-document__lens-controls\" aria-label=\"Lens visibility controls\">"

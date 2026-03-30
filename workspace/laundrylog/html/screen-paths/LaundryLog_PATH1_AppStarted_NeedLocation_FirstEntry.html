@@ -199,12 +199,12 @@ html, body { height: 100%; overflow: hidden; }
 <div class="ll-path-document__title-zone">
 <div class="ll-path-document__eyebrow">PATH1 screen path</div>
 <h1 class="ll-path-document__title">PATH 1: Fresh First Launch -&gt; Need Location -&gt; First Entry</h1>
-<details class="ll-path-document__context">
-<summary>
+<details class="ll-path-document__context" data-testid="path-scenario">
+<summary data-testid="path-scenario-summary">
 <span class="ll-path-document__context-label">Scenario</span>
 <span class="ll-path-document__context-title">fresh first launch with no known local data</span>
 </summary>
-<div class="ll-path-document__context-panel">
+<div class="ll-path-document__context-panel" data-testid="path-scenario-panel">
 <p class="ll-path-document__description">Screen-path lens over a fresh first launch with no known local data. It follows application lifecycle, app runtime, and user-visible screen states until the first expense is logged.</p>
 <ul class="ll-path-document__assumptions">
 <li>No saved location is available yet.</li>
@@ -219,9 +219,9 @@ html, body { height: 100%; overflow: hidden; }
 <section class="ll-path-document__view-controls" aria-label="Path viewer controls">
 <div class="ll-path-document__view-label">View</div>
 <div class="ll-path-document__view-buttons">
-<button class="ll-path-view-toggle" type="button" data-view-mode="summary" aria-pressed="false">Summary</button>
-<button class="ll-path-view-toggle" type="button" data-view-mode="standard" aria-pressed="true">Standard</button>
-<button class="ll-path-view-toggle" type="button" data-view-mode="detailed" aria-pressed="false">Detailed</button>
+<button class="ll-path-view-toggle" type="button" data-testid="path-view-toggle" data-view-mode="summary" aria-pressed="false">Summary</button>
+<button class="ll-path-view-toggle" type="button" data-testid="path-view-toggle" data-view-mode="standard" aria-pressed="true">Standard</button>
+<button class="ll-path-view-toggle" type="button" data-testid="path-view-toggle" data-view-mode="detailed" aria-pressed="false">Detailed</button>
 </div>
 </section>
 <section class="ll-path-document__lens-controls" aria-label="Lens visibility controls">
@@ -275,19 +275,19 @@ html, body { height: 100%; overflow: hidden; }
 <h3 class="ll-boot-state__title">Starting LaundryLog</h3>
 <p class="ll-boot-state__subtitle">Preparing the first-launch startup sequence.</p>
 <div class="ll-boot-state__checks">
-<div class="ll-boot-state__check ll-boot-state__check--active">
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="AppStarted observed">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
 <span class="ll-boot-state__check-label">AppStarted observed</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Runtime checks running">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">Runtime checks running</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="No known local session">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">No known local session</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">Route to Need Location</span>
 </div>
@@ -317,19 +317,19 @@ html, body { height: 100%; overflow: hidden; }
 <h3 class="ll-boot-state__title">Checking startup requirements</h3>
 <p class="ll-boot-state__subtitle">Inspecting local state, offline readiness, and runtime startup conditions.</p>
 <div class="ll-boot-state__checks">
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">AppStarted observed</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--active">
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="Runtime checks running">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
 <span class="ll-boot-state__check-label">Runtime checks running</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="No known local session">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">No known local session</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">Route to Need Location</span>
 </div>
@@ -359,19 +359,19 @@ html, body { height: 100%; overflow: hidden; }
 <h3 class="ll-boot-state__title">No local session found</h3>
 <p class="ll-boot-state__subtitle">No saved location, active session, or pending expense draft was discovered.</p>
 <div class="ll-boot-state__checks">
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">AppStarted observed</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="Runtime checks running">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">Runtime checks running</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--active">
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="No known local session">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
 <span class="ll-boot-state__check-label">No known local session</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--pending">
+<div class="ll-boot-state__check ll-boot-state__check--pending" data-testid="boot-check" data-status="pending" data-check-label="Route to Need Location">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">○</span>
 <span class="ll-boot-state__check-label">Route to Need Location</span>
 </div>
@@ -401,19 +401,19 @@ html, body { height: 100%; overflow: hidden; }
 <h3 class="ll-boot-state__title">Routing to Need Location</h3>
 <p class="ll-boot-state__subtitle">Startup checks are complete and the first-launch path is ready to enter the app.</p>
 <div class="ll-boot-state__checks">
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="AppStarted observed">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">AppStarted observed</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="Runtime checks running">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">Runtime checks running</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--complete">
+<div class="ll-boot-state__check ll-boot-state__check--complete" data-testid="boot-check" data-status="complete" data-check-label="No known local session">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">✓</span>
 <span class="ll-boot-state__check-label">No known local session</span>
 </div>
-<div class="ll-boot-state__check ll-boot-state__check--active">
+<div class="ll-boot-state__check ll-boot-state__check--active" data-testid="boot-check" data-status="active" data-check-label="Route to Need Location">
 <span class="ll-boot-state__check-glyph" aria-hidden="true">◉</span>
 <span class="ll-boot-state__check-label">Route to Need Location</span>
 </div>
@@ -1112,8 +1112,8 @@ Log Expense
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "screen-path::20260330022159795";
-  const currentArtifactUpdatedAt = "2026-03-30T02:21:59Z";
+  const currentArtifactVersion = "screen-path::20260330023725666";
+  const currentArtifactUpdatedAt = "2026-03-30T02:37:25Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updatePollTimer = 0;

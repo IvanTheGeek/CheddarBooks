@@ -28,6 +28,10 @@ Refresh helper:
 - [`../../scripts/laundrylog/refresh-workspace-html.sh`](../../scripts/laundrylog/refresh-workspace-html.sh)
 - [`../../scripts/laundrylog/refresh-workspace-html.fsx`](../../scripts/laundrylog/refresh-workspace-html.fsx)
 
+Verification helper:
+
+- [`../../scripts/laundrylog/verify-workspace-html.sh`](../../scripts/laundrylog/verify-workspace-html.sh)
+
 Formal browser harness:
 
 - [`../../tests/browser/README.md`](../../tests/browser/README.md)
@@ -39,9 +43,11 @@ Working rule:
 - `tmp/` remains scratch and should only be used when there is a specific reason to investigate local regeneration details, experiments, screenshots, or transient outputs
 - this workspace holds the checked-in current artifacts worth preserving in git history
 - refresh the tracked HTML with the checked-in helper under `scripts/laundrylog/` rather than ad hoc shell snippets
+- when you want the full current LaundryLog verification flow, prefer the checked-in verify helper so refresh, Expecto, and Playwright run in the right serial order
 - when renderer or artifact behavior changes materially, refresh the relevant workspace artifact in the same commit as the code/docs change
 - do not force separate artifact-only commits just to keep the workspace current
 - for formal browser proof, target these tracked workspace artifacts through the Playwright workspace under `tests/browser/`
+- for recurring LaundryLog verification, AI should default to the checked-in helper scripts in `scripts/laundrylog/` rather than reconstructing the flow by hand
 
 Current first review targets:
 

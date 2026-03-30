@@ -415,14 +415,17 @@ module LaundryLogTests =
                       ScreenPathHtmlRenderer.renderDocument (ScreenPathHtmlExamples.path1StartupToFirstEntry ())
 
                   Expect.stringContains htmlDocument "data-view-mode=\"standard\"" "Expected the path document to carry a default view mode."
-                  Expect.stringContains htmlDocument "class=\"ll-path-view-toggle\"" "Expected explicit path viewer controls."
+                  Expect.stringContains htmlDocument "data-testid=\"path-view-toggle\"" "Expected stable browser-test hooks for path viewer controls."
                   Expect.stringContains htmlDocument "data-testid=\"path-lens-toggle\"" "Expected stable browser-test hooks for header lens visibility controls."
+                  Expect.stringContains htmlDocument "data-testid=\"path-scenario\"" "Expected a stable browser-test hook for the scenario disclosure."
+                  Expect.stringContains htmlDocument "data-testid=\"path-scenario-panel\"" "Expected a stable browser-test hook for the scenario detail panel."
                   Expect.stringContains htmlDocument "lensFilterStorageKey" "Expected lens visibility choices to be stored locally."
                   Expect.stringContains htmlDocument "step.hidden = !activeLensKeys.includes(stepLensKey);" "Expected header lens toggles to hide or show step columns."
                   Expect.stringContains htmlDocument "button.dataset.viewMode" "Expected the viewer controls to be wired by script."
                   Expect.stringContains htmlDocument "<section class=\"ll-phone-screen ll-phone-screen--boot\">" "Expected the splash family to render as a dedicated headerless phone screen."
-                  Expect.stringContains htmlDocument "ll-boot-state__check--active" "Expected active startup checkpoints."
-                  Expect.stringContains htmlDocument "ll-boot-state__check--complete" "Expected completed startup checkpoints."
+                  Expect.stringContains htmlDocument "data-testid=\"boot-check\"" "Expected stable browser-test hooks for boot checkpoint states."
+                  Expect.stringContains htmlDocument "data-status=\"active\"" "Expected active startup checkpoints."
+                  Expect.stringContains htmlDocument "data-status=\"complete\"" "Expected completed startup checkpoints."
                   Expect.stringContains htmlDocument "Route to Need Location" "Expected route-resolution checkpoint copy in the splash progression.")
 
               testCase "Screen path renderer adds a synced top horizontal scroll rail" (fun () ->

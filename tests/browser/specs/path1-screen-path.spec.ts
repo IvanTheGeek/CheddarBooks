@@ -103,6 +103,16 @@ async function clickLens(page, lensKey: string): Promise<void> {
   await page.locator(`[data-testid="path-lens-toggle"][data-lens-key="${lensKey}"]`).click();
 }
 
+async function clickViewMode(page, viewMode: string): Promise<void> {
+  await page.locator(`[data-testid="path-view-toggle"][data-view-mode="${viewMode}"]`).click();
+}
+
+async function readBootStatuses(page, stepKey: string): Promise<string[]> {
+  return page
+    .locator(`[data-testid="path-step"][data-step-key="${stepKey}"] [data-testid="boot-check"]`)
+    .evaluateAll((elements) => elements.map((element) => element.getAttribute('data-status') || ''));
+}
+
 test.describe('PATH1 screen path workspace artifact', () => {
   test('next and previous move by whole logical columns and keep the rail in sync', async ({ page }) => {
     await page.goto(path1HttpPath);
@@ -152,16 +162,25 @@ test.describe('PATH1 screen path workspace artifact', () => {
     await clickLens(page, 'app-runtime');
     await clickLens(page, 'screen-path');
     await expect.poll(async () => (await readPathMetrics(page)).visibleStepKeys).toEqual(['01-app-started']);
+    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toHaveAttribute('hidden', '');
+    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
 
     await clickLens(page, 'app-runtime');
     await expect
       .poll(async () => (await readPathMetrics(page)).visibleStepKeys)
       .toEqual(['01-app-started', '02-runtime-checks', '03-no-local-session', '04-route-resolved']);
+    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
 
     await clickLens(page, 'application-lifecycle');
     await expect
       .poll(async () => (await readPathMetrics(page)).visibleStepKeys)
       .toEqual(['02-runtime-checks', '03-no-local-session', '04-route-resolved']);
+    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toHaveAttribute('hidden', '');
+    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toHaveAttribute('hidden', '');
 
     await clickLens(page, 'screen-path');
     await expect
@@ -176,6 +195,9 @@ test.describe('PATH1 screen path workspace artifact', () => {
         '08-washer-draft',
         '09-logged-success',
       ]);
+    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="07-entry-form-ready"]')).toBeVisible();
 
     await page.reload();
     await expect
@@ -196,6 +218,80 @@ test.describe('PATH1 screen path workspace artifact', () => {
     );
     await expect(page.locator('[data-testid="path-lens-toggle"][data-lens-key="app-runtime"]')).toHaveClass(/is-active/);
     await expect(page.locator('[data-testid="path-lens-toggle"][data-lens-key="screen-path"]')).toHaveClass(/is-active/);
+    await expect(page.locator('[data-testid="path-step"][data-step-key="01-app-started"]')).toHaveAttribute('hidden', '');
+    await expect(page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"]')).toBeVisible();
+    await expect(page.locator('[data-testid="path-step"][data-step-key="05-need-location"]')).toBeVisible();
+  });
+
+  test('view modes change visible metadata density without changing the core path', async ({ page }) => {
+    await page.goto(path1HttpPath);
+
+    const pathDocument = page.getByTestId('screen-path-document');
+    const scenarioSummary = page.locator('[data-testid="path-scenario-summary"]');
+    const scenarioPanel = page.getByTestId('path-scenario-panel');
+    const appStartedStep = page.locator('[data-testid="path-step"][data-step-key="01-app-started"]');
+    const appStartedNote = appStartedStep.locator('.ll-path-step__note');
+    const appStartedMeta = appStartedStep.locator('.ll-path-step__meta');
+    const appStartedSurfaceName = appStartedStep.locator('.ll-screen-surface__name');
+
+    await scenarioSummary.click();
+    await expect(pathDocument).toHaveAttribute('data-view-mode', 'standard');
+    await expect(appStartedNote).toBeVisible();
+    await expect(appStartedMeta).toBeVisible();
+    await expect(appStartedSurfaceName).toBeVisible();
+    await expect(scenarioPanel).toBeVisible();
+    await expect(page.getByText('No saved location is available yet.')).toBeHidden();
+
+    await clickViewMode(page, 'summary');
+    await expect(pathDocument).toHaveAttribute('data-view-mode', 'summary');
+    await expect(appStartedNote).toBeHidden();
+    await expect(appStartedMeta).toBeHidden();
+    await expect(appStartedSurfaceName).toBeHidden();
+    await expect(scenarioPanel).toBeHidden();
+
+    await clickViewMode(page, 'detailed');
+    await expect(pathDocument).toHaveAttribute('data-view-mode', 'detailed');
+    await expect(appStartedNote).toBeVisible();
+    await expect(appStartedMeta).toBeVisible();
+    await expect(appStartedSurfaceName).toBeVisible();
+    await expect(scenarioPanel).toBeVisible();
+    await expect(page.getByText('No saved location is available yet.')).toBeVisible();
+    await expect(page.getByText('Startup/runtime checks must finish before the first usable screen appears.')).toBeVisible();
+  });
+
+  test('startup splash steps stay headerless while checkpoint states progress in order', async ({ page }) => {
+    await page.goto(path1HttpPath);
+
+    const startupStepKeys = [
+      '01-app-started',
+      '02-runtime-checks',
+      '03-no-local-session',
+      '04-route-resolved',
+    ];
+
+    for (const stepKey of startupStepKeys) {
+      const step = page.locator(`[data-testid="path-step"][data-step-key="${stepKey}"]`);
+      await expect(step.locator('.ll-phone-screen--boot')).toBeVisible();
+      await expect(step.locator('.ll-header')).toHaveCount(0);
+    }
+
+    expect(await readBootStatuses(page, '01-app-started')).toEqual(['active', 'pending', 'pending', 'pending']);
+    expect(await readBootStatuses(page, '02-runtime-checks')).toEqual(['complete', 'active', 'pending', 'pending']);
+    expect(await readBootStatuses(page, '03-no-local-session')).toEqual(['complete', 'complete', 'active', 'pending']);
+    expect(await readBootStatuses(page, '04-route-resolved')).toEqual(['complete', 'complete', 'complete', 'active']);
+
+    await expect(
+      page.locator('[data-testid="path-step"][data-step-key="01-app-started"] .ll-boot-state__title'),
+    ).toHaveText('Starting LaundryLog');
+    await expect(
+      page.locator('[data-testid="path-step"][data-step-key="02-runtime-checks"] .ll-boot-state__title'),
+    ).toHaveText('Checking startup requirements');
+    await expect(
+      page.locator('[data-testid="path-step"][data-step-key="03-no-local-session"] .ll-boot-state__title'),
+    ).toHaveText('No local session found');
+    await expect(
+      page.locator('[data-testid="path-step"][data-step-key="04-route-resolved"] .ll-boot-state__title'),
+    ).toHaveText('Routing to Need Location');
   });
 
   test('tracked file artifact still opens directly from file:// with the basic path controls visible', async ({ page }) => {
