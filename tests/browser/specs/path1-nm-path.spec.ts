@@ -348,6 +348,21 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--command')).toBeVisible();
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-block--event')).toBeVisible();
     await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-aem-detail"] .slice-block--view')).toBeVisible();
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"]')).not.toContainText('COMMAND SLICE');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="08-current-laundry-session-location"] [data-testid="nm-aem-detail"]')).not.toContainText('VIEW SLICE');
+    await expect(page.locator('[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-aem-detail"] .slice-card')).toHaveCount(0);
+
+    const aemHeaderRolePill = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] .nm-column__classification [data-testid="nm-column-pill"][data-pill-type="role"]',
+    );
+    await expect(aemHeaderRolePill).toHaveCount(0);
+
+    const aemScreenMeta = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-meta"]',
+    );
+    await expect(aemScreenMeta).toBeVisible();
+    await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
+    await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-lens"]')).toHaveText('ui lens');
 
     const lifecycleContextPill = lifecycleColumn.locator('[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]');
     const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
@@ -369,6 +384,15 @@ test.describe('PATH1 NM workspace artifact', () => {
     await expect(userRolePopover).toBeVisible();
     await expect(userRolePopover).toContainText('User means the human is acting through the UI at this point in the path.');
     await expect(userRolePopover).toContainText('Need Location depends on or expresses a direct user action.');
+
+    const aemScreenLensPill = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-pill"][data-pill-type="screen-lens"][data-pill-label="ui lens"]',
+    );
+    const aemScreenLensPopover = popoverForPill(aemScreenLensPill);
+    await aemScreenLensPill.click();
+    await expect(aemScreenLensPopover).toBeVisible();
+    await expect(aemScreenLensPopover).toContainText('ui lens marks the linked app surface that frames the business slice.');
+    await expect(aemScreenLensPopover).toContainText('CaptureLaundryLocation is being grounded in the app surface around the business slice.');
   });
 
   test('surface thumbnails open the overlay and the tracked file artifact still loads directly from disk', async ({ page }) => {

@@ -651,7 +651,7 @@ module SliceHtmlRenderer =
             builder
             "<button type=\"button\" class=\"slice-card__width-action\" data-action=\"toggle-slice-width\" aria-pressed=\"false\" aria-label=\"Expand slice width\" title=\"Expand slice width\">→</button>"
 
-    let private renderBlock (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
+    let private renderBlock (builder: StringBuilder) showProperties showWidthActions (blockState: SliceBlockState) =
         let blockCssClass = SliceBlockKind.cssClass blockState.Kind
         let showsPropertiesToggle =
             match blockState.Content with
@@ -659,9 +659,10 @@ module SliceHtmlRenderer =
             | _ -> false
 
         let showsWidthAction =
-            match blockState.Content with
-            | PropertyLines _ -> true
-            | ScreenshotPlaceholder _ -> false
+            match blockState.Content, showWidthActions with
+            | _, false -> false
+            | PropertyLines _, true -> true
+            | ScreenshotPlaceholder _, true -> false
 
         appendLine builder $"<section class=\"slice-block slice-block--{blockCssClass}\">"
         appendLine builder "<div class=\"slice-block__topline\">"
@@ -709,13 +710,13 @@ module SliceHtmlRenderer =
         appendLine builder $"<div class=\"slice-card__row slice-card__row--{rowCssClass}\">"
 
         match row.Content with
-        | SliceCardRowContent.BlockRow blockState -> renderBlock builder options.ShowProperties blockState
+        | SliceCardRowContent.BlockRow blockState -> renderBlock builder options.ShowProperties true blockState
         | SliceCardRowContent.EmptyRow ->
             appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
 
         appendLine builder "</div>"
 
-    let private renderGwtBlockReference (builder: StringBuilder) showProperties (blockState: SliceBlockState) =
+    let private renderGwtBlockReference (builder: StringBuilder) showProperties showWidthActions (blockState: SliceBlockState) =
         let blockCssClass = SliceBlockKind.cssClass blockState.Kind
         let showsPropertiesToggle =
             match blockState.Content with
@@ -723,9 +724,10 @@ module SliceHtmlRenderer =
             | _ -> false
 
         let showsWidthAction =
-            match blockState.Content with
-            | PropertyLines _ -> true
-            | ScreenshotPlaceholder _ -> false
+            match blockState.Content, showWidthActions with
+            | _, false -> false
+            | PropertyLines _, true -> true
+            | ScreenshotPlaceholder _, true -> false
 
         appendLine builder $"<div class=\"path-document__gwt-ref path-document__gwt-ref--{blockCssClass}\">"
         appendLine builder "<div class=\"path-document__gwt-ref-topline\">"
@@ -754,7 +756,7 @@ module SliceHtmlRenderer =
 
         appendLine builder "</div>"
 
-    let private renderGwtClause (builder: StringBuilder) (clause: GwtClause) =
+    let private renderGwtClause (builder: StringBuilder) showProperties showWidthActions (clause: GwtClause) =
         appendLine builder "<div class=\"path-document__gwt-clause\">"
         renderBadge builder "path-document__gwt-stage" (GwtStage.label clause.Stage)
         appendLine builder "<div class=\"path-document__gwt-clause-body\">"
@@ -765,13 +767,13 @@ module SliceHtmlRenderer =
 
         if not (List.isEmpty clause.BlockReferences) then
             appendLine builder "<div class=\"path-document__gwt-ref-stack\">"
-            clause.BlockReferences |> List.iter (renderGwtBlockReference builder true)
+            clause.BlockReferences |> List.iter (renderGwtBlockReference builder showProperties showWidthActions)
             appendLine builder "</div>"
 
         appendLine builder "</div>"
         appendLine builder "</div>"
 
-    let private renderEmbeddedGwtCard (builder: StringBuilder) (card: SliceGwtCard) =
+    let private renderEmbeddedGwtCard (builder: StringBuilder) showProperties showWidthActions (card: SliceGwtCard) =
         let kindCssClass = SliceGwtKind.cssClass card.Kind
 
         appendLine builder $"<section class=\"slice-card__gwt-card slice-card__gwt-card--{kindCssClass}\">"
@@ -779,7 +781,7 @@ module SliceHtmlRenderer =
         renderBadge builder "slice-card__gwt-kind" (SliceGwtKind.label card.Kind)
         appendLine builder "</div>"
         appendLine builder "<div class=\"slice-card__gwt-clauses\">"
-        card.Clauses |> List.iter (renderGwtClause builder)
+        card.Clauses |> List.iter (renderGwtClause builder showProperties showWidthActions)
         appendLine builder "</div>"
         appendLine builder "</section>"
 
@@ -813,7 +815,7 @@ module SliceHtmlRenderer =
         appendLine builder "<div class=\"slice-card__gwt-row\">"
 
         match gwt with
-        | Some gwtCard -> renderEmbeddedGwtCard builder gwtCard
+        | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties true gwtCard
         | None -> appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
 
         appendLine builder "</div>"
@@ -856,6 +858,42 @@ module SliceHtmlRenderer =
         function
         | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
         | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
+
+    /// Renders the modeled AEM detail body without the outer slice shell or linked screen slot.
+    let renderEmbeddedDetailBodyHtml options =
+        function
+        | PathSliceCard.CommandSlice commandSlice ->
+            let builder = StringBuilder()
+            appendLine builder "<div class=\"slice-card__embedded-body slice-card__embedded-body--command\">"
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow commandSlice.Command))
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow commandSlice.Event))
+            appendLine builder "<div class=\"slice-card__embedded-gwt\">"
+            match commandSlice.Gwt with
+            | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+            | None -> ()
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+            builder.ToString()
+        | PathSliceCard.ViewSlice viewSlice ->
+            let builder = StringBuilder()
+            appendLine builder "<div class=\"slice-card__embedded-body slice-card__embedded-body--view\">"
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow viewSlice.View))
+            appendLine builder "<div class=\"slice-card__embedded-gwt\">"
+            match viewSlice.Gwt with
+            | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+            | None -> ()
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+            builder.ToString()
 
     let private renderScript (builder: StringBuilder) =
         appendLine builder "<script>"

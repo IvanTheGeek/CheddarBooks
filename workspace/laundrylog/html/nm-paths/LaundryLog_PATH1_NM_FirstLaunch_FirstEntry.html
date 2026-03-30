@@ -353,17 +353,18 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 .nm-column__detail-kind { justify-self: end; display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1e293b; }
 .nm-column__detail-title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; color: #0f172a; }
 .nm-column__detail-copy { display: grid; gap: 0.28rem; }
+.nm-column__screen-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.32rem; }
 .nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }
 .nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }
 .nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }
 .nm-column__aem-detail { display: flex; flex-direction: column; border-radius: 18px; padding: 2px 0 0; }
-.nm-column__aem-detail .slice-card__slot--screen { display: none; }
-.nm-column__aem-detail .slice-card { padding-top: 2px; }
-.nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }
-.nm-column__aem-row .slice-card { width: 100%; }
-.nm-column__aem-row .slice-card__title { font-size: 0.78rem; }
-.nm-column__aem-row .slice-card__description { font-size: 0.62rem; }
-.nm-column__aem-row .slice-card__gwt-row { margin-top: 0; }
+.nm-column__aem-detail .slice-card__embedded-body { display: grid; gap: 10px; }
+.nm-column__aem-detail .slice-card__embedded-gwt { display: grid; gap: 8px; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 8px; }
+.nm-column__aem-detail .slice-card__row { min-height: 0; }
+.nm-column__aem-detail .slice-card__row--detail { display: flex; }
+.nm-column__aem-detail .slice-card__width-action { display: none; }
+.nm-column__aem-detail .slice-block { min-height: var(--detail-row-height); }
+.nm-column__aem-detail .slice-card__gwt-card { min-height: 0; }
 .nm-surface-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.66); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 40; }
 .nm-surface-overlay.is-open { display: flex; }
 .nm-surface-overlay__dialog { width: min(92vw, 520px); max-height: 92vh; background: #f8fafc; border-radius: 20px; box-shadow: 0 20px 44px rgba(15, 23, 42, 0.34); display: flex; flex-direction: column; overflow: hidden; }
@@ -1349,14 +1350,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <p class="nm-column__pill-popover-text">This column appears in the AEM lens because CaptureLaundryLocation is represented through Event Modeling.</p>
 </div>
 </div>
-<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
-<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-07-capture-laundry-location-role-user">User</button>
-<div id="nm-pill-popover-07-capture-laundry-location-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
-<div class="nm-column__pill-popover-title">User</div>
-<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This column is tagged User because CaptureLaundryLocation depends on or expresses a direct user action.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1372,6 +1365,24 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
+<div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-07-capture-laundry-location-screen-role-user">User</button>
+<div id="nm-pill-popover-07-capture-laundry-location-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because CaptureLaundryLocation depends on or expresses a direct user action.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
+<button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-07-capture-laundry-location-screen-lens-ui-lens">ui lens</button>
+<div id="nm-pill-popover-07-capture-laundry-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div class="nm-column__pill-popover-title">ui lens</div>
+<p class="nm-column__pill-popover-text">ui lens marks the linked app surface that frames the business slice.</p>
+<p class="nm-column__pill-popover-text">This screen box uses ui lens because CaptureLaundryLocation is being grounded in the app surface around the business slice.</p>
+</div>
+</div>
+</div>
 <div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.NewSession - Ready To Set</div>
 </div>
 <div class="nm-column__surface-preview-stage">
@@ -1434,36 +1445,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
-<article class="slice-card slice-card--command">
-<div class="slice-card__header">
-<div class="slice-card__topline">
-<span class="slice-card__app-pill">LaundryLog</span>
-<div class="slice-card__kind">COMMAND SLICE</div>
-</div>
-<h2 class="slice-card__title">Capture Laundry Location</h2>
-<p class="slice-card__description">manual location entry starts the path</p>
-</div>
-<div class="slice-card__body">
-<div class="slice-card__row slice-card__row--screen">
-<section class="slice-block slice-block--screen">
-<div class="slice-block__topline">
-<h3 class="slice-block__title">Set Location Screen</h3>
-<div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--meta">User</span>
-<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
-</div>
-</div>
-<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
-<div class="slice-block__footer">
-<div class="slice-block__footer-left">
-</div>
-<div class="slice-block__footer-right">
-<span class="slice-block__footer-badge">ui lens</span>
-</div>
-</div>
-</section>
-</div>
+<div class="slice-card__embedded-body slice-card__embedded-body--command">
 <div class="slice-card__row slice-card__row--detail">
 <section class="slice-block slice-block--command">
 <div class="slice-block__topline">
@@ -1532,8 +1514,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 </div>
-</div>
-<div class="slice-card__gwt-row">
+<div class="slice-card__embedded-gwt">
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">command gwt</span>
@@ -1572,7 +1553,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -1610,7 +1590,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -1620,9 +1599,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 </div>
-</article>
+</div>
 
-</section>
 </div>
 </div>
 </section>
@@ -1675,6 +1653,16 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
+<div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
+<button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-08-current-laundry-session-location-screen-lens-ui-lens">ui lens</button>
+<div id="nm-pill-popover-08-current-laundry-session-location-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div class="nm-column__pill-popover-title">ui lens</div>
+<p class="nm-column__pill-popover-text">ui lens marks the linked app surface that frames the business slice.</p>
+<p class="nm-column__pill-popover-text">This screen box uses ui lens because CurrentLaundrySession is being grounded in the app surface around the business slice.</p>
+</div>
+</div>
+</div>
 <div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Ready At Location</div>
 </div>
 <div class="nm-column__surface-preview-stage">
@@ -1822,20 +1810,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
-<article class="slice-card slice-card--view">
-<div class="slice-card__header">
-<div class="slice-card__topline">
-<span class="slice-card__app-pill">LaundryLog</span>
-<div class="slice-card__kind">VIEW SLICE</div>
-</div>
-<h2 class="slice-card__title">Current Laundry Session</h2>
-<p class="slice-card__description">ready to log the first washer expense</p>
-</div>
-<div class="slice-card__body">
-<div class="slice-card__row slice-card__row--screen">
-<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
-</div>
+<div class="slice-card__embedded-body slice-card__embedded-body--view">
 <div class="slice-card__row slice-card__row--detail">
 <section class="slice-block slice-block--view">
 <div class="slice-block__topline">
@@ -1872,11 +1847,7 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 </div>
-<div class="slice-card__row slice-card__row--detail">
-<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
-</div>
-</div>
-<div class="slice-card__gwt-row">
+<div class="slice-card__embedded-gwt">
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">view gwt</span>
@@ -1913,7 +1884,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -1957,7 +1927,6 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -1967,9 +1936,8 @@ body { margin: 0; background: linear-gradient(180deg, #eef2f7 0%, #e6ecf4 100%);
 </div>
 </section>
 </div>
-</article>
+</div>
 
-</section>
 </div>
 </div>
 </section>
@@ -2452,14 +2420,6 @@ Log Expense
 <p class="nm-column__pill-popover-text">This column appears in the AEM lens because LogLaundryExpense is represented through Event Modeling.</p>
 </div>
 </div>
-<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="role">
-<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="role" data-pill-label="User" aria-describedby="nm-pill-popover-11-log-laundry-expense-role-user">User</button>
-<div id="nm-pill-popover-11-log-laundry-expense-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="role" role="tooltip">
-<div class="nm-column__pill-popover-title">User</div>
-<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
-<p class="nm-column__pill-popover-text">This column is tagged User because LogLaundryExpense depends on or expresses a direct user action.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -2475,6 +2435,24 @@ Log Expense
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
+<div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-role">
+<button class="nm-column__badge nm-column__badge--role" type="button" data-testid="nm-column-pill" data-pill-type="screen-role" data-pill-label="User" aria-describedby="nm-pill-popover-11-log-laundry-expense-screen-role-user">User</button>
+<div id="nm-pill-popover-11-log-laundry-expense-screen-role-user" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-role" role="tooltip">
+<div class="nm-column__pill-popover-title">User</div>
+<p class="nm-column__pill-popover-text">User means the human is acting through the UI at this point in the path.</p>
+<p class="nm-column__pill-popover-text">This column is tagged User because LogLaundryExpense depends on or expresses a direct user action.</p>
+</div>
+</div>
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
+<button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-11-log-laundry-expense-screen-lens-ui-lens">ui lens</button>
+<div id="nm-pill-popover-11-log-laundry-expense-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div class="nm-column__pill-popover-title">ui lens</div>
+<p class="nm-column__pill-popover-text">ui lens marks the linked app surface that frames the business slice.</p>
+<p class="nm-column__pill-popover-text">This screen box uses ui lens because LogLaundryExpense is being grounded in the app surface around the business slice.</p>
+</div>
+</div>
+</div>
 <div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Washer Draft</div>
 </div>
 <div class="nm-column__surface-preview-stage">
@@ -2625,36 +2603,7 @@ Log Expense
 </div>
 </section>
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
-<article class="slice-card slice-card--command">
-<div class="slice-card__header">
-<div class="slice-card__topline">
-<span class="slice-card__app-pill">LaundryLog</span>
-<div class="slice-card__kind">COMMAND SLICE</div>
-</div>
-<h2 class="slice-card__title">Log Washer Expense</h2>
-<p class="slice-card__description">first expense recorded in the active location</p>
-</div>
-<div class="slice-card__body">
-<div class="slice-card__row slice-card__row--screen">
-<section class="slice-block slice-block--screen">
-<div class="slice-block__topline">
-<h3 class="slice-block__title">Log Expense Screen - Ready</h3>
-<div class="slice-block__badges">
-<span class="slice-block__badge slice-block__badge--meta">User</span>
-<span class="slice-block__badge slice-block__badge--kind">SCREEN</span>
-</div>
-</div>
-<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
-<div class="slice-block__footer">
-<div class="slice-block__footer-left">
-</div>
-<div class="slice-block__footer-right">
-<span class="slice-block__footer-badge">ui lens</span>
-</div>
-</div>
-</section>
-</div>
+<div class="slice-card__embedded-body slice-card__embedded-body--command">
 <div class="slice-card__row slice-card__row--detail">
 <section class="slice-block slice-block--command">
 <div class="slice-block__topline">
@@ -2743,8 +2692,7 @@ Log Expense
 </div>
 </section>
 </div>
-</div>
-<div class="slice-card__gwt-row">
+<div class="slice-card__embedded-gwt">
 <section class="slice-card__gwt-card slice-card__gwt-card--command">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">command gwt</span>
@@ -2781,7 +2729,6 @@ Log Expense
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -2823,7 +2770,6 @@ Log Expense
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -2873,7 +2819,6 @@ Log Expense
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -2883,9 +2828,8 @@ Log Expense
 </div>
 </section>
 </div>
-</article>
+</div>
 
-</section>
 </div>
 </div>
 </section>
@@ -2938,6 +2882,16 @@ Log Expense
 </div>
 <div class="nm-column__detail-copy" data-testid="nm-column-detail-copy">
 <p class="nm-column__detail-note">The linked app surface that frames this Event Modeling slice.</p>
+<div class="nm-column__screen-meta" data-testid="nm-column-screen-meta">
+<div class="nm-column__pill-wrap" data-testid="nm-column-pill-wrap" data-pill-type="screen-lens">
+<button class="nm-column__badge nm-column__badge--surface-lens" type="button" data-testid="nm-column-pill" data-pill-type="screen-lens" data-pill-label="ui lens" aria-describedby="nm-pill-popover-12-current-laundry-session-washer-screen-lens-ui-lens">ui lens</button>
+<div id="nm-pill-popover-12-current-laundry-session-washer-screen-lens-ui-lens" class="nm-column__pill-popover" data-testid="nm-column-pill-popover" data-pill-type="screen-lens" role="tooltip">
+<div class="nm-column__pill-popover-title">ui lens</div>
+<p class="nm-column__pill-popover-text">ui lens marks the linked app surface that frames the business slice.</p>
+<p class="nm-column__pill-popover-text">This screen box uses ui lens because CurrentLaundrySession is being grounded in the app surface around the business slice.</p>
+</div>
+</div>
+</div>
 <div class="nm-column__technical" data-testid="nm-column-technical">Surface · Screen.EntryForm - Logged Success</div>
 </div>
 <div class="nm-column__surface-preview-stage">
@@ -3097,20 +3051,7 @@ Log Expense
 </div>
 </section>
 <div class="nm-column__aem-detail" data-testid="nm-aem-detail">
-<section class="path-document__row nm-column__aem-row" data-base-columns="1" style="--current-slice-columns: 1;">
-<article class="slice-card slice-card--view">
-<div class="slice-card__header">
-<div class="slice-card__topline">
-<span class="slice-card__app-pill">LaundryLog</span>
-<div class="slice-card__kind">VIEW SLICE</div>
-</div>
-<h2 class="slice-card__title">Current Laundry Session</h2>
-<p class="slice-card__description">washer entry is visible in the current session</p>
-</div>
-<div class="slice-card__body">
-<div class="slice-card__row slice-card__row--screen">
-<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
-</div>
+<div class="slice-card__embedded-body slice-card__embedded-body--view">
 <div class="slice-card__row slice-card__row--detail">
 <section class="slice-block slice-block--view">
 <div class="slice-block__topline">
@@ -3147,11 +3088,7 @@ Log Expense
 </div>
 </section>
 </div>
-<div class="slice-card__row slice-card__row--detail">
-<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
-</div>
-</div>
-<div class="slice-card__gwt-row">
+<div class="slice-card__embedded-gwt">
 <section class="slice-card__gwt-card slice-card__gwt-card--view">
 <div class="slice-card__gwt-topline">
 <span class="slice-card__gwt-kind">view gwt</span>
@@ -3200,7 +3137,6 @@ Log Expense
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -3244,7 +3180,6 @@ Log Expense
 <button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
 </div>
 <div class="path-document__gwt-ref-footer-right">
-<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
 </div>
 </div>
 </div>
@@ -3254,9 +3189,8 @@ Log Expense
 </div>
 </section>
 </div>
-</article>
+</div>
 
-</section>
 </div>
 </div>
 </section>
@@ -3964,8 +3898,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => syncWidth()).catch(() => {});
   }
-  const currentArtifactVersion = "nm-path::20260330145759023";
-  const currentArtifactUpdatedAt = "2026-03-30T14:57:59Z";
+  const currentArtifactVersion = "nm-path::20260330151553633";
+  const currentArtifactUpdatedAt = "2026-03-30T15:15:53Z";
   const updatePollIntervalMs = 3000;
   let pendingUpdateManifest = null;
   let updateCheckInFlight = false;

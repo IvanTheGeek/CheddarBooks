@@ -747,7 +747,7 @@ module NmPathHtmlRenderer =
                 "nm-column__badge--lens")
 
         match columnState.ActorRoleBadge with
-        | Some roleBadge ->
+        | Some roleBadge when columnState.PrimaryContext <> NmContextKind.EventModeling ->
             renderBadgePopover
                 builder
                 columnState.ColumnKey
@@ -757,6 +757,7 @@ module NmPathHtmlRenderer =
                 (roleWhyThisColumn columnState roleBadge)
                 "nm-column__badge--role"
         | None -> ()
+        | Some _ -> ()
 
         appendLine builder "</div>"
         appendLine builder "</div>"
@@ -764,9 +765,7 @@ module NmPathHtmlRenderer =
 
     let private renderEmbeddedAemCard (builder: StringBuilder) (sliceCard: PathSliceCard) =
         appendLine builder "<div class=\"nm-column__aem-detail\" data-testid=\"nm-aem-detail\">"
-        appendLine builder "<section class=\"path-document__row nm-column__aem-row\" data-base-columns=\"1\" style=\"--current-slice-columns: 1;\">"
-        appendLine builder (SliceHtmlRenderer.renderSliceCardHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") sliceCard)
-        appendLine builder "</section>"
+        appendLine builder (SliceHtmlRenderer.renderEmbeddedDetailBodyHtml (SliceRenderOptions.classicEventModel "NM Embedded Slice") sliceCard)
         appendLine builder "</div>"
 
     let private renderStructuredDetailBox
@@ -839,6 +838,34 @@ module NmPathHtmlRenderer =
         appendLine builder "</div>"
         appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
         appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (screenBoxNote columnState)}</p>"
+
+        match columnState.PrimaryContext, columnState.ActorRoleBadge with
+        | NmContextKind.EventModeling, roleBadge ->
+            appendLine builder "<div class=\"nm-column__screen-meta\" data-testid=\"nm-column-screen-meta\">"
+
+            match roleBadge with
+            | Some roleText ->
+                renderBadgePopover
+                    builder
+                    columnState.ColumnKey
+                    "screen-role"
+                    roleText
+                    (roleMeaning roleText)
+                    (roleWhyThisColumn columnState roleText)
+                    "nm-column__badge--role"
+            | None -> ()
+
+            renderBadgePopover
+                builder
+                columnState.ColumnKey
+                "screen-lens"
+                "ui lens"
+                "ui lens marks the linked app surface that frames the business slice."
+                $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
+                "nm-column__badge--surface-lens"
+
+            appendLine builder "</div>"
+        | _ -> ()
 
         match columnState.TechnicalSurfaceLabel with
         | Some surfaceLabel ->
@@ -1037,17 +1064,18 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__detail-kind { justify-self: end; display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1e293b; }"
         appendLine builder ".nm-column__detail-title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; color: #0f172a; }"
         appendLine builder ".nm-column__detail-copy { display: grid; gap: 0.28rem; }"
+        appendLine builder ".nm-column__screen-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.32rem; }"
         appendLine builder ".nm-column__detail-note { margin: 0; color: #4f657f; font-size: 0.68rem; line-height: 1.25; }"
         appendLine builder ".nm-column__technical { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: #48627f; }"
         appendLine builder ".nm-column__detail-list { margin: 0; padding-left: 1rem; display: grid; gap: 0.14rem; color: #475569; font-size: 0.68rem; line-height: 1.22; }"
         appendLine builder ".nm-column__aem-detail { display: flex; flex-direction: column; border-radius: 18px; padding: 2px 0 0; }"
-        appendLine builder ".nm-column__aem-detail .slice-card__slot--screen { display: none; }"
-        appendLine builder ".nm-column__aem-detail .slice-card { padding-top: 2px; }"
-        appendLine builder ".nm-column__aem-row { grid-template-columns: minmax(0, 1fr); column-gap: 0; row-gap: 6px; overflow: visible; padding: 0; }"
-        appendLine builder ".nm-column__aem-row .slice-card { width: 100%; }"
-        appendLine builder ".nm-column__aem-row .slice-card__title { font-size: 0.78rem; }"
-        appendLine builder ".nm-column__aem-row .slice-card__description { font-size: 0.62rem; }"
-        appendLine builder ".nm-column__aem-row .slice-card__gwt-row { margin-top: 0; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__embedded-body { display: grid; gap: 10px; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__embedded-gwt { display: grid; gap: 8px; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 8px; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__row { min-height: 0; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__row--detail { display: flex; }"
+        appendLine builder ".nm-column__aem-detail .slice-card__width-action { display: none; }"
+        appendLine builder ".nm-column__aem-detail .slice-block { min-height: var(--detail-row-height); }"
+        appendLine builder ".nm-column__aem-detail .slice-card__gwt-card { min-height: 0; }"
         appendLine builder ".nm-surface-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.66); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 40; }"
         appendLine builder ".nm-surface-overlay.is-open { display: flex; }"
         appendLine builder ".nm-surface-overlay__dialog { width: min(92vw, 520px); max-height: 92vh; background: #f8fafc; border-radius: 20px; box-shadow: 0 20px 44px rgba(15, 23, 42, 0.34); display: flex; flex-direction: column; overflow: hidden; }"
