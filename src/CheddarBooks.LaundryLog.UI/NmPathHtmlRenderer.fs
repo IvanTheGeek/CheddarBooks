@@ -541,15 +541,15 @@ module NmPathHtmlRenderer =
 
     let private roleMeaning =
         function
-        | "System" -> "System means the app/runtime is acting at this point in the path."
-        | "User" -> "User means the human is acting through the UI at this point in the path."
-        | roleText -> $"{roleText} is the acting party represented in this column."
+        | "System" -> "Actor · System means the app/runtime is acting at this point in the path."
+        | "User" -> "Actor · User means the human is acting through the UI at this point in the path."
+        | roleText -> $"Actor · {roleText} is the acting party represented in this column."
 
     let private roleWhyThisColumn (columnState: NmColumnState) =
         function
-        | "System" -> $"This column is tagged System because {columnState.ColumnTitle} happens through app/runtime work rather than direct user input."
-        | "User" -> $"This column is tagged User because {columnState.ColumnTitle} depends on or expresses a direct user action."
-        | roleText -> $"This column is tagged {roleText} because that actor is the relevant participant in {columnState.ColumnTitle}."
+        | "System" -> $"This actor badge is System because {columnState.ColumnTitle} happens through app/runtime work rather than direct user input."
+        | "User" -> $"This actor badge is User because {columnState.ColumnTitle} depends on or expresses a direct user action."
+        | roleText -> $"This actor badge is {roleText} because that actor is the relevant participant in {columnState.ColumnTitle}."
 
     let private selectedChoiceLabels (optionGroup: OptionGroupState) =
         optionGroup.Choices
@@ -698,6 +698,15 @@ module NmPathHtmlRenderer =
 
     let private renderBadgePopover (builder: StringBuilder) columnKey pillType label meaning whyThisColumn modifierClass =
         let popoverId = $"nm-pill-popover-{columnKey}-{pillType}-{domSlug label}"
+        let badgeCategoryLabel =
+            match pillType with
+            | "group" -> "Context Group badge"
+            | "context" -> "Bounded Context badge"
+            | "lens"
+            | "screen-lens" -> "Lens badge"
+            | "role"
+            | "screen-role" -> "Actor badge"
+            | otherType -> $"{otherType} badge"
 
         appendLine builder $"<div class=\"nm-column__pill-wrap\" data-testid=\"nm-column-pill-wrap\" data-pill-type=\"{htmlEncode pillType}\">"
         appendLine
@@ -706,7 +715,13 @@ module NmPathHtmlRenderer =
         appendLine
             builder
             $"<div id=\"{htmlEncode popoverId}\" class=\"nm-column__pill-popover\" data-testid=\"nm-column-pill-popover\" data-pill-type=\"{htmlEncode pillType}\" role=\"tooltip\">"
+        appendLine builder "<div class=\"nm-column__pill-popover-header\">"
+        appendLine builder "<div class=\"nm-column__pill-popover-heading\">"
+        appendLine builder $"<div class=\"nm-column__pill-popover-label\">{htmlEncode badgeCategoryLabel}</div>"
         appendLine builder $"<div class=\"nm-column__pill-popover-title\">{htmlEncode label}</div>"
+        appendLine builder "</div>"
+        appendLine builder "<button class=\"nm-column__pill-popover-close\" type=\"button\" data-testid=\"nm-column-pill-popover-close\" aria-label=\"Close explanation\">Close</button>"
+        appendLine builder "</div>"
         appendLine builder $"<p class=\"nm-column__pill-popover-text\">{htmlEncode meaning}</p>"
         appendLine builder $"<p class=\"nm-column__pill-popover-text\">{htmlEncode whyThisColumn}</p>"
         appendLine builder "</div>"
@@ -848,39 +863,37 @@ module NmPathHtmlRenderer =
             builder
             "<section class=\"nm-column__detail-box nm-column__detail-box--screen\" data-testid=\"nm-column-screen-box\" data-detail-kind=\"screen\">"
         appendLine builder "<div class=\"nm-column__detail-topline\">"
+        appendLine builder "<div class=\"nm-column__detail-label-row\" data-testid=\"nm-column-screen-label-row\">"
+
+        match columnState.ActorRoleBadge with
+        | Some roleText ->
+            renderBadgePopover
+                builder
+                columnState.ColumnKey
+                "screen-role"
+                roleText
+                (roleMeaning roleText)
+                (roleWhyThisColumn columnState roleText)
+                "nm-column__badge--role"
+        | None -> ()
+
         appendLine builder "<span class=\"nm-column__detail-kind\">SCREEN</span>"
+        appendLine builder "</div>"
         appendLine builder $"<h3 class=\"nm-column__detail-title\">{htmlEncode (screenBoxTitle columnState)}</h3>"
         appendLine builder "</div>"
         appendLine builder "<div class=\"nm-column__detail-copy\" data-testid=\"nm-column-detail-copy\">"
         appendLine builder $"<p class=\"nm-column__detail-note\">{htmlEncode (screenBoxNote columnState)}</p>"
 
-        let shouldRenderScreenMeta =
-            columnState.ActorRoleBadge.IsSome || columnState.PrimaryContext = NmContextKind.EventModeling
-
-        if shouldRenderScreenMeta then
+        if columnState.PrimaryContext = NmContextKind.EventModeling then
             appendLine builder "<div class=\"nm-column__screen-meta\" data-testid=\"nm-column-screen-meta\">"
-
-            match columnState.ActorRoleBadge with
-            | Some roleText ->
-                renderBadgePopover
-                    builder
-                    columnState.ColumnKey
-                    "screen-role"
-                    roleText
-                    (roleMeaning roleText)
-                    (roleWhyThisColumn columnState roleText)
-                    "nm-column__badge--role"
-            | None -> ()
-
-            if columnState.PrimaryContext = NmContextKind.EventModeling then
-                renderBadgePopover
-                    builder
-                    columnState.ColumnKey
-                    "screen-lens"
-                    "ui lens"
-                    "ui lens marks the linked app surface that frames the business slice."
-                    $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
-                    "nm-column__badge--surface-lens"
+            renderBadgePopover
+                builder
+                columnState.ColumnKey
+                "screen-lens"
+                "ui lens"
+                "ui lens marks the linked app surface that frames the business slice."
+                $"This screen box uses ui lens because {columnState.ColumnTitle} is being grounded in the app surface around the business slice."
+                "nm-column__badge--surface-lens"
 
             appendLine builder "</div>"
 
@@ -1118,14 +1131,22 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__meta { display: flex; flex-wrap: wrap; gap: 0.38rem; align-items: flex-start; min-width: 0; }"
         appendLine builder ".nm-column__meta--secondary { gap: 0.32rem; }"
         appendLine builder ".nm-column__pill-wrap { position: relative; display: inline-flex; max-width: 100%; }"
+        appendLine builder ".nm-column__pill-wrap[data-open=\"true\"] { z-index: 80; }"
         appendLine builder ".nm-column__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.94); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.01em; text-transform: none; color: #334155; white-space: nowrap; cursor: help; }"
         appendLine builder ".nm-column__badge--group { background: #0f2740; border-color: #0f2740; color: #ffffff; }"
         appendLine builder ".nm-column__badge--interactive { appearance: none; -webkit-appearance: none; }"
         appendLine builder ".nm-column__badge--interactive:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
         appendLine builder ".nm-column__badge--role { text-transform: none; }"
-        appendLine builder ".nm-column__pill-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease; }"
-        appendLine builder ".nm-column__pill-wrap:hover .nm-column__pill-popover, .nm-column__pill-wrap:focus-within .nm-column__pill-popover { opacity: 1; transform: translateY(0); pointer-events: auto; }"
+        appendLine builder ".nm-column__pill-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }"
+        appendLine builder ".nm-column__pill-wrap[data-open=\"true\"] .nm-column__pill-popover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }"
+        appendLine builder ".nm-column__pill-popover-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }"
+        appendLine builder ".nm-column__pill-popover-heading { display: grid; gap: 0.14rem; }"
+        appendLine builder ".nm-column__pill-popover-label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
         appendLine builder ".nm-column__pill-popover-title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }"
+        appendLine builder ".nm-column__pill-popover-close { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.58rem; font-weight: 700; line-height: 1; padding: 0.28rem 0.5rem; cursor: pointer; }"
+        appendLine builder ".nm-column__pill-popover-close:hover { border-color: #94a3b8; }"
+        appendLine builder ".nm-column__pill-popover-close:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
+        appendLine builder ".nm-column__detail-label-row .nm-column__pill-popover, .nm-column__screen-meta .nm-column__pill-popover { left: auto; right: 0; }"
         appendLine builder ".nm-column__pill-popover-text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }"
         appendLine builder ".nm-column__detail-box { display: grid; gap: 7px; border-radius: 18px; padding: 10px 11px; border: 2px solid; min-height: 0; height: 100%; overflow: visible; background: rgba(255, 255, 255, 0.86); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72); }"
         appendLine builder ".nm-column__detail-box--screen { border-color: #c8dcff; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%); }"
@@ -1133,6 +1154,7 @@ module NmPathHtmlRenderer =
         appendLine builder ".nm-column__detail-box--orchestration { border-color: #8ac3dd; background: rgba(84, 165, 200, 0.14); }"
         appendLine builder ".nm-column__detail-box--interaction { border-color: #8ad1a1; background: rgba(93, 194, 120, 0.16); }"
         appendLine builder ".nm-column__detail-topline { display: grid; gap: 5px; }"
+        appendLine builder ".nm-column__detail-label-row { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.32rem; }"
         appendLine builder ".nm-column__detail-kind { justify-self: end; display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1e293b; }"
         appendLine builder ".nm-column__detail-title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; color: #0f172a; }"
         appendLine builder ".nm-column__detail-copy { display: grid; gap: 0.28rem; }"
@@ -1192,6 +1214,7 @@ module NmPathHtmlRenderer =
         appendLine builder "  const overlayTitle = document.getElementById('nm-surface-overlay-title');"
         appendLine builder "  const overlaySurface = document.getElementById('nm-surface-overlay-surface');"
         appendLine builder "  const overlayClose = document.getElementById('nm-surface-overlay-close');"
+        appendLine builder "  const pillWraps = Array.from(document.querySelectorAll('[data-testid=\"nm-column-pill-wrap\"]'));"
         appendLine builder $"  const updateModeStorageKey = 'll-nm-path-update-mode::{htmlEncode (pathState.PathId.ToLowerInvariant())}';"
         appendLine builder $"  const lensFilterStorageKey = 'll-nm-path-lenses::{htmlEncode (pathState.PathId.ToLowerInvariant())}';"
         appendLine builder $"  const surfaceModeStorageKey = 'll-nm-path-surface::{htmlEncode (pathState.PathId.ToLowerInvariant())}';"
@@ -1439,6 +1462,46 @@ module NmPathHtmlRenderer =
         appendLine builder "    overlay.hidden = true;"
         appendLine builder "    overlaySurface.innerHTML = '';"
         appendLine builder "  };"
+        appendLine builder "  const closePillPopovers = () => {"
+        appendLine builder "    pillWraps.forEach((wrap) => { delete wrap.dataset.open; });"
+        appendLine builder "  };"
+        appendLine builder "  const openPillPopover = (pillWrap) => {"
+        appendLine builder "    pillWraps.forEach((wrap) => {"
+        appendLine builder "      if (wrap === pillWrap) {"
+        appendLine builder "        wrap.dataset.open = 'true';"
+        appendLine builder "      } else {"
+        appendLine builder "        delete wrap.dataset.open;"
+        appendLine builder "      }"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  pillWraps.forEach((pillWrap) => {"
+        appendLine builder "    const pill = pillWrap.querySelector('[data-testid=\"nm-column-pill\"]');"
+        appendLine builder "    const closeButton = pillWrap.querySelector('[data-testid=\"nm-column-pill-popover-close\"]');"
+        appendLine builder "    pillWrap.addEventListener('mouseenter', () => openPillPopover(pillWrap));"
+        appendLine builder "    pillWrap.addEventListener('mouseleave', () => closePillPopovers());"
+        appendLine builder "    pillWrap.addEventListener('focusin', () => openPillPopover(pillWrap));"
+        appendLine builder "    pillWrap.addEventListener('focusout', () => {"
+        appendLine builder "      window.requestAnimationFrame(() => {"
+        appendLine builder "        if (!pillWrap.contains(document.activeElement)) {"
+        appendLine builder "          delete pillWrap.dataset.open;"
+        appendLine builder "        }"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "    if (pill) {"
+        appendLine builder "      pill.addEventListener('click', (event) => {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        openPillPopover(pillWrap);"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "    if (closeButton) {"
+        appendLine builder "      closeButton.addEventListener('click', (event) => {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        closePillPopovers();"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "  });"
         appendLine builder "  document.querySelectorAll('[data-action=\"open-surface-overlay\"]').forEach((surfaceActivator) => {"
         appendLine builder "    surfaceActivator.addEventListener('click', () => openOverlay(surfaceActivator));"
         appendLine builder "    surfaceActivator.addEventListener('keydown', (event) => {"
@@ -1455,7 +1518,13 @@ module NmPathHtmlRenderer =
         appendLine builder "    });"
         appendLine builder "  }"
         appendLine builder "  document.addEventListener('keydown', (event) => {"
-        appendLine builder "    if (event.key === 'Escape') { closeOverlay(); }"
+        appendLine builder "    if (event.key === 'Escape') { closePillPopovers(); closeOverlay(); }"
+        appendLine builder "  });"
+        appendLine builder "  document.addEventListener('click', (event) => {"
+        appendLine builder "    const target = event.target;"
+        appendLine builder "    if (!(target instanceof Node)) { return; }"
+        appendLine builder "    const clickedInsidePill = pillWraps.some((pillWrap) => pillWrap.contains(target));"
+        appendLine builder "    if (!clickedInsidePill) { closePillPopovers(); }"
         appendLine builder "  });"
         appendLine builder "  let updateStatusTimer = 0;"
         appendLine builder "  const setUpdateStatusState = (state) => {"

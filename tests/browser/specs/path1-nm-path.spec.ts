@@ -488,23 +488,41 @@ test.describe('PATH1 NM workspace artifact', () => {
     );
     await expect(interactionHeaderRolePill).toHaveCount(0);
 
+    const aemScreenLabelRow = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-label-row"]',
+    );
+    await expect(aemScreenLabelRow).toBeVisible();
+    await expect(aemScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
+    await expect(aemScreenLabelRow.locator('.nm-column__detail-kind')).toHaveText('SCREEN');
+
     const aemScreenMeta = page.locator(
       '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-screen-meta"]',
     );
     await expect(aemScreenMeta).toBeVisible();
-    await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
     await expect(aemScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-lens"]')).toHaveText('ui lens');
 
     const interactionScreenMeta = page.locator(
       '[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-meta"]',
     );
-    await expect(interactionScreenMeta).toBeVisible();
-    await expect(interactionScreenMeta.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
+    await expect(interactionScreenMeta).toHaveCount(0);
+
+    const interactionScreenLabelRow = page.locator(
+      '[data-testid="nm-path-column"][data-column-key="05-need-location"] [data-testid="nm-column-screen-label-row"]',
+    );
+    await expect(interactionScreenLabelRow).toBeVisible();
+    await expect(interactionScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]')).toHaveText('User');
+
+    const actorBadgeBox = await interactionScreenLabelRow.locator('[data-testid="nm-column-pill"][data-pill-type="screen-role"]').boundingBox();
+    const screenKindBox = await interactionScreenLabelRow.locator('.nm-column__detail-kind').boundingBox();
+    expect(actorBadgeBox).not.toBeNull();
+    expect(screenKindBox).not.toBeNull();
+    expect((actorBadgeBox?.x ?? 0) + (actorBadgeBox?.width ?? 0)).toBeLessThan((screenKindBox?.x ?? 0) + 1);
 
     const lifecycleContextPill = lifecycleColumn.locator('[data-testid="nm-column-pill"][data-pill-type="context"][data-pill-label="ApplicationLifecycle"]');
     const lifecycleContextPopover = popoverForPill(lifecycleContextPill);
     await lifecycleContextPill.hover();
     await expect(lifecycleContextPopover).toBeVisible();
+    await expect(lifecycleContextPopover).toContainText('Bounded Context badge');
     await expect(lifecycleContextPopover).toContainText('ApplicationLifecycle owns the meaning of app phase changes like start, resume, and suspend.');
     await expect(lifecycleContextPopover).toContainText('AppStarted marks an app lifecycle phase becoming visible.');
 
@@ -512,6 +530,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     const runtimeContextPopover = popoverForPill(runtimeContextPill);
     await runtimeContextPill.hover();
     await expect(runtimeContextPopover).toBeVisible();
+    await expect(runtimeContextPopover).toContainText('Bounded Context badge');
     await expect(runtimeContextPopover).toContainText('RuntimeOrchestration owns startup checks, route resolution, and coordination between app/runtime and the business flow.');
     await expect(runtimeContextPopover).toContainText('Runtime Checks coordinates checks, route choice, or state handoff.');
 
@@ -519,8 +538,11 @@ test.describe('PATH1 NM workspace artifact', () => {
     const userRolePopover = popoverForPill(userRolePill);
     await userRolePill.click();
     await expect(userRolePopover).toBeVisible();
-    await expect(userRolePopover).toContainText('User means the human is acting through the UI at this point in the path.');
-    await expect(userRolePopover).toContainText('Need Location depends on or expresses a direct user action.');
+    await expect(userRolePopover).toContainText('Actor badge');
+    await expect(userRolePopover).toContainText('Actor · User means the human is acting through the UI at this point in the path.');
+    await expect(userRolePopover).toContainText('This actor badge is User because Need Location depends on or expresses a direct user action.');
+    await userRolePopover.getByTestId('nm-column-pill-popover-close').click();
+    await expect(userRolePopover).toBeHidden();
 
     const aemScreenLensPill = page.locator(
       '[data-testid="nm-path-column"][data-column-key="07-capture-laundry-location"] [data-testid="nm-column-pill"][data-pill-type="screen-lens"][data-pill-label="ui lens"]',
@@ -528,6 +550,7 @@ test.describe('PATH1 NM workspace artifact', () => {
     const aemScreenLensPopover = popoverForPill(aemScreenLensPill);
     await aemScreenLensPill.click();
     await expect(aemScreenLensPopover).toBeVisible();
+    await expect(aemScreenLensPopover).toContainText('Lens badge');
     await expect(aemScreenLensPopover).toContainText('ui lens marks the linked app surface that frames the business slice.');
     await expect(aemScreenLensPopover).toContainText('CaptureLaundryLocation is being grounded in the app surface around the business slice.');
   });
