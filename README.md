@@ -28,5 +28,14 @@ Start here:
 
 - [`docs/agent-readme.md`](docs/agent-readme.md)
 - [`docs/current-focus.md`](docs/current-focus.md)
+- [`docs/reference/packages/README.md`](docs/reference/packages/README.md)
 - [`docs/context-packs/laundrylog-context-pack.md`](docs/context-packs/laundrylog-context-pack.md)
 - [`docs/session-handoffs/README.md`](docs/session-handoffs/README.md)
+
+## External Package Guidance
+
+CheddarBooks inherits the broader NEXUS rule:
+
+- check official package docs and examples first
+- then use local package-reference notes for repo-specific workflows and gotchas
+- add or update a local note when a package becomes part of repeated work here

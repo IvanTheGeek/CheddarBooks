@@ -49,6 +49,7 @@ Short version:
 
 - do not leave important app discoveries only in chat
 - do not guess from memory, old chat, screenshots, or stale assumptions when the current repo state can be inspected directly; verify the actual docs, code, tests, generated artifacts, and branch/worktree shape before acting
+- when a task depends on an external package, check the package's official docs entry point, onboarding docs, and examples before inferring behavior from generated outputs or local quirks
 - keep local app docs up to date when local behavior or understanding changes
 - use bootstrap provenance as traceable history, not as the only explanation of the repo
 - treat context packs and current-focus docs as views, not as the deepest source truth
@@ -70,6 +71,8 @@ Use upstream NEXUS doctrine when the topic is clearly foundation-level, such as:
 - broader CORTEX and FORGE direction
 - cross-repo architectural doctrine
 
+For external package usage, inherit the broader NEXUS package-guidance rule first, then record local package notes only when this repo has stronger package-specific workflows or gotchas.
+
 But this repo should still be understandable even if the reader has not just come from NEXUS.
 
 ## Contribution Expectations
@@ -83,6 +86,7 @@ When local app understanding changes:
 - for now, default to `main` as the active branch and merge accepted side work back quickly instead of keeping local or remote side branches alive
 - record discoveries durably if they will matter later
 - keep README, foundation docs, and LaundryLog docs locally navigable
+- add or update a note under [`reference/packages/`](reference/packages/README.md) when a package becomes part of repeated repo-specific work
 
 When work is docs-only or tests are not applicable, say so explicitly.
 
@@ -170,6 +174,7 @@ If the next collaborator should be able to recover it reliably, it belongs in du
 ## Related
 
 - [`current-focus.md`](current-focus.md)
+- [`reference/packages/README.md`](reference/packages/README.md)
 - [`context-packs/README.md`](context-packs/README.md)
 - [`session-handoffs/README.md`](session-handoffs/README.md)
 - [`context-packs/laundrylog-context-pack.md`](context-packs/laundrylog-context-pack.md)
