@@ -1,0 +1,89 @@
+# CheddarBooks LaundryLog Event Modeling
+
+This area is the durable markdown counterpart to the visual Event Modeling work.
+
+The visual board can live in an external tool.
+
+These docs are the repo memory that records:
+
+- the current modeling scope
+- the first CommandSlices we think we need
+- the first events we think we need
+- the first `PATH` we want to model
+- the first business-lens ViewSlices or "screenshots" we think we need
+- the open questions that should not stay trapped in chat or on a temporary board
+
+## Current Penpot Page Split
+
+The current intended Penpot split is:
+
+- `PATHS`
+  each `PATH` as its own readable row
+- `Event Model`
+  slice primitives and lens experimentation
+- `Screens`
+  app-page surfaces and screenshot-oriented references
+- `Components`
+  reusable visual bases and token-oriented building blocks
+
+## Current Modeling Approach
+
+For the next step, we are intentionally starting small:
+
+1. identify the first events needed
+2. shape the first `PATH`
+3. define the first CommandSlices that should produce that path
+4. define the first ViewSlices or business screenshots for that path
+5. defer deeper policies and exceptions until the first command, event, and View slice line is stable enough
+
+That keeps the first pass grounded in desired behavior rather than prematurely designing UI mechanics or storage details.
+
+## Event Modeling Is One Lens Here
+
+For LaundryLog, this Event Modeling area should be read as:
+
+- one selected business-flow lens over the app
+- not the whole model of the app
+
+Other concern lines will still matter and should stay able to pressure the model later, including:
+
+- screen and component behavior
+- design tokens and visual system concerns
+- runtime and execution concerns
+- device-specific adaptation
+- sample data and test pressure
+- customer feedback about how tasks should actually be completed
+
+So these notes should stay precise in Event Modeling terms without pretending they already cover every other concern line.
+
+## Presentation Rule
+
+When describing command, event, and view relationships in LaundryLog:
+
+- do not flatten them into a fixed linear triplet such as `COMMAND -> EVENT -> VIEW`
+- describe the command slice as producing event fact(s)
+- describe the view slice as consuming prior event fact(s)
+- do not require the consumed event to come from the immediately previous slice
+- allow multiple view slices to consume the same prior event when the store already contains it
+
+This rule matters because the path and NM projections have already drifted several times when the relationship was described too linearly.
+
+## Start Here
+
+- [`starting-point.md`](starting-point.md)
+- [`commands.md`](commands.md)
+- [`events.md`](events.md)
+- [`path-1-first-entry.md`](path-1-first-entry.md)
+- [`views.md`](views.md)
+- [`open-questions.md`](open-questions.md)
+- [`penpot-projection.md`](penpot-projection.md)
+- [`penpot-board-seed.md`](penpot-board-seed.md)
+- [`penpot-slice-components.md`](penpot-slice-components.md)
+- [`inspiration.md`](inspiration.md)
+- [`../command-view-primitive-seam.md`](../command-view-primitive-seam.md)
+
+## Working Rule
+
+The external visual model is useful for thinking and discussion.
+
+The markdown notes here are the durable repo memory that future humans and AI should be able to read without needing access to the external modeling tool.

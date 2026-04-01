@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaundryLog PATH 1 CommandSlice/ViewSlice</title>
+<style>
+:root { color-scheme: light; }
+body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: "IBM Plex Sans", "Aptos", "Segoe UI", sans-serif; }
+.path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.34rem; --slice-description-height: 1.04rem; --property-value-indent: 1.2rem; --gwt-row-height: 148px; padding: 8px 10px 10px; }
+.path-document__header { max-width: none; margin-bottom: 8px; }
+.path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }
+.path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }
+.path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }
+.path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }
+.path-document__action:hover { background: rgba(255, 255, 255, 1.0); }
+.path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }
+.path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }
+.path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.slice-help-wrap { position: relative; display: inline-flex; flex: 0 0 auto; width: max-content; max-width: 100%; }
+.slice-help-wrap[data-open="true"] { z-index: 80; }
+.slice-help-trigger { appearance: none; -webkit-appearance: none; cursor: pointer; font-family: inherit; }
+.slice-help-trigger:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
+.slice-help-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }
+.slice-help-wrap[data-open="true"] .slice-help-popover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+.slice-help-popover__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.slice-help-popover__heading { display: grid; gap: 0.14rem; }
+.slice-help-popover__label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }
+.slice-help-popover__title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }
+.slice-help-popover__close { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.58rem; font-weight: 700; line-height: 1; padding: 0.28rem 0.5rem; cursor: pointer; }
+.slice-help-popover__close:hover { border-color: #94a3b8; }
+.slice-help-popover__close:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }
+.slice-help-popover__text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }
+.slice-block__badges .slice-help-popover, .slice-card__gwt-topline .slice-help-popover, .path-document__gwt-ref-topline .slice-help-popover { left: 0 !important; right: auto !important; }
+.path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }
+.path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }
+.path-document__gwt-ref { border: 1px solid #c7d7ea; border-radius: 8px; background: rgba(255,255,255,0.8); padding: 3px 4px 4px; display: flex; flex-direction: column; gap: 2px; }
+.path-document__gwt-ref--command { background: rgba(74, 150, 255, 0.12); border-color: #8bc3ff; }
+.path-document__gwt-ref--event { background: rgba(255, 167, 57, 0.14); border-color: #ffb777; }
+.path-document__gwt-ref--view { background: rgba(103, 229, 130, 0.14); border-color: #78e39d; }
+.path-document__gwt-ref-topline { display: flex; justify-content: flex-end; }
+.path-document__gwt-ref-kind { display: inline-flex; align-items: center; justify-content: center; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.path-document__gwt-ref-title { border-radius: 2px 2px 0 0; padding: 3px 5px; font-size: 0.56rem; font-weight: 600; line-height: 1.15; color: #ffffff; background: #0ea5e9; }
+.path-document__gwt-ref--event .path-document__gwt-ref-title { background: #f97316; }
+.path-document__gwt-ref--view .path-document__gwt-ref-title { background: #22c55e; }
+.path-document__gwt-ref-properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; }
+.path-document__gwt-ref-properties-panel[open] { gap: 2px; }
+.path-document__gwt-ref-properties-panel > summary { display: none; list-style: none; cursor: pointer; }
+.path-document__gwt-ref-properties-panel > summary::-webkit-details-marker { display: none; }
+.path-document__gwt-ref-properties-summary { display: none; }
+.path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }
+.path-document__gwt-ref-properties-panel:not([open]) .path-document__gwt-ref-properties { display: none; }
+.path-document__gwt-ref-properties--hidden { display: none; }
+.path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }
+.path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }
+.path-document__gwt-ref-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }
+.path-document__gwt-ref-footer-left { display: flex; align-items: flex-end; }
+.path-document__gwt-ref-footer-right { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }
+.path-document__gwt-ref-toggle { border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; border-radius: 999px; padding: 1px 6px; font-size: 0.48rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }
+.path-document__gwt-ref-toggle:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; grid-column: span 1; }
+.slice-card--wide { grid-column: span 2; }
+.slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }
+.slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }
+.slice-card__header, .slice-card__body { display: contents; }
+.slice-card__topline { grid-row: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.slice-card__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }
+.slice-card__width-action { width: 22px; height: 22px; border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.96); color: #27435c; border-radius: 999px; padding: 0; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: -6px; margin-bottom: -6px; box-shadow: 0 2px 6px rgba(10, 27, 49, 0.12); }
+.slice-card__width-action:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }
+.slice-card__title { grid-row: 2; margin: 3px 0 0; font-size: 0.82rem; line-height: 1.04; overflow: visible; }
+.slice-card__description { grid-row: 3; margin: 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; overflow: visible; }
+.slice-card__row { display: flex; flex-direction: column; min-height: 0; }
+.slice-card__row--screen { grid-row: 4; }
+.slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }
+.slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }
+.slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 6px; margin-top: 2px; }
+.slice-card__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+.slice-card__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }
+.slice-card__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }
+.slice-card__gwt-topline { display: flex; justify-content: flex-start; }
+.slice-card__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }
+.slice-card__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }
+.slice-card__row > .slice-block { flex: 1; }
+.slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }
+.slice-card__slot--row-fill { flex: 1; }
+.slice-block { display: flex; flex-direction: column; gap: 3px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; }
+.slice-block--screen { min-height: var(--screen-row-height); box-sizing: border-box; background: rgba(255, 255, 255, 0.78); border-color: #c8dcff; }
+.slice-block--command { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(74, 150, 255, 0.18); border-color: #8bc3ff; }
+.slice-block--event { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(255, 167, 57, 0.2); border-color: #ffb777; }
+.slice-block--view { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(103, 229, 130, 0.18); border-color: #78e39d; }
+.slice-block__topline { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto; row-gap: 5px; min-height: 0; }
+.slice-block__badges { display: flex; flex-direction: row; justify-content: flex-end; gap: 4px; grid-row: 1; }
+.slice-block__title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; overflow-wrap: normal; word-break: normal; hyphens: none; grid-row: 2; }
+.slice-block--screen .slice-block__title { font-weight: 400; font-size: 0.64rem; white-space: nowrap; }
+.slice-block__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4a647f; white-space: nowrap; box-sizing: border-box; }
+.slice-block__badge--kind { padding: 2px 6px; border-radius: 4px; border-color: #bfcad7; background: #cbd5e1; font-size: 0.5rem; letter-spacing: 0.06em; color: #1e293b; }
+.slice-block__snapshot { min-height: var(--screen-snapshot-height); border-radius: 10px; border: 1px dashed #c7d7ea; background: linear-gradient(180deg, #eef4fb 0%, #e7eef7 100%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; color: #7087a0; font-size: 0.7rem; font-weight: 600; }
+.slice-block__properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; flex: 0 0 auto; min-height: 0; }
+.slice-block__properties-panel[open] { gap: 3px; }
+.slice-block__properties-panel > summary { display: none; list-style: none; cursor: pointer; }
+.slice-block__properties-panel > summary::-webkit-details-marker { display: none; }
+.slice-block__properties-summary { display: none; }
+.slice-block__properties { display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.32); border-radius: 9px; padding: 6px 7px 5px; min-height: 48px; overflow: visible; }
+.slice-block__properties-panel:not([open]) .slice-block__properties { display: none; }
+.slice-block__properties--hidden { min-height: 0; padding: 0; background: transparent; }
+.slice-block__property-line { font-family: "IBM Plex Mono", "Cascadia Mono", "Consolas", monospace; font-size: 0.58rem; line-height: 1.18; color: #27435c; }
+.slice-block__property-line--inline { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.slice-block__property-line--stacked { display: flex; flex-direction: column; }
+.slice-block__property-key { white-space: nowrap; }
+.slice-block__property-value { overflow-wrap: break-word; word-break: normal; }
+.slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }
+.slice-card--wide .slice-block__property-line--stacked { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 0.3rem; }
+.slice-card--wide .slice-block__property-line--stacked .slice-block__property-value { padding-left: 0; }
+.slice-block__footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }
+.slice-block__footer-left { display: flex; align-items: flex-end; }
+.slice-block__footer-right { display: flex; align-items: flex-end; gap: 4px; margin-left: auto; }
+.slice-block__footer-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: none; white-space: nowrap; cursor: pointer; }
+.slice-block__footer-toggle:hover { background: rgba(255, 255, 255, 1.0); }
+.slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }
+@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }
+@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }
+</style>
+</head>
+<body>
+<main class="path-document">
+<header class="path-document__header">
+<h1 class="path-document__title">PATH 1: Manual Location -&gt; Washer -&gt; Dryer</h1>
+<p class="path-document__description">Single-actor readable row for the first LaundryLog path. The location is captured first, then washer and dryer expenses are logged into the same current session.</p>
+<div class="path-document__header-actions">
+<button type="button" class="path-document__action" data-action="expand-properties">Expand All Properties</button>
+<button type="button" class="path-document__action" data-action="collapse-properties">Collapse All Properties</button>
+<button type="button" class="path-document__action" data-action="expand-width">Expand All Width</button>
+<button type="button" class="path-document__action" data-action="collapse-width">Collapse All Width</button>
+</div>
+</header>
+<section class="path-document__row" data-base-columns="6" style="--current-slice-columns: 6;">
+<article class="slice-card slice-card--command">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">COMMAND SLICE</div>
+</div>
+<h2 class="slice-card__title">Capture Laundry Location</h2>
+<p class="slice-card__description">manual location entry starts the path</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<section class="slice-block slice-block--screen">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">Set Location Screen</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--meta">User</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-set-location-screen-screen">SCREEN</button>
+<div id="slice-help-block-kind-set-location-screen-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment attached to this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Set Location Screen is the linked app surface shown in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">ui lens</span>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--command">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CaptureLaundryLocation</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-capturelaundrylocation-command">COMMAND</button>
+<div id="slice-help-block-kind-capturelaundrylocation-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because CaptureLaundryLocation is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--event">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LaundryLocationCaptured</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-block-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--command">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="COMMAND GWT" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">COMMAND GWT</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND GWT marks the Given/When/Then rule band that governs a command slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND GWT because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">no active laundry location has been captured yet</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--command">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-capturelaundrylocation-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-capturelaundrylocation-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because CaptureLaundryLocation is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">CaptureLaundryLocation</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+<article class="slice-card slice-card--view">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">VIEW SLICE</div>
+</div>
+<h2 class="slice-card__title">Current Laundry Session</h2>
+<p class="slice-card__description">ready to log the first washer expense</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--view">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CurrentLaundrySession</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$0.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[]&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">classic em</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--view">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="VIEW GWT" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">VIEW GWT</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW GWT marks the Given/When/Then rule band that explains a view slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW GWT because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">project the current laundry session for the active location</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--view">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$0.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[]&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+<article class="slice-card slice-card--command">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">COMMAND SLICE</div>
+</div>
+<h2 class="slice-card__title">Log Washer Expense</h2>
+<p class="slice-card__description">first expense recorded in the active location</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<section class="slice-block slice-block--screen">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">Log Expense Screen - Ready</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--meta">User</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-log-expense-screen---ready-screen">SCREEN</button>
+<div id="slice-help-block-kind-log-expense-screen---ready-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment attached to this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Log Expense Screen - Ready is the linked app surface shown in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">ui lens</span>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--command">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LogLaundryExpense</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-block-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--event">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LaundryExpenseLogged</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-block-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--command">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="COMMAND GWT" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">COMMAND GWT</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND GWT marks the Given/When/Then rule band that governs a command slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND GWT because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundrylocationcaptured-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundrylocationcaptured-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryLocationCaptured is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryLocationCaptured</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">capture_method =</span>
+<span class="slice-block__property-value">&quot;manual-text&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:42:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--command">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LogLaundryExpense</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+<article class="slice-card slice-card--view">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">VIEW SLICE</div>
+</div>
+<h2 class="slice-card__title">Current Laundry Session</h2>
+<p class="slice-card__description">washer entry is visible in the current session</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--view">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CurrentLaundrySession</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00]&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">classic em</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--view">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="VIEW GWT" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">VIEW GWT</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW GWT marks the Given/When/Then rule band that explains a view slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW GWT because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">project the current laundry session over visible entries</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--view">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00]&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+<article class="slice-card slice-card--command">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">COMMAND SLICE</div>
+</div>
+<h2 class="slice-card__title">Log Dryer Expense</h2>
+<p class="slice-card__description">second expense recorded in the same session</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<section class="slice-block slice-block--screen">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">Log Expense Screen - Washer Visible</h3>
+<div class="slice-block__badges">
+<span class="slice-block__badge slice-block__badge--meta">User</span>
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="SCREEN" aria-describedby="slice-help-block-kind-log-expense-screen---washer-visible-screen">SCREEN</button>
+<div id="slice-help-block-kind-log-expense-screen---washer-visible-screen" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">SCREEN</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; SCREEN marks the app-facing screen compartment attached to this modeled slice.</p>
+<p class="slice-help-popover__text">This compartment is SCREEN because Log Expense Screen - Washer Visible is the linked app surface shown in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="slice-block__snapshot"><span>Screen snapshot</span></div>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">ui lens</span>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--command">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LogLaundryExpense</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-block-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-block-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;dryer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;2.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;cash&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--event">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">LaundryExpenseLogged</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-block-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-block-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;dryer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;2.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;cash&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T14:03:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">business</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--command">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="COMMAND GWT" aria-describedby="slice-help-gwt-kind-command-gwt-command-gwt">COMMAND GWT</button>
+<div id="slice-help-gwt-kind-command-gwt-command-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND GWT marks the Given/When/Then rule band that governs a command slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND GWT because it traces the scenario rules that lead from given conditions into a command and its resulting event.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--command">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="COMMAND" aria-describedby="slice-help-gwt-ref-kind-loglaundryexpense-command">COMMAND</button>
+<div id="slice-help-gwt-ref-kind-loglaundryexpense-command" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">COMMAND</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; COMMAND marks the modeled change or intent block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is COMMAND because LogLaundryExpense is the modeled change or intent in this slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LogLaundryExpense</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;dryer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;2.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;cash&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;dryer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;2.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;cash&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T14:03:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+<article class="slice-card slice-card--view">
+<div class="slice-card__header">
+<div class="slice-card__topline">
+<span class="slice-card__app-pill">LaundryLog</span>
+<div class="slice-card__kind">VIEW SLICE</div>
+</div>
+<h2 class="slice-card__title">Current Laundry Session</h2>
+<p class="slice-card__description">washer and dryer are visible in the current session</p>
+</div>
+<div class="slice-card__body">
+<div class="slice-card__row slice-card__row--screen">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<section class="slice-block slice-block--view">
+<div class="slice-block__topline">
+<h3 class="slice-block__title">CurrentLaundrySession</h3>
+<div class="slice-block__badges">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="block-kind">
+<button class="slice-block__badge slice-block__badge--kind slice-help-trigger" type="button" data-testid="slice-kind-trigger" data-slice-help-trigger data-slice-help-type="block-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-block-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-block-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-kind-popover" data-slice-help-popover data-slice-help-type="block-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+</div>
+<details class="slice-block__properties-panel">
+<summary class="slice-block__properties-summary">properties</summary>
+<div class="slice-block__properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$5.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00; Dryer x1 Cash $2.50]&quot;</span>
+</div>
+</div>
+</details>
+<div class="slice-block__footer">
+<div class="slice-block__footer-left">
+<button type="button" class="slice-block__footer-toggle" data-action="toggle-block-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="slice-block__footer-right">
+<span class="slice-block__footer-badge">classic em</span>
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</section>
+</div>
+<div class="slice-card__row slice-card__row--detail">
+<div class="slice-card__slot slice-card__slot--empty slice-card__slot--row-fill" aria-hidden="true"></div>
+</div>
+</div>
+<div class="slice-card__gwt-row">
+<section class="slice-card__gwt-card slice-card__gwt-card--view">
+<div class="slice-card__gwt-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-kind">
+<button class="slice-card__gwt-kind slice-help-trigger" type="button" data-testid="slice-gwt-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-kind" data-slice-help-label="VIEW GWT" aria-describedby="slice-help-gwt-kind-view-gwt-view-gwt">VIEW GWT</button>
+<div id="slice-help-gwt-kind-view-gwt-view-gwt" class="slice-help-popover" data-testid="slice-gwt-kind-popover" data-slice-help-popover data-slice-help-type="gwt-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW GWT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW GWT marks the Given/When/Then rule band that explains a view slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW GWT because it traces the scenario rules that explain how events become a projected view.</p>
+</div>
+</div>
+</div>
+<div class="slice-card__gwt-clauses">
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">GIVEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;washer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;3.00&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;card&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T13:47:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref path-document__gwt-ref--event">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="EVENT" aria-describedby="slice-help-gwt-ref-kind-laundryexpenselogged-event">EVENT</button>
+<div id="slice-help-gwt-ref-kind-laundryexpenselogged-event" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">EVENT</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; EVENT marks the backbone event block produced by the modeled change.</p>
+<p class="slice-help-popover__text">This compartment is EVENT because LaundryExpenseLogged is the event backbone produced by the modeled change.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">LaundryExpenseLogged</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">expense_kind =</span>
+<span class="slice-block__property-value">&quot;dryer&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">quantity =</span>
+<span class="slice-block__property-value">1</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">unit_price =</span>
+<span class="slice-block__property-value">&quot;2.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">payment_method =</span>
+<span class="slice-block__property-value">&quot;cash&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">recorded_at_utc =</span>
+<span class="slice-block__property-value">&quot;2026-03-27T14:03:00Z&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">WHEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-text">project the current laundry session over visible entries</div>
+</div>
+</div>
+<div class="path-document__gwt-clause">
+<span class="path-document__gwt-stage">THEN</span>
+<div class="path-document__gwt-clause-body">
+<div class="path-document__gwt-ref-stack">
+<div class="path-document__gwt-ref path-document__gwt-ref--view">
+<div class="path-document__gwt-ref-topline">
+<div class="slice-help-wrap" data-slice-help-wrap data-slice-help-type="gwt-ref-kind">
+<button class="path-document__gwt-ref-kind slice-help-trigger" type="button" data-testid="slice-gwt-ref-kind-trigger" data-slice-help-trigger data-slice-help-type="gwt-ref-kind" data-slice-help-label="VIEW" aria-describedby="slice-help-gwt-ref-kind-currentlaundrysession-view">VIEW</button>
+<div id="slice-help-gwt-ref-kind-currentlaundrysession-view" class="slice-help-popover" data-testid="slice-gwt-ref-kind-popover" data-slice-help-popover data-slice-help-type="gwt-ref-kind" role="dialog" aria-modal="false">
+<div class="slice-help-popover__header">
+<div class="slice-help-popover__heading">
+<div class="slice-help-popover__label">Compartment Classification</div>
+<div class="slice-help-popover__title">VIEW</div>
+</div>
+<button class="slice-help-popover__close" type="button" data-testid="slice-help-popover-close" data-slice-help-popover-close aria-label="Close explanation">Close</button>
+</div>
+<p class="slice-help-popover__text">Compartment Classification &#183; VIEW marks the modeled read or interpretation block inside this slice.</p>
+<p class="slice-help-popover__text">This compartment is VIEW because CurrentLaundrySession is the modeled read or interpretation made visible by the slice.</p>
+</div>
+</div>
+</div>
+<div class="path-document__gwt-ref-title">CurrentLaundrySession</div>
+<details class="path-document__gwt-ref-properties-panel">
+<summary class="path-document__gwt-ref-properties-summary">properties</summary>
+<div class="path-document__gwt-ref-properties">
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">active_location_name =</span>
+<span class="slice-block__property-value">&quot;Love&#39;s #123 - Springfield, OH&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--inline">
+<span class="slice-block__property-key">running_total =</span>
+<span class="slice-block__property-value">&quot;$5.50&quot;</span>
+</div>
+<div class="slice-block__property-line slice-block__property-line--stacked">
+<span class="slice-block__property-key">visible_entries =</span>
+<span class="slice-block__property-value">&quot;[Washer x1 Card $3.00; Dryer x1 Cash $2.50]&quot;</span>
+</div>
+</div>
+</details>
+<div class="path-document__gwt-ref-footer">
+<div class="path-document__gwt-ref-footer-left">
+<button type="button" class="path-document__gwt-ref-toggle" data-action="toggle-gwt-properties" aria-expanded="false">Properties</button>
+</div>
+<div class="path-document__gwt-ref-footer-right">
+<button type="button" class="slice-card__width-action" data-action="toggle-slice-width" aria-pressed="false" aria-label="Expand slice width" title="Expand slice width">→</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</article>
+</section>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const expandButton = document.querySelector('[data-action="expand-properties"]');
+  const collapseButton = document.querySelector('[data-action="collapse-properties"]');
+  const expandWidthButton = document.querySelector('[data-action="expand-width"]');
+  const collapseWidthButton = document.querySelector('[data-action="collapse-width"]');
+  const rowElements = Array.from(document.querySelectorAll('.path-document__row'));
+  const helpWraps = Array.from(document.querySelectorAll('[data-slice-help-wrap]'));
+  const updatePropertyToggles = function () {
+    document.querySelectorAll('[data-action="toggle-block-properties"]').forEach(function (button) {
+      const block = button.closest('.slice-block');
+      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;
+      const expanded = !!panel && panel.open;
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+    document.querySelectorAll('[data-action="toggle-gwt-properties"]').forEach(function (button) {
+      const ref = button.closest('.path-document__gwt-ref');
+      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;
+      const expanded = !!panel && panel.open;
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
+  };
+  const updateRowWidthState = function (rowElement) {
+    const baseColumns = Number(rowElement.getAttribute('data-base-columns') || '0');
+    const expandedSlices = rowElement.querySelectorAll('.slice-card--wide').length;
+    rowElement.style.setProperty('--current-slice-columns', String(baseColumns + expandedSlices));
+    rowElement.querySelectorAll('[data-action="toggle-slice-width"]').forEach(function (button) {
+      const sliceCard = button.closest('.slice-card');
+      const expanded = !!sliceCard && sliceCard.classList.contains('slice-card--wide');
+      button.textContent = expanded ? '←' : '→';
+      button.setAttribute('title', expanded ? 'Collapse slice width' : 'Expand slice width');
+      button.setAttribute('aria-label', expanded ? 'Collapse slice width' : 'Expand slice width');
+      button.setAttribute('aria-pressed', expanded ? 'true' : 'false');
+    });
+  };
+  if (expandButton) {
+    expandButton.addEventListener('click', function () {
+      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {
+        panel.open = true;
+      });
+      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {
+        panel.open = true;
+      });
+      updatePropertyToggles();
+    });
+  }
+  if (collapseButton) {
+    collapseButton.addEventListener('click', function () {
+      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {
+        panel.open = false;
+      });
+      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {
+        panel.open = false;
+      });
+      updatePropertyToggles();
+    });
+  }
+  if (expandWidthButton) {
+    expandWidthButton.addEventListener('click', function () {
+      rowElements.forEach(function (rowElement) {
+        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {
+          sliceCard.classList.add('slice-card--wide');
+        });
+        updateRowWidthState(rowElement);
+      });
+    });
+  }
+  if (collapseWidthButton) {
+    collapseWidthButton.addEventListener('click', function () {
+      rowElements.forEach(function (rowElement) {
+        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {
+          sliceCard.classList.remove('slice-card--wide');
+        });
+        updateRowWidthState(rowElement);
+      });
+    });
+  }
+  document.querySelectorAll('[data-action="toggle-block-properties"]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const block = button.closest('.slice-block');
+      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;
+      if (!panel) { return; }
+      panel.open = !panel.open;
+      updatePropertyToggles();
+    });
+  });
+  document.querySelectorAll('[data-action="toggle-gwt-properties"]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      const ref = button.closest('.path-document__gwt-ref');
+      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;
+      if (!panel) { return; }
+      panel.open = !panel.open;
+      updatePropertyToggles();
+    });
+  });
+  rowElements.forEach(function (rowElement) {
+    updateRowWidthState(rowElement);
+    rowElement.querySelectorAll('[data-action="toggle-slice-width"]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const sliceCard = button.closest('.slice-card');
+        if (!sliceCard) { return; }
+        sliceCard.classList.toggle('slice-card--wide');
+        updateRowWidthState(rowElement);
+      });
+    });
+  });
+  const closeHelpPopovers = function (includePinned) {
+    const shouldClosePinned = includePinned !== false;
+    helpWraps.forEach(function (wrap) {
+      if (!shouldClosePinned && wrap.dataset.pinned === 'true') { return; }
+      delete wrap.dataset.open;
+      delete wrap.dataset.pinned;
+    });
+  };
+  const openHelpPopover = function (wrap, pinned) {
+    const shouldPin = pinned === true;
+    if (!shouldPin) {
+      const anotherPinnedPopoverIsOpen = helpWraps.some(function (candidate) {
+        return candidate !== wrap && candidate.dataset.pinned === 'true';
+      });
+      if (anotherPinnedPopoverIsOpen) { return; }
+    }
+    helpWraps.forEach(function (candidate) {
+      if (candidate === wrap) {
+        candidate.dataset.open = 'true';
+        if (shouldPin) { candidate.dataset.pinned = 'true'; }
+      } else {
+        delete candidate.dataset.open;
+        delete candidate.dataset.pinned;
+      }
+    });
+  };
+  helpWraps.forEach(function (wrap) {
+    const trigger = wrap.querySelector('[data-slice-help-trigger]');
+    const closeButton = wrap.querySelector('[data-slice-help-popover-close]');
+    wrap.addEventListener('mouseenter', function () { openHelpPopover(wrap, false); });
+    wrap.addEventListener('mouseleave', function () {
+      if (wrap.dataset.pinned === 'true') { return; }
+      delete wrap.dataset.open;
+    });
+    wrap.addEventListener('focusin', function () { openHelpPopover(wrap, false); });
+    wrap.addEventListener('focusout', function () {
+      window.requestAnimationFrame(function () {
+        if (!wrap.contains(document.activeElement) && wrap.dataset.pinned !== 'true') {
+          delete wrap.dataset.open;
+        }
+      });
+    });
+    if (trigger) {
+      trigger.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (wrap.dataset.pinned === 'true') {
+          delete wrap.dataset.open;
+          delete wrap.dataset.pinned;
+          return;
+        }
+        openHelpPopover(wrap, true);
+      });
+    }
+    if (closeButton) {
+      closeButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        delete wrap.dataset.open;
+        delete wrap.dataset.pinned;
+      });
+    }
+  });
+  document.addEventListener('click', function (event) {
+    const target = event.target;
+    if (!(target instanceof Node)) { return; }
+    const clickedInsideHelp = helpWraps.some(function (wrap) { return wrap.contains(target); });
+    if (!clickedInsideHelp) { closeHelpPopovers(true); }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') { closeHelpPopovers(true); }
+  });
+  updatePropertyToggles();
+});
+</script>
+
+</body>
+</html>

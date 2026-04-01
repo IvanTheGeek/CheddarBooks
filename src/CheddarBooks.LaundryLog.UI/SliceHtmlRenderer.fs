@@ -1,0 +1,1368 @@
+namespace CheddarBooks.LaundryLog.UI
+
+open System
+open System.Net
+open System.Text
+open CheddarBooks.LaundryLog
+
+/// Distinguishes the current supported block kinds inside a rendered slice card.
+type SliceBlockKind =
+    | Screen
+    | Command
+    | Event
+    | View
+
+[<RequireQualifiedAccess>]
+module SliceBlockKind =
+    /// Returns the stable uppercase badge label for the block kind.
+    let badgeLabel =
+        function
+        | SliceBlockKind.Screen -> "SCREEN"
+        | SliceBlockKind.Command -> "COMMAND"
+        | SliceBlockKind.Event -> "EVENT"
+        | SliceBlockKind.View -> "VIEW"
+
+    /// Returns the stable CSS class suffix for the block kind.
+    let cssClass =
+        function
+        | SliceBlockKind.Screen -> "screen"
+        | SliceBlockKind.Command -> "command"
+        | SliceBlockKind.Event -> "event"
+        | SliceBlockKind.View -> "view"
+
+/// Describes the content carried inside one rendered slice block.
+type SliceBlockContent =
+    | ScreenshotPlaceholder of string
+    | PropertyLines of string list
+
+/// Describes one rendered block inside a CommandSlice or ViewSlice card.
+type SliceBlockState =
+    { Kind: SliceBlockKind
+      Title: string
+      MetaBadges: string list
+      Content: SliceBlockContent
+      FooterBadgeText: string option }
+
+[<RequireQualifiedAccess>]
+module SliceBlockState =
+    /// Creates a validated slice block using small explicit surface rules.
+    let tryCreate kind title metaBadges content footerBadgeText =
+        let isBlank value = String.IsNullOrWhiteSpace value
+        let footerBadgeText : string option = footerBadgeText
+
+        if isBlank title then
+            Error "Slice blocks must provide a title."
+        elif metaBadges |> List.exists isBlank then
+            Error "Slice block badges must not be blank."
+        else
+            match content with
+            | ScreenshotPlaceholder label when isBlank label ->
+                Error "Screenshot placeholders must provide visible label text."
+            | PropertyLines lines when lines |> List.exists isBlank ->
+                Error "Slice block property lines must not contain blanks."
+            | _ ->
+                Ok
+                    { Kind = kind
+                      Title = title.Trim()
+                      MetaBadges = metaBadges |> List.map (fun value -> value.Trim())
+                      Content = content
+                      FooterBadgeText = footerBadgeText |> Option.map (fun (value: string) -> value.Trim()) }
+
+/// Distinguishes the first supported scenario stages for GWT-style path bands.
+type GwtStage =
+    | Given
+    | When
+    | Then
+
+[<RequireQualifiedAccess>]
+module GwtStage =
+    /// Returns the stable uppercase stage label for the current scenario cell.
+    let label =
+        function
+        | GwtStage.Given -> "GIVEN"
+        | GwtStage.When -> "WHEN"
+        | GwtStage.Then -> "THEN"
+
+/// Describes one stage clause inside a per-slice GWT card.
+type GwtClause =
+    { Stage: GwtStage
+      Text: string option
+      BlockReferences: SliceBlockState list }
+
+[<RequireQualifiedAccess>]
+module GwtClause =
+    /// Creates a validated GWT clause for a single slice card.
+    let tryCreate stage text blockReferences =
+        let text : string option = text
+        let normalizedText = text |> Option.map (fun value -> value.Trim()) |> Option.filter (String.IsNullOrWhiteSpace >> not)
+
+        if List.isEmpty blockReferences && normalizedText.IsNone then
+            Error "GWT clauses must provide text, block references, or both."
+        else
+            Ok
+                { Stage = stage
+                  Text = normalizedText
+                  BlockReferences = blockReferences }
+
+/// Distinguishes the two current per-slice GWT purposes.
+type SliceGwtKind =
+    | CommandRules
+    | ViewProjection
+
+[<RequireQualifiedAccess>]
+module SliceGwtKind =
+    /// Returns the stable badge label for the current GWT card kind.
+    let label =
+        function
+        | SliceGwtKind.CommandRules -> "COMMAND GWT"
+        | SliceGwtKind.ViewProjection -> "VIEW GWT"
+
+    /// Returns the stable CSS class suffix for the current GWT card kind.
+    let cssClass =
+        function
+        | SliceGwtKind.CommandRules -> "command"
+        | SliceGwtKind.ViewProjection -> "view"
+
+/// Describes one per-slice GWT card rendered inside a slice frame.
+type SliceGwtCard =
+    { Kind: SliceGwtKind
+      Clauses: GwtClause list }
+
+[<RequireQualifiedAccess>]
+module SliceGwtCard =
+    /// Creates a validated per-slice GWT card.
+    let tryCreate kind clauses =
+        if List.isEmpty clauses then
+            Error "GWT cards must contain at least one clause."
+        else
+            Ok
+                { Kind = kind
+                  Clauses = clauses }
+
+/// Describes one fully rendered CommandSlice card.
+type CommandSliceCardState =
+    { AppName: string
+      Title: string
+      Description: string
+      Screen: SliceBlockState
+      Command: SliceBlockState
+      Event: SliceBlockState
+      Gwt: SliceGwtCard option }
+
+[<RequireQualifiedAccess>]
+module CommandSliceCardState =
+    /// Creates a validated CommandSlice card state.
+    let tryCreate appName title description screen command event gwt =
+        if String.IsNullOrWhiteSpace appName then
+            Error "CommandSlice cards must provide an app name."
+        elif String.IsNullOrWhiteSpace title then
+            Error "CommandSlice cards must provide a title."
+        elif String.IsNullOrWhiteSpace description then
+            Error "CommandSlice cards must provide a description."
+        else
+            Ok
+                { AppName = appName.Trim()
+                  Title = title.Trim()
+                  Description = description.Trim()
+                  Screen = screen
+                  Command = command
+                  Event = event
+                  Gwt = gwt }
+
+/// Describes one fully rendered ViewSlice card.
+type ViewSliceCardState =
+    { AppName: string
+      Title: string
+      Description: string
+      Screen: SliceBlockState option
+      View: SliceBlockState
+      Gwt: SliceGwtCard option }
+
+[<RequireQualifiedAccess>]
+module ViewSliceCardState =
+    /// Creates a validated ViewSlice card state.
+    let tryCreate appName title description screen view gwt =
+        if String.IsNullOrWhiteSpace appName then
+            Error "ViewSlice cards must provide an app name."
+        elif String.IsNullOrWhiteSpace title then
+            Error "ViewSlice cards must provide a title."
+        elif String.IsNullOrWhiteSpace description then
+            Error "ViewSlice cards must provide a description."
+        else
+            Ok
+                { AppName = appName.Trim()
+                  Title = title.Trim()
+                  Description = description.Trim()
+                  Screen = screen
+                  View = view
+                  Gwt = gwt }
+
+/// Distinguishes the supported slice cards that can appear in a rendered path row.
+type PathSliceCard =
+    | CommandSlice of CommandSliceCardState
+    | ViewSlice of ViewSliceCardState
+
+/// Describes one rendered PATH row.
+type PathRowState =
+    { PathId: string
+      Title: string
+      Description: string
+      SliceCards: PathSliceCard list }
+
+[<RequireQualifiedAccess>]
+module PathRowState =
+    /// Creates a validated PATH row state.
+    let tryCreate pathId title description sliceCards =
+        if String.IsNullOrWhiteSpace pathId then
+            Error "Path rows must provide a stable path identifier."
+        elif String.IsNullOrWhiteSpace title then
+            Error "Path rows must provide a title."
+        elif String.IsNullOrWhiteSpace description then
+            Error "Path rows must provide a description."
+        elif List.isEmpty sliceCards then
+            Error "Path rows must contain at least one slice card."
+        else
+            Ok
+                { PathId = pathId.Trim()
+                  Title = title.Trim()
+                  Description = description.Trim()
+                  SliceCards = sliceCards }
+
+/// Describes the current rendering options for the HTML path projection.
+type SliceRenderOptions =
+    { ShowProperties: bool
+      ShowViewScreens: bool
+      DocumentTitle: string }
+
+[<RequireQualifiedAccess>]
+module SliceRenderOptions =
+    /// Classic Event Modeling lens with green-box View emphasis.
+    let classicEventModel documentTitle =
+        { ShowProperties = true
+          ShowViewScreens = false
+          DocumentTitle = documentTitle }
+
+    /// UI-enriched lens that also shows the screen supported by the View.
+    let uiNarrative documentTitle =
+        { ShowProperties = true
+          ShowViewScreens = true
+          DocumentTitle = documentTitle }
+
+/// Provides deterministic LaundryLog slice examples that back the first HTML/CSS proving ground.
+[<RequireQualifiedAccess>]
+module SliceHtmlExamples =
+    let private expect description result =
+        match result with
+        | Ok value -> value
+        | Error message -> failwith $"Expected a valid {description}. {message}"
+
+    let private location =
+        LocationName.tryCreate "Love's #123 - Springfield, OH"
+        |> expect "path1 location"
+
+    let private block kind title badges content footerBadgeText =
+        SliceBlockState.tryCreate kind title badges content footerBadgeText
+        |> expect $"slice block '{title}'"
+
+    let private commandSlice appName title description screen command event gwt =
+        CommandSliceCardState.tryCreate appName title description screen command event gwt
+        |> expect $"command slice '{title}'"
+        |> PathSliceCard.CommandSlice
+
+    let private gwtClauseText stage text =
+        GwtClause.tryCreate stage (Some text) []
+        |> expect $"gwt clause '{text}'"
+
+    let private gwtClauseBlocks stage blocks =
+        GwtClause.tryCreate stage None blocks
+        |> expect "gwt block clause"
+
+    let private gwtClauseMixed stage text blocks =
+        GwtClause.tryCreate stage (Some text) blocks
+        |> expect $"gwt clause '{text}'"
+
+    let private gwtCard kind clauses =
+        SliceGwtCard.tryCreate kind clauses
+        |> expect "gwt card"
+
+    let private viewSlice appName title description screen view gwt =
+        ViewSliceCardState.tryCreate appName title description screen view gwt
+        |> expect $"view slice '{title}'"
+        |> PathSliceCard.ViewSlice
+
+    let private visibleLine expenseKind paymentMethod quantity lineTotal =
+        VisibleLaundryExpenseViewLine.tryCreate expenseKind paymentMethod quantity lineTotal
+        |> expect $"visible entry '{ExpenseKind.displayName expenseKind}'"
+
+    let private currentSession visibleEntries runningTotalText lastRecordedAtLocalText =
+        CurrentLaundrySessionViewState.tryCreate location visibleEntries runningTotalText lastRecordedAtLocalText
+        |> expect "current session view state"
+
+    let private quoted value = $"\"{value}\""
+
+    let private formatLocationCaptureEvent recordedAtUtc =
+        let captureMethodText = quoted "manual-text"
+
+        [ $"location_name = {quoted (LocationName.value location)}"
+          $"capture_method = {captureMethodText}"
+          $"recorded_at_utc = {quoted recordedAtUtc}" ]
+
+    let private formatExpenseCommand (command: LogLaundryExpenseCommandSliceState) =
+        let unitPriceText = defaultArg command.UnitPriceText ""
+
+        [ $"expense_kind = {quoted (ExpenseKind.slug command.SelectedExpenseKind)}"
+          $"quantity = {command.Quantity}"
+          $"unit_price = {quoted unitPriceText}"
+          $"payment_method = {quoted (PaymentMethod.slug command.SelectedPaymentMethod)}" ]
+
+    let private formatExpenseEvent recordedAtUtc (command: LogLaundryExpenseCommandSliceState) =
+        [ yield $"location_name = {quoted (LocationName.value location)}"
+          yield! formatExpenseCommand command
+          yield $"recorded_at_utc = {quoted recordedAtUtc}" ]
+
+    let private formatViewState (viewState: CurrentLaundrySessionViewState) =
+        let visibleEntriesText =
+            match viewState.VisibleEntries with
+            | [] -> "[]"
+            | entries ->
+                entries
+                |> List.map (fun entry ->
+                    $"{ExpenseKind.displayName entry.ExpenseKind} x{entry.Quantity} {PaymentMethod.displayName entry.PaymentMethod} {entry.LineTotalText}")
+                |> String.concat "; "
+                |> fun value -> $"[{value}]"
+
+        [ $"active_location_name = {quoted (LocationName.value viewState.ActiveLocationName)}"
+          $"running_total = {quoted viewState.RunningTotalText}"
+          $"visible_entries = {quoted visibleEntriesText}" ]
+
+    /// Builds the first deterministic LaundryLog PATH 1 row using local command/event/view examples.
+    let path1ManualLocationWasherDryer () : PathRowState =
+        let captureMethodText = quoted "manual-text"
+
+        let washerCommand =
+            LogLaundryExpenseCommandSliceState.tryCreate
+                ExpenseKind.Washer
+                1
+                (Some "3.00")
+                PaymentMethod.Card
+                [ "$2.50"; "$3.00"; "$3.50" ]
+                true
+            |> expect "washer command slice"
+
+        let dryerCommand =
+            LogLaundryExpenseCommandSliceState.tryCreate
+                ExpenseKind.Dryer
+                1
+                (Some "2.50")
+                PaymentMethod.Cash
+                [ "$2.50"; "$3.00"; "$3.50" ]
+                true
+            |> expect "dryer command slice"
+
+        let washerEntry = visibleLine ExpenseKind.Washer PaymentMethod.Card 1 "$3.00"
+        let dryerEntry = visibleLine ExpenseKind.Dryer PaymentMethod.Cash 1 "$2.50"
+
+        let readyView = currentSession [] "$0.00" None
+        let washerView = currentSession [ washerEntry ] "$3.00" (Some "2026-03-27 09:47")
+        let washerDryerView = currentSession [ washerEntry; dryerEntry ] "$5.50" (Some "2026-03-27 10:03")
+
+        let setLocationScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Set Location Screen"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let captureLocationCommandBlock =
+            block
+                SliceBlockKind.Command
+                "CaptureLaundryLocation"
+                []
+                (PropertyLines [ $"location_name = {quoted (LocationName.value location)}"; $"capture_method = {captureMethodText}" ])
+                (Some "business")
+
+        let locationCapturedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryLocationCaptured"
+                []
+                (PropertyLines (formatLocationCaptureEvent "2026-03-27T13:42:00Z"))
+                (Some "business")
+
+        let readyScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Ready"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let readyViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState readyView))
+                (Some "classic em")
+
+        let washerCommandBlock =
+            block
+                SliceBlockKind.Command
+                "LogLaundryExpense"
+                []
+                (PropertyLines (formatExpenseCommand washerCommand))
+                (Some "business")
+
+        let washerLoggedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryExpenseLogged"
+                []
+                (PropertyLines (formatExpenseEvent "2026-03-27T13:47:00Z" washerCommand))
+                (Some "business")
+
+        let washerVisibleScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Washer Visible"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let washerVisibleViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState washerView))
+                (Some "classic em")
+
+        let dryerCommandBlock =
+            block
+                SliceBlockKind.Command
+                "LogLaundryExpense"
+                []
+                (PropertyLines (formatExpenseCommand dryerCommand))
+                (Some "business")
+
+        let dryerLoggedEventBlock =
+            block
+                SliceBlockKind.Event
+                "LaundryExpenseLogged"
+                []
+                (PropertyLines (formatExpenseEvent "2026-03-27T14:03:00Z" dryerCommand))
+                (Some "business")
+
+        let washerDryerVisibleScreenBlock =
+            block
+                SliceBlockKind.Screen
+                "Log Expense Screen - Washer And Dryer Visible"
+                [ "User" ]
+                (ScreenshotPlaceholder "Screen snapshot")
+                (Some "ui lens")
+
+        let washerDryerVisibleViewBlock =
+            block
+                SliceBlockKind.View
+                "CurrentLaundrySession"
+                []
+                (PropertyLines (formatViewState washerDryerView))
+                (Some "classic em")
+
+        let captureLocationGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseText GwtStage.Given "no active laundry location has been captured yet"
+                  gwtClauseBlocks GwtStage.When [ captureLocationCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ locationCapturedEventBlock ] ]
+
+        let readyViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session for the active location"
+                  gwtClauseBlocks GwtStage.Then [ readyViewBlock ] ]
+
+        let washerCommandGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseBlocks GwtStage.Given [ locationCapturedEventBlock ]
+                  gwtClauseBlocks GwtStage.When [ washerCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ washerLoggedEventBlock ] ]
+
+        let washerViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                  gwtClauseBlocks GwtStage.Then [ washerVisibleViewBlock ] ]
+
+        let dryerCommandGwt =
+            gwtCard
+                SliceGwtKind.CommandRules
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock ]
+                  gwtClauseBlocks GwtStage.When [ dryerCommandBlock ]
+                  gwtClauseBlocks GwtStage.Then [ dryerLoggedEventBlock ] ]
+
+        let dryerViewGwt =
+            gwtCard
+                SliceGwtKind.ViewProjection
+                [ gwtClauseBlocks GwtStage.Given [ washerLoggedEventBlock; dryerLoggedEventBlock ]
+                  gwtClauseText GwtStage.When "project the current laundry session over visible entries"
+                  gwtClauseBlocks GwtStage.Then [ washerDryerVisibleViewBlock ] ]
+
+        PathRowState.tryCreate
+            "path1"
+            "PATH 1: Manual Location -> Washer -> Dryer"
+            "Single-actor readable row for the first LaundryLog path. The location is captured first, then washer and dryer expenses are logged into the same current session."
+            [ commandSlice
+                  "LaundryLog"
+                  "Capture Laundry Location"
+                  "manual location entry starts the path"
+                  setLocationScreenBlock
+                  captureLocationCommandBlock
+                  locationCapturedEventBlock
+                  (Some captureLocationGwt)
+              viewSlice
+                  "LaundryLog"
+                  "Current Laundry Session"
+                  "ready to log the first washer expense"
+                  (Some readyScreenBlock)
+                  readyViewBlock
+                  (Some readyViewGwt)
+              commandSlice
+                  "LaundryLog"
+                  "Log Washer Expense"
+                  "first expense recorded in the active location"
+                  readyScreenBlock
+                  washerCommandBlock
+                  washerLoggedEventBlock
+                  (Some washerCommandGwt)
+              viewSlice
+                  "LaundryLog"
+                  "Current Laundry Session"
+                  "washer entry is visible in the current session"
+                  (Some washerVisibleScreenBlock)
+                  washerVisibleViewBlock
+                  (Some washerViewGwt)
+              commandSlice
+                  "LaundryLog"
+                  "Log Dryer Expense"
+                  "second expense recorded in the same session"
+                  washerVisibleScreenBlock
+                  dryerCommandBlock
+                  dryerLoggedEventBlock
+                  (Some dryerCommandGwt)
+              viewSlice
+                  "LaundryLog"
+                  "Current Laundry Session"
+                  "washer and dryer are visible in the current session"
+                  (Some washerDryerVisibleScreenBlock)
+                  washerDryerVisibleViewBlock
+                  (Some dryerViewGwt) ]
+        |> expect "path1 row"
+
+/// Renders deterministic HTML/CSS slice projections for LaundryLog PATH work.
+[<RequireQualifiedAccess>]
+module SliceHtmlRenderer =
+    type private SliceCardRowHeight =
+        | ScreenRow
+        | DetailRow
+
+    type private SliceCardRowContent =
+        | BlockRow of SliceBlockState
+        | EmptyRow
+
+    type private SliceCardRow =
+        { Height: SliceCardRowHeight
+          Content: SliceCardRowContent }
+
+    let private htmlEncode (value: string) = WebUtility.HtmlEncode value
+
+    let private appendLine (builder: StringBuilder) (value: string) =
+        builder.AppendLine(value) |> ignore
+
+    let private renderBadge (builder: StringBuilder) cssClass text =
+        appendLine builder $"<span class=\"{cssClass}\">{htmlEncode text}</span>"
+
+    let private domSlug (value: string) =
+        value
+        |> Seq.map (fun ch ->
+            if Char.IsLetterOrDigit ch then
+                Char.ToLowerInvariant ch
+            else
+                '-')
+        |> Seq.toArray
+        |> String
+        |> fun slug -> slug.Trim('-')
+
+    let private blockKindMeaning (kind: SliceBlockKind) =
+        match kind with
+        | SliceBlockKind.Screen -> "Compartment Classification · SCREEN marks the app-facing screen compartment attached to this modeled slice."
+        | SliceBlockKind.Command -> "Compartment Classification · COMMAND marks the modeled change or intent block inside this slice."
+        | SliceBlockKind.Event -> "Compartment Classification · EVENT marks the backbone event block produced by the modeled change."
+        | SliceBlockKind.View -> "Compartment Classification · VIEW marks the modeled read or interpretation block inside this slice."
+
+    let private blockKindWhy (blockState: SliceBlockState) =
+        match blockState.Kind with
+        | SliceBlockKind.Screen -> $"This compartment is SCREEN because {blockState.Title} is the linked app surface shown in this slice."
+        | SliceBlockKind.Command -> $"This compartment is COMMAND because {blockState.Title} is the modeled change or intent in this slice."
+        | SliceBlockKind.Event -> $"This compartment is EVENT because {blockState.Title} is the event backbone produced by the modeled change."
+        | SliceBlockKind.View -> $"This compartment is VIEW because {blockState.Title} is the modeled read or interpretation made visible by the slice."
+
+    let private gwtKindMeaning (kind: SliceGwtKind) =
+        match kind with
+        | SliceGwtKind.CommandRules -> "Compartment Classification · COMMAND GWT marks the Given/When/Then rule band that governs a command slice."
+        | SliceGwtKind.ViewProjection -> "Compartment Classification · VIEW GWT marks the Given/When/Then rule band that explains a view slice."
+
+    let private gwtKindWhy (kind: SliceGwtKind) =
+        match kind with
+        | SliceGwtKind.CommandRules -> "This compartment is COMMAND GWT because it traces the scenario rules that lead from given conditions into a command and its resulting event."
+        | SliceGwtKind.ViewProjection -> "This compartment is VIEW GWT because it traces the scenario rules that explain how events become a projected view."
+
+    let private renderInteractiveKind
+        (builder: StringBuilder)
+        wrapperClass
+        triggerClass
+        triggerTestId
+        popoverTestId
+        helpType
+        idSeed
+        label
+        categoryLabel
+        meaning
+        whyText
+        =
+        let popoverId = $"slice-help-{helpType}-{domSlug idSeed}-{domSlug label}"
+
+        appendLine
+            builder
+            $"<div class=\"{wrapperClass}\" data-slice-help-wrap data-slice-help-type=\"{htmlEncode helpType}\">"
+        appendLine
+            builder
+            $"<button class=\"{triggerClass}\" type=\"button\" data-testid=\"{htmlEncode triggerTestId}\" data-slice-help-trigger data-slice-help-type=\"{htmlEncode helpType}\" data-slice-help-label=\"{htmlEncode label}\" aria-describedby=\"{htmlEncode popoverId}\">{htmlEncode label}</button>"
+        appendLine
+            builder
+            $"<div id=\"{htmlEncode popoverId}\" class=\"slice-help-popover\" data-testid=\"{htmlEncode popoverTestId}\" data-slice-help-popover data-slice-help-type=\"{htmlEncode helpType}\" role=\"dialog\" aria-modal=\"false\">"
+        appendLine builder "<div class=\"slice-help-popover__header\">"
+        appendLine builder "<div class=\"slice-help-popover__heading\">"
+        appendLine builder $"<div class=\"slice-help-popover__label\">{htmlEncode categoryLabel}</div>"
+        appendLine builder $"<div class=\"slice-help-popover__title\">{htmlEncode label}</div>"
+        appendLine builder "</div>"
+        appendLine builder "<button class=\"slice-help-popover__close\" type=\"button\" data-testid=\"slice-help-popover-close\" data-slice-help-popover-close aria-label=\"Close explanation\">Close</button>"
+        appendLine builder "</div>"
+        appendLine builder $"<p class=\"slice-help-popover__text\">{htmlEncode meaning}</p>"
+        appendLine builder $"<p class=\"slice-help-popover__text\">{htmlEncode whyText}</p>"
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderPropertyLine (builder: StringBuilder) (line: string) =
+        let separator = " = "
+        let separatorIndex = line.IndexOf(separator, StringComparison.Ordinal)
+
+        if separatorIndex < 0 then
+            appendLine builder $"<div class=\"slice-block__property-line\">{htmlEncode line}</div>"
+        else
+            let key = line.Substring(0, separatorIndex)
+            let value = line.Substring(separatorIndex + separator.Length)
+            let shouldStack = line.Length >= 34 || value.Length >= 22
+
+            if shouldStack then
+                appendLine builder "<div class=\"slice-block__property-line slice-block__property-line--stacked\">"
+                appendLine builder $"<span class=\"slice-block__property-key\">{htmlEncode key} =</span>"
+                appendLine builder $"<span class=\"slice-block__property-value\">{htmlEncode value}</span>"
+                appendLine builder "</div>"
+            else
+                appendLine builder "<div class=\"slice-block__property-line slice-block__property-line--inline\">"
+                appendLine builder $"<span class=\"slice-block__property-key\">{htmlEncode key} =</span>"
+                appendLine builder $"<span class=\"slice-block__property-value\">{htmlEncode value}</span>"
+                appendLine builder "</div>"
+
+    let private screenRow content =
+        { Height = SliceCardRowHeight.ScreenRow
+          Content = content }
+
+    let private detailRow content =
+        { Height = SliceCardRowHeight.DetailRow
+          Content = content }
+
+    let private renderBlockContent (builder: StringBuilder) showProperties content =
+        match content with
+        | ScreenshotPlaceholder label ->
+            appendLine
+                builder
+                $"<div class=\"slice-block__snapshot\"><span>{htmlEncode label}</span></div>"
+        | PropertyLines propertyLines when showProperties ->
+            appendLine builder "<details class=\"slice-block__properties-panel\">"
+            appendLine builder "<summary class=\"slice-block__properties-summary\">properties</summary>"
+            appendLine builder "<div class=\"slice-block__properties\">"
+
+            propertyLines
+            |> List.iter (renderPropertyLine builder)
+
+            appendLine builder "</div>"
+            appendLine builder "</details>"
+        | PropertyLines _ ->
+            appendLine builder "<div class=\"slice-block__properties slice-block__properties--hidden\"></div>"
+
+    let private renderGwtReferenceProperties (builder: StringBuilder) showProperties propertyLines =
+        if showProperties then
+            appendLine builder "<details class=\"path-document__gwt-ref-properties-panel\">"
+            appendLine builder "<summary class=\"path-document__gwt-ref-properties-summary\">properties</summary>"
+            appendLine builder "<div class=\"path-document__gwt-ref-properties\">"
+            propertyLines |> List.iter (renderPropertyLine builder)
+            appendLine builder "</div>"
+            appendLine builder "</details>"
+        else
+            appendLine builder "<div class=\"path-document__gwt-ref-properties path-document__gwt-ref-properties--hidden\"></div>"
+
+    let private renderSliceWidthAction (builder: StringBuilder) =
+        appendLine
+            builder
+            "<button type=\"button\" class=\"slice-card__width-action\" data-action=\"toggle-slice-width\" aria-pressed=\"false\" aria-label=\"Expand slice width\" title=\"Expand slice width\">→</button>"
+
+    let private renderBlock (builder: StringBuilder) showProperties showWidthActions (blockState: SliceBlockState) =
+        let blockCssClass = SliceBlockKind.cssClass blockState.Kind
+        let showsPropertiesToggle =
+            match blockState.Content with
+            | PropertyLines _ when showProperties -> true
+            | _ -> false
+
+        let showsWidthAction =
+            match blockState.Content, showWidthActions with
+            | _, false -> false
+            | PropertyLines _, true -> true
+            | ScreenshotPlaceholder _, true -> false
+
+        appendLine builder $"<section class=\"slice-block slice-block--{blockCssClass}\">"
+        appendLine builder "<div class=\"slice-block__topline\">"
+        appendLine builder $"<h3 class=\"slice-block__title\">{htmlEncode blockState.Title}</h3>"
+        appendLine builder "<div class=\"slice-block__badges\">"
+
+        blockState.MetaBadges
+        |> List.iter (renderBadge builder "slice-block__badge slice-block__badge--meta")
+
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "slice-block__badge slice-block__badge--kind slice-help-trigger"
+            "slice-kind-trigger"
+            "slice-kind-popover"
+            "block-kind"
+            blockState.Title
+            (SliceBlockKind.badgeLabel blockState.Kind)
+            "Compartment Classification"
+            (blockKindMeaning blockState.Kind)
+            (blockKindWhy blockState)
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+        renderBlockContent builder showProperties blockState.Content
+
+        if blockState.FooterBadgeText.IsSome || showsWidthAction || showsPropertiesToggle then
+            appendLine builder "<div class=\"slice-block__footer\">"
+            appendLine builder "<div class=\"slice-block__footer-left\">"
+
+            if showsPropertiesToggle then
+                appendLine
+                    builder
+                    "<button type=\"button\" class=\"slice-block__footer-toggle\" data-action=\"toggle-block-properties\" aria-expanded=\"false\">Properties</button>"
+
+            appendLine builder "</div>"
+            appendLine builder "<div class=\"slice-block__footer-right\">"
+
+            match blockState.FooterBadgeText with
+            | Some footerBadgeText -> renderBadge builder "slice-block__footer-badge" footerBadgeText
+            | None -> ()
+
+            if showsWidthAction then
+                renderSliceWidthAction builder
+
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+
+        appendLine builder "</section>"
+
+    let private renderCardRow (builder: StringBuilder) options (row: SliceCardRow) =
+        let rowCssClass =
+            match row.Height with
+            | SliceCardRowHeight.ScreenRow -> "screen"
+            | SliceCardRowHeight.DetailRow -> "detail"
+
+        appendLine builder $"<div class=\"slice-card__row slice-card__row--{rowCssClass}\">"
+
+        match row.Content with
+        | SliceCardRowContent.BlockRow blockState -> renderBlock builder options.ShowProperties true blockState
+        | SliceCardRowContent.EmptyRow ->
+            appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
+
+        appendLine builder "</div>"
+
+    let private renderGwtBlockReference (builder: StringBuilder) showProperties showWidthActions (blockState: SliceBlockState) =
+        let blockCssClass = SliceBlockKind.cssClass blockState.Kind
+        let showsPropertiesToggle =
+            match blockState.Content with
+            | PropertyLines _ when showProperties -> true
+            | _ -> false
+
+        let showsWidthAction =
+            match blockState.Content, showWidthActions with
+            | _, false -> false
+            | PropertyLines _, true -> true
+            | ScreenshotPlaceholder _, true -> false
+
+        appendLine builder $"<div class=\"path-document__gwt-ref path-document__gwt-ref--{blockCssClass}\">"
+        appendLine builder "<div class=\"path-document__gwt-ref-topline\">"
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "path-document__gwt-ref-kind slice-help-trigger"
+            "slice-gwt-ref-kind-trigger"
+            "slice-gwt-ref-kind-popover"
+            "gwt-ref-kind"
+            blockState.Title
+            (SliceBlockKind.badgeLabel blockState.Kind)
+            "Compartment Classification"
+            (blockKindMeaning blockState.Kind)
+            (blockKindWhy blockState)
+        appendLine builder "</div>"
+        appendLine builder $"<div class=\"path-document__gwt-ref-title\">{htmlEncode blockState.Title}</div>"
+
+        match blockState.Content with
+        | PropertyLines propertyLines when showProperties ->
+            renderGwtReferenceProperties builder showProperties propertyLines
+            appendLine builder "<div class=\"path-document__gwt-ref-footer\">"
+            appendLine builder "<div class=\"path-document__gwt-ref-footer-left\">"
+            if showsPropertiesToggle then
+                appendLine
+                    builder
+                    "<button type=\"button\" class=\"path-document__gwt-ref-toggle\" data-action=\"toggle-gwt-properties\" aria-expanded=\"false\">Properties</button>"
+            appendLine builder "</div>"
+            appendLine builder "<div class=\"path-document__gwt-ref-footer-right\">"
+            if showsWidthAction then
+                renderSliceWidthAction builder
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+        | ScreenshotPlaceholder label ->
+            appendLine builder $"<div class=\"path-document__gwt-ref-text\">{htmlEncode label}</div>"
+        | PropertyLines _ -> ()
+
+        appendLine builder "</div>"
+
+    let private renderGwtClause (builder: StringBuilder) showProperties showWidthActions (clause: GwtClause) =
+        appendLine builder "<div class=\"path-document__gwt-clause\">"
+        renderBadge builder "path-document__gwt-stage" (GwtStage.label clause.Stage)
+        appendLine builder "<div class=\"path-document__gwt-clause-body\">"
+
+        match clause.Text with
+        | Some text -> appendLine builder $"<div class=\"path-document__gwt-text\">{htmlEncode text}</div>"
+        | None -> ()
+
+        if not (List.isEmpty clause.BlockReferences) then
+            appendLine builder "<div class=\"path-document__gwt-ref-stack\">"
+            clause.BlockReferences |> List.iter (renderGwtBlockReference builder showProperties showWidthActions)
+            appendLine builder "</div>"
+
+        appendLine builder "</div>"
+        appendLine builder "</div>"
+
+    let private renderEmbeddedGwtCard (builder: StringBuilder) showProperties showWidthActions (card: SliceGwtCard) =
+        let kindCssClass = SliceGwtKind.cssClass card.Kind
+
+        appendLine builder $"<section class=\"slice-card__gwt-card slice-card__gwt-card--{kindCssClass}\">"
+        appendLine builder "<div class=\"slice-card__gwt-topline\">"
+        renderInteractiveKind
+            builder
+            "slice-help-wrap"
+            "slice-card__gwt-kind slice-help-trigger"
+            "slice-gwt-kind-trigger"
+            "slice-gwt-kind-popover"
+            "gwt-kind"
+            (SliceGwtKind.label card.Kind)
+            (SliceGwtKind.label card.Kind)
+            "Compartment Classification"
+            (gwtKindMeaning card.Kind)
+            (gwtKindWhy card.Kind)
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"slice-card__gwt-clauses\">"
+        card.Clauses |> List.iter (renderGwtClause builder showProperties showWidthActions)
+        appendLine builder "</div>"
+        appendLine builder "</section>"
+
+    let private renderSliceCardShell
+        (builder: StringBuilder)
+        options
+        sliceCssClass
+        appName
+        kindLabel
+        title
+        description
+        rows
+        gwt
+        =
+        appendLine builder $"<article class=\"slice-card {sliceCssClass}\">"
+        appendLine builder "<div class=\"slice-card__header\">"
+        appendLine builder "<div class=\"slice-card__topline\">"
+        renderBadge builder "slice-card__app-pill" appName
+        appendLine builder $"<div class=\"slice-card__kind\">{htmlEncode kindLabel}</div>"
+        appendLine builder "</div>"
+        appendLine builder $"<h2 class=\"slice-card__title\">{htmlEncode title}</h2>"
+        appendLine builder $"<p class=\"slice-card__description\">{htmlEncode description}</p>"
+        appendLine builder "</div>"
+        appendLine builder "<div class=\"slice-card__body\">"
+
+        rows
+        |> List.iter (renderCardRow builder options)
+
+        appendLine builder "</div>"
+
+        appendLine builder "<div class=\"slice-card__gwt-row\">"
+
+        match gwt with
+        | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties true gwtCard
+        | None -> appendLine builder "<div class=\"slice-card__slot slice-card__slot--empty slice-card__slot--row-fill\" aria-hidden=\"true\"></div>"
+
+        appendLine builder "</div>"
+        appendLine builder "</article>"
+
+    let private renderCommandSlice (builder: StringBuilder) options (sliceState: CommandSliceCardState) =
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--command"
+            sliceState.AppName
+            "COMMAND SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ screenRow (SliceCardRowContent.BlockRow sliceState.Screen)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Command)
+              detailRow (SliceCardRowContent.BlockRow sliceState.Event) ]
+            sliceState.Gwt
+
+    let private renderViewSlice (builder: StringBuilder) options (sliceState: ViewSliceCardState) =
+        renderSliceCardShell
+            builder
+            options
+            "slice-card--view"
+            sliceState.AppName
+            "VIEW SLICE"
+            sliceState.Title
+            sliceState.Description
+            [ if options.ShowViewScreens then
+                  match sliceState.Screen with
+                  | Some screen -> screenRow (SliceCardRowContent.BlockRow screen)
+                  | None -> screenRow SliceCardRowContent.EmptyRow
+              else
+                  screenRow SliceCardRowContent.EmptyRow
+              detailRow (SliceCardRowContent.BlockRow sliceState.View)
+              detailRow SliceCardRowContent.EmptyRow ]
+            sliceState.Gwt
+
+    let private renderSliceCard (builder: StringBuilder) options =
+        function
+        | PathSliceCard.CommandSlice commandSlice -> renderCommandSlice builder options commandSlice
+        | PathSliceCard.ViewSlice viewSlice -> renderViewSlice builder options viewSlice
+
+    /// Renders one embedded slice block without the outer slice shell.
+    let renderEmbeddedBlockHtml options (blockState: SliceBlockState) =
+        let builder = StringBuilder()
+        renderBlock builder options.ShowProperties false blockState
+        builder.ToString()
+
+    /// Renders one embedded GWT card without the outer slice shell.
+    let renderEmbeddedGwtHtml options (gwtCard: SliceGwtCard) =
+        let builder = StringBuilder()
+        renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+        builder.ToString()
+
+    /// Renders the modeled AEM detail body without the outer slice shell or linked screen slot.
+    let renderEmbeddedDetailBodyHtml options =
+        function
+        | PathSliceCard.CommandSlice commandSlice ->
+            let builder = StringBuilder()
+            appendLine builder "<div class=\"slice-card__embedded-body slice-card__embedded-body--command\">"
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow commandSlice.Command))
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow commandSlice.Event))
+            appendLine builder "<div class=\"slice-card__embedded-gwt\">"
+            match commandSlice.Gwt with
+            | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+            | None -> ()
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+            builder.ToString()
+        | PathSliceCard.ViewSlice viewSlice ->
+            let builder = StringBuilder()
+            appendLine builder "<div class=\"slice-card__embedded-body slice-card__embedded-body--view\">"
+            renderCardRow
+                builder
+                options
+                (detailRow (SliceCardRowContent.BlockRow viewSlice.View))
+            appendLine builder "<div class=\"slice-card__embedded-gwt\">"
+            match viewSlice.Gwt with
+            | Some gwtCard -> renderEmbeddedGwtCard builder options.ShowProperties false gwtCard
+            | None -> ()
+            appendLine builder "</div>"
+            appendLine builder "</div>"
+            builder.ToString()
+
+    let private renderScript (builder: StringBuilder) =
+        appendLine builder "<script>"
+        appendLine builder "document.addEventListener('DOMContentLoaded', function () {"
+        appendLine builder "  const expandButton = document.querySelector('[data-action=\"expand-properties\"]');"
+        appendLine builder "  const collapseButton = document.querySelector('[data-action=\"collapse-properties\"]');"
+        appendLine builder "  const expandWidthButton = document.querySelector('[data-action=\"expand-width\"]');"
+        appendLine builder "  const collapseWidthButton = document.querySelector('[data-action=\"collapse-width\"]');"
+        appendLine builder "  const rowElements = Array.from(document.querySelectorAll('.path-document__row'));"
+        appendLine builder "  const helpWraps = Array.from(document.querySelectorAll('[data-slice-help-wrap]'));"
+        appendLine builder "  const updatePropertyToggles = function () {"
+        appendLine builder "    document.querySelectorAll('[data-action=\"toggle-block-properties\"]').forEach(function (button) {"
+        appendLine builder "      const block = button.closest('.slice-block');"
+        appendLine builder "      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;"
+        appendLine builder "      const expanded = !!panel && panel.open;"
+        appendLine builder "      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');"
+        appendLine builder "    });"
+        appendLine builder "    document.querySelectorAll('[data-action=\"toggle-gwt-properties\"]').forEach(function (button) {"
+        appendLine builder "      const ref = button.closest('.path-document__gwt-ref');"
+        appendLine builder "      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;"
+        appendLine builder "      const expanded = !!panel && panel.open;"
+        appendLine builder "      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  const updateRowWidthState = function (rowElement) {"
+        appendLine builder "    const baseColumns = Number(rowElement.getAttribute('data-base-columns') || '0');"
+        appendLine builder "    const expandedSlices = rowElement.querySelectorAll('.slice-card--wide').length;"
+        appendLine builder "    rowElement.style.setProperty('--current-slice-columns', String(baseColumns + expandedSlices));"
+        appendLine builder "    rowElement.querySelectorAll('[data-action=\"toggle-slice-width\"]').forEach(function (button) {"
+        appendLine builder "      const sliceCard = button.closest('.slice-card');"
+        appendLine builder "      const expanded = !!sliceCard && sliceCard.classList.contains('slice-card--wide');"
+        appendLine builder "      button.textContent = expanded ? '←' : '→';"
+        appendLine builder "      button.setAttribute('title', expanded ? 'Collapse slice width' : 'Expand slice width');"
+        appendLine builder "      button.setAttribute('aria-label', expanded ? 'Collapse slice width' : 'Expand slice width');"
+        appendLine builder "      button.setAttribute('aria-pressed', expanded ? 'true' : 'false');"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  if (expandButton) {"
+        appendLine builder "    expandButton.addEventListener('click', function () {"
+        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = true;"
+        appendLine builder "      });"
+        appendLine builder "      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = true;"
+        appendLine builder "      });"
+        appendLine builder "      updatePropertyToggles();"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "  if (collapseButton) {"
+        appendLine builder "    collapseButton.addEventListener('click', function () {"
+        appendLine builder "      document.querySelectorAll('.slice-block__properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = false;"
+        appendLine builder "      });"
+        appendLine builder "      document.querySelectorAll('.path-document__gwt-ref-properties-panel').forEach(function (panel) {"
+        appendLine builder "        panel.open = false;"
+        appendLine builder "      });"
+        appendLine builder "      updatePropertyToggles();"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "  if (expandWidthButton) {"
+        appendLine builder "    expandWidthButton.addEventListener('click', function () {"
+        appendLine builder "      rowElements.forEach(function (rowElement) {"
+        appendLine builder "        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {"
+        appendLine builder "          sliceCard.classList.add('slice-card--wide');"
+        appendLine builder "        });"
+        appendLine builder "        updateRowWidthState(rowElement);"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "  if (collapseWidthButton) {"
+        appendLine builder "    collapseWidthButton.addEventListener('click', function () {"
+        appendLine builder "      rowElements.forEach(function (rowElement) {"
+        appendLine builder "        rowElement.querySelectorAll('.slice-card').forEach(function (sliceCard) {"
+        appendLine builder "          sliceCard.classList.remove('slice-card--wide');"
+        appendLine builder "        });"
+        appendLine builder "        updateRowWidthState(rowElement);"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "  }"
+        appendLine builder "  document.querySelectorAll('[data-action=\"toggle-block-properties\"]').forEach(function (button) {"
+        appendLine builder "    button.addEventListener('click', function () {"
+        appendLine builder "      const block = button.closest('.slice-block');"
+        appendLine builder "      const panel = block ? block.querySelector('.slice-block__properties-panel') : null;"
+        appendLine builder "      if (!panel) { return; }"
+        appendLine builder "      panel.open = !panel.open;"
+        appendLine builder "      updatePropertyToggles();"
+        appendLine builder "    });"
+        appendLine builder "  });"
+        appendLine builder "  document.querySelectorAll('[data-action=\"toggle-gwt-properties\"]').forEach(function (button) {"
+        appendLine builder "    button.addEventListener('click', function () {"
+        appendLine builder "      const ref = button.closest('.path-document__gwt-ref');"
+        appendLine builder "      const panel = ref ? ref.querySelector('.path-document__gwt-ref-properties-panel') : null;"
+        appendLine builder "      if (!panel) { return; }"
+        appendLine builder "      panel.open = !panel.open;"
+        appendLine builder "      updatePropertyToggles();"
+        appendLine builder "    });"
+        appendLine builder "  });"
+        appendLine builder "  rowElements.forEach(function (rowElement) {"
+        appendLine builder "    updateRowWidthState(rowElement);"
+        appendLine builder "    rowElement.querySelectorAll('[data-action=\"toggle-slice-width\"]').forEach(function (button) {"
+        appendLine builder "      button.addEventListener('click', function () {"
+        appendLine builder "        const sliceCard = button.closest('.slice-card');"
+        appendLine builder "        if (!sliceCard) { return; }"
+        appendLine builder "        sliceCard.classList.toggle('slice-card--wide');"
+        appendLine builder "        updateRowWidthState(rowElement);"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "  });"
+        appendLine builder "  const closeHelpPopovers = function (includePinned) {"
+        appendLine builder "    const shouldClosePinned = includePinned !== false;"
+        appendLine builder "    helpWraps.forEach(function (wrap) {"
+        appendLine builder "      if (!shouldClosePinned && wrap.dataset.pinned === 'true') { return; }"
+        appendLine builder "      delete wrap.dataset.open;"
+        appendLine builder "      delete wrap.dataset.pinned;"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  const openHelpPopover = function (wrap, pinned) {"
+        appendLine builder "    const shouldPin = pinned === true;"
+        appendLine builder "    if (!shouldPin) {"
+        appendLine builder "      const anotherPinnedPopoverIsOpen = helpWraps.some(function (candidate) {"
+        appendLine builder "        return candidate !== wrap && candidate.dataset.pinned === 'true';"
+        appendLine builder "      });"
+        appendLine builder "      if (anotherPinnedPopoverIsOpen) { return; }"
+        appendLine builder "    }"
+        appendLine builder "    helpWraps.forEach(function (candidate) {"
+        appendLine builder "      if (candidate === wrap) {"
+        appendLine builder "        candidate.dataset.open = 'true';"
+        appendLine builder "        if (shouldPin) { candidate.dataset.pinned = 'true'; }"
+        appendLine builder "      } else {"
+        appendLine builder "        delete candidate.dataset.open;"
+        appendLine builder "        delete candidate.dataset.pinned;"
+        appendLine builder "      }"
+        appendLine builder "    });"
+        appendLine builder "  };"
+        appendLine builder "  helpWraps.forEach(function (wrap) {"
+        appendLine builder "    const trigger = wrap.querySelector('[data-slice-help-trigger]');"
+        appendLine builder "    const closeButton = wrap.querySelector('[data-slice-help-popover-close]');"
+        appendLine builder "    wrap.addEventListener('mouseenter', function () { openHelpPopover(wrap, false); });"
+        appendLine builder "    wrap.addEventListener('mouseleave', function () {"
+        appendLine builder "      if (wrap.dataset.pinned === 'true') { return; }"
+        appendLine builder "      delete wrap.dataset.open;"
+        appendLine builder "    });"
+        appendLine builder "    wrap.addEventListener('focusin', function () { openHelpPopover(wrap, false); });"
+        appendLine builder "    wrap.addEventListener('focusout', function () {"
+        appendLine builder "      window.requestAnimationFrame(function () {"
+        appendLine builder "        if (!wrap.contains(document.activeElement) && wrap.dataset.pinned !== 'true') {"
+        appendLine builder "          delete wrap.dataset.open;"
+        appendLine builder "        }"
+        appendLine builder "      });"
+        appendLine builder "    });"
+        appendLine builder "    if (trigger) {"
+        appendLine builder "      trigger.addEventListener('click', function (event) {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        if (wrap.dataset.pinned === 'true') {"
+        appendLine builder "          delete wrap.dataset.open;"
+        appendLine builder "          delete wrap.dataset.pinned;"
+        appendLine builder "          return;"
+        appendLine builder "        }"
+        appendLine builder "        openHelpPopover(wrap, true);"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "    if (closeButton) {"
+        appendLine builder "      closeButton.addEventListener('click', function (event) {"
+        appendLine builder "        event.preventDefault();"
+        appendLine builder "        event.stopPropagation();"
+        appendLine builder "        delete wrap.dataset.open;"
+        appendLine builder "        delete wrap.dataset.pinned;"
+        appendLine builder "      });"
+        appendLine builder "    }"
+        appendLine builder "  });"
+        appendLine builder "  document.addEventListener('click', function (event) {"
+        appendLine builder "    const target = event.target;"
+        appendLine builder "    if (!(target instanceof Node)) { return; }"
+        appendLine builder "    const clickedInsideHelp = helpWraps.some(function (wrap) { return wrap.contains(target); });"
+        appendLine builder "    if (!clickedInsideHelp) { closeHelpPopovers(true); }"
+        appendLine builder "  });"
+        appendLine builder "  document.addEventListener('keydown', function (event) {"
+        appendLine builder "    if (event.key === 'Escape') { closeHelpPopovers(true); }"
+        appendLine builder "  });"
+        appendLine builder "  updatePropertyToggles();"
+        appendLine builder "});"
+        appendLine builder "</script>"
+
+    let private renderStyles (builder: StringBuilder) =
+        appendLine builder "<style>"
+        appendLine builder ":root { color-scheme: light; }"
+        appendLine builder "body { margin: 0; background: linear-gradient(180deg, #f3f5f8 0%, #e9edf3 100%); color: #0d2440; font-family: \"IBM Plex Sans\", \"Aptos\", \"Segoe UI\", sans-serif; }"
+        appendLine builder ".path-document { --slice-card-width: 224px; --screen-row-height: 98px; --detail-row-height: 58px; --screen-snapshot-height: 22px; --slice-title-height: 1.34rem; --slice-description-height: 1.04rem; --property-value-indent: 1.2rem; --gwt-row-height: 148px; padding: 8px 10px 10px; }"
+        appendLine builder ".path-document__header { max-width: none; margin-bottom: 8px; }"
+        appendLine builder ".path-document__title { margin: 0; font-size: 1.0rem; line-height: 1.02; }"
+        appendLine builder ".path-document__description { margin: 3px 0 0; max-width: none; font-size: 0.7rem; line-height: 1.2; color: #48627f; white-space: nowrap; }"
+        appendLine builder ".path-document__header-actions { margin-top: 5px; display: flex; align-items: center; gap: 8px; }"
+        appendLine builder ".path-document__action { border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.92); color: #27435c; border-radius: 999px; padding: 4px 10px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
+        appendLine builder ".path-document__action:hover { background: rgba(255, 255, 255, 1.0); }"
+        appendLine builder ".path-document__row { display: grid; grid-template-columns: repeat(var(--current-slice-columns), var(--slice-card-width)); grid-template-rows: auto minmax(var(--slice-title-height), max-content) minmax(var(--slice-description-height), max-content) minmax(var(--screen-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--detail-row-height), max-content) minmax(var(--gwt-row-height), max-content); column-gap: 10px; row-gap: 6px; overflow-x: auto; align-items: start; padding: 2px 2px 6px; }"
+        appendLine builder ".path-document__gwt-clause { display: grid; grid-template-columns: auto 1fr; align-items: start; column-gap: 6px; }"
+        appendLine builder ".path-document__gwt-stage { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }"
+        appendLine builder ".slice-help-wrap { position: relative; display: inline-flex; flex: 0 0 auto; width: max-content; max-width: 100%; }"
+        appendLine builder ".slice-help-wrap[data-open=\"true\"] { z-index: 80; }"
+        appendLine builder ".slice-help-trigger { appearance: none; -webkit-appearance: none; cursor: pointer; font-family: inherit; }"
+        appendLine builder ".slice-help-trigger:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
+        appendLine builder ".slice-help-popover { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; width: min(250px, 72vw); display: grid; gap: 0.3rem; padding: 0.72rem 0.8rem; border-radius: 0.85rem; border: 1px solid #cbd5e1; background: rgba(255,255,255,0.98); box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16); opacity: 0; visibility: hidden; transform: translateY(-4px); pointer-events: none; transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease; }"
+        appendLine builder ".slice-help-wrap[data-open=\"true\"] .slice-help-popover { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }"
+        appendLine builder ".slice-help-popover__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }"
+        appendLine builder ".slice-help-popover__heading { display: grid; gap: 0.14rem; }"
+        appendLine builder ".slice-help-popover__label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; }"
+        appendLine builder ".slice-help-popover__title { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.04em; color: #0f172a; }"
+        appendLine builder ".slice-help-popover__close { border: 1px solid #cbd5e1; border-radius: 999px; background: #ffffff; color: #475569; font-size: 0.58rem; font-weight: 700; line-height: 1; padding: 0.28rem 0.5rem; cursor: pointer; }"
+        appendLine builder ".slice-help-popover__close:hover { border-color: #94a3b8; }"
+        appendLine builder ".slice-help-popover__close:focus-visible { outline: 2px solid #0e5883; outline-offset: 2px; }"
+        appendLine builder ".slice-help-popover__text { margin: 0; color: #475569; font-size: 0.68rem; line-height: 1.3; }"
+        appendLine builder ".slice-block__badges .slice-help-popover, .slice-card__gwt-topline .slice-help-popover, .path-document__gwt-ref-topline .slice-help-popover { left: 0 !important; right: auto !important; }"
+        appendLine builder ".path-document__gwt-clause-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }"
+        appendLine builder ".path-document__gwt-text { font-size: 0.62rem; line-height: 1.22; color: #0f2740; }"
+        appendLine builder ".path-document__gwt-ref-stack { display: flex; flex-direction: column; gap: 3px; }"
+        appendLine builder ".path-document__gwt-ref { border: 1px solid #c7d7ea; border-radius: 8px; background: rgba(255,255,255,0.8); padding: 3px 4px 4px; display: flex; flex-direction: column; gap: 2px; }"
+        appendLine builder ".path-document__gwt-ref--command { background: rgba(74, 150, 255, 0.12); border-color: #8bc3ff; }"
+        appendLine builder ".path-document__gwt-ref--event { background: rgba(255, 167, 57, 0.14); border-color: #ffb777; }"
+        appendLine builder ".path-document__gwt-ref--view { background: rgba(103, 229, 130, 0.14); border-color: #78e39d; }"
+        appendLine builder ".path-document__gwt-ref-topline { display: flex; justify-content: flex-end; }"
+        appendLine builder ".path-document__gwt-ref-kind { display: inline-flex; align-items: center; justify-content: center; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }"
+        appendLine builder ".path-document__gwt-ref-title { border-radius: 2px 2px 0 0; padding: 3px 5px; font-size: 0.56rem; font-weight: 600; line-height: 1.15; color: #ffffff; background: #0ea5e9; }"
+        appendLine builder ".path-document__gwt-ref--event .path-document__gwt-ref-title { background: #f97316; }"
+        appendLine builder ".path-document__gwt-ref--view .path-document__gwt-ref-title { background: #22c55e; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel[open] { gap: 2px; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel > summary { display: none; list-style: none; cursor: pointer; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel > summary::-webkit-details-marker { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties-summary { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties { display: flex; flex-direction: column; gap: 1px; background: rgba(255, 255, 255, 0.42); border-radius: 0 0 2px 2px; padding: 4px 5px; }"
+        appendLine builder ".path-document__gwt-ref-properties-panel:not([open]) .path-document__gwt-ref-properties { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties--hidden { display: none; }"
+        appendLine builder ".path-document__gwt-ref-properties .slice-block__property-line { font-size: 0.5rem; line-height: 1.16; }"
+        appendLine builder ".path-document__gwt-ref-text { font-size: 0.54rem; line-height: 1.18; color: #48627f; }"
+        appendLine builder ".path-document__gwt-ref-footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }"
+        appendLine builder ".path-document__gwt-ref-footer-left { display: flex; align-items: flex-end; }"
+        appendLine builder ".path-document__gwt-ref-footer-right { display: flex; align-items: flex-end; gap: 6px; margin-left: auto; }"
+        appendLine builder ".path-document__gwt-ref-toggle { border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; border-radius: 999px; padding: 1px 6px; font-size: 0.48rem; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; }"
+        appendLine builder ".path-document__gwt-ref-toggle:hover { background: rgba(255, 255, 255, 1.0); }"
+        appendLine builder ".slice-card { min-height: 0; border-radius: 20px; border: 4px solid #15263d; box-shadow: 0 10px 24px rgba(10, 27, 49, 0.1); padding: 7px 7px 8px; display: grid; grid-template-rows: subgrid; grid-row: 1 / span 7; align-content: start; grid-column: span 1; }"
+        appendLine builder ".slice-card--wide { grid-column: span 2; }"
+        appendLine builder ".slice-card--command { background: linear-gradient(180deg, #dff1ff 0%, #eff7ff 100%); }"
+        appendLine builder ".slice-card--view { background: linear-gradient(180deg, #dbfae4 0%, #effbf3 100%); }"
+        appendLine builder ".slice-card__header, .slice-card__body { display: contents; }"
+        appendLine builder ".slice-card__topline { grid-row: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }"
+        appendLine builder ".slice-card__app-pill { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 999px; background: #ffb54d; color: white; font-size: 0.62rem; font-weight: 700; line-height: 1; }"
+        appendLine builder ".slice-card__width-action { width: 22px; height: 22px; border: 1px solid #9ab3d0; background: rgba(255, 255, 255, 0.96); color: #27435c; border-radius: 999px; padding: 0; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-right: -6px; margin-bottom: -6px; box-shadow: 0 2px 6px rgba(10, 27, 49, 0.12); }"
+        appendLine builder ".slice-card__width-action:hover { background: rgba(255, 255, 255, 1.0); }"
+        appendLine builder ".slice-card__kind { color: #0e5883; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; text-align: right; line-height: 1; white-space: nowrap; }"
+        appendLine builder ".slice-card__title { grid-row: 2; margin: 3px 0 0; font-size: 0.82rem; line-height: 1.04; overflow: visible; }"
+        appendLine builder ".slice-card__description { grid-row: 3; margin: 0; font-size: 0.66rem; line-height: 1.18; color: #506b87; overflow: visible; }"
+        appendLine builder ".slice-card__row { display: flex; flex-direction: column; min-height: 0; }"
+        appendLine builder ".slice-card__row--screen { grid-row: 4; }"
+        appendLine builder ".slice-card__body .slice-card__row:nth-of-type(2) { grid-row: 5; }"
+        appendLine builder ".slice-card__body .slice-card__row:nth-of-type(3) { grid-row: 6; }"
+        appendLine builder ".slice-card__gwt-row { grid-row: 7; display: flex; flex-direction: column; min-height: 0; border-top: 1px dashed rgba(64, 92, 124, 0.35); padding-top: 6px; margin-top: 2px; }"
+        appendLine builder ".slice-card__gwt-card { min-height: var(--gwt-row-height); border-radius: 16px; border: 2px solid #b8cadc; background: rgba(255, 255, 255, 0.84); box-shadow: 0 6px 14px rgba(10, 27, 49, 0.06); padding: 7px 8px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }"
+        appendLine builder ".slice-card__gwt-card--command { background: rgba(226, 240, 255, 0.92); border-color: #a8c9ee; }"
+        appendLine builder ".slice-card__gwt-card--view { background: rgba(232, 249, 237, 0.92); border-color: #9ad7ab; }"
+        appendLine builder ".slice-card__gwt-topline { display: flex; justify-content: flex-start; }"
+        appendLine builder ".slice-card__gwt-kind { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 4px; border: 1px solid #bfcad7; background: #cbd5e1; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; color: #1e293b; text-transform: uppercase; box-sizing: border-box; }"
+        appendLine builder ".slice-card__gwt-clauses { display: flex; flex-direction: column; gap: 4px; }"
+        appendLine builder ".slice-card__row > .slice-block { flex: 1; }"
+        appendLine builder ".slice-card__slot--empty { min-height: 0; border-radius: 16px; background: transparent; }"
+        appendLine builder ".slice-card__slot--row-fill { flex: 1; }"
+        appendLine builder ".slice-block { display: flex; flex-direction: column; gap: 3px; border-radius: 14px; padding: 6px 7px; border: 2px solid; min-height: 0; overflow: visible; }"
+        appendLine builder ".slice-block--screen { min-height: var(--screen-row-height); box-sizing: border-box; background: rgba(255, 255, 255, 0.78); border-color: #c8dcff; }"
+        appendLine builder ".slice-block--command { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(74, 150, 255, 0.18); border-color: #8bc3ff; }"
+        appendLine builder ".slice-block--event { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(255, 167, 57, 0.2); border-color: #ffb777; }"
+        appendLine builder ".slice-block--view { min-height: var(--detail-row-height); box-sizing: border-box; background: rgba(103, 229, 130, 0.18); border-color: #78e39d; }"
+        appendLine builder ".slice-block__topline { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto; row-gap: 5px; min-height: 0; }"
+        appendLine builder ".slice-block__badges { display: flex; flex-direction: row; justify-content: flex-end; gap: 4px; grid-row: 1; }"
+        appendLine builder ".slice-block__title { margin: 0; font-size: 0.72rem; line-height: 1.14; font-weight: 700; overflow-wrap: normal; word-break: normal; hyphens: none; grid-row: 2; }"
+        appendLine builder ".slice-block--screen .slice-block__title { font-weight: 400; font-size: 0.64rem; white-space: nowrap; }"
+        appendLine builder ".slice-block__badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c2d4e8; background: rgba(255, 255, 255, 0.92); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4a647f; white-space: nowrap; box-sizing: border-box; }"
+        appendLine builder ".slice-block__badge--kind { padding: 2px 6px; border-radius: 4px; border-color: #bfcad7; background: #cbd5e1; font-size: 0.5rem; letter-spacing: 0.06em; color: #1e293b; }"
+        appendLine builder ".slice-block__snapshot { min-height: var(--screen-snapshot-height); border-radius: 10px; border: 1px dashed #c7d7ea; background: linear-gradient(180deg, #eef4fb 0%, #e7eef7 100%); display: flex; align-items: center; justify-content: center; text-align: center; padding: 6px; color: #7087a0; font-size: 0.7rem; font-weight: 600; }"
+        appendLine builder ".slice-block__properties-panel { margin: 0; display: flex; flex-direction: column; gap: 0; flex: 0 0 auto; min-height: 0; }"
+        appendLine builder ".slice-block__properties-panel[open] { gap: 3px; }"
+        appendLine builder ".slice-block__properties-panel > summary { display: none; list-style: none; cursor: pointer; }"
+        appendLine builder ".slice-block__properties-panel > summary::-webkit-details-marker { display: none; }"
+        appendLine builder ".slice-block__properties-summary { display: none; }"
+        appendLine builder ".slice-block__properties { display: flex; flex-direction: column; gap: 2px; background: rgba(255, 255, 255, 0.32); border-radius: 9px; padding: 6px 7px 5px; min-height: 48px; overflow: visible; }"
+        appendLine builder ".slice-block__properties-panel:not([open]) .slice-block__properties { display: none; }"
+        appendLine builder ".slice-block__properties--hidden { min-height: 0; padding: 0; background: transparent; }"
+        appendLine builder ".slice-block__property-line { font-family: \"IBM Plex Mono\", \"Cascadia Mono\", \"Consolas\", monospace; font-size: 0.58rem; line-height: 1.18; color: #27435c; }"
+        appendLine builder ".slice-block__property-line--inline { display: flex; flex-wrap: wrap; gap: 0.3rem; }"
+        appendLine builder ".slice-block__property-line--stacked { display: flex; flex-direction: column; }"
+        appendLine builder ".slice-block__property-key { white-space: nowrap; }"
+        appendLine builder ".slice-block__property-value { overflow-wrap: break-word; word-break: normal; }"
+        appendLine builder ".slice-block__property-line--stacked .slice-block__property-value { padding-left: var(--property-value-indent); }"
+        appendLine builder ".slice-card--wide .slice-block__property-line--stacked { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 0.3rem; }"
+        appendLine builder ".slice-card--wide .slice-block__property-line--stacked .slice-block__property-value { padding-left: 0; }"
+        appendLine builder ".slice-block__footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; margin-top: auto; }"
+        appendLine builder ".slice-block__footer-left { display: flex; align-items: flex-end; }"
+        appendLine builder ".slice-block__footer-right { display: flex; align-items: flex-end; gap: 4px; margin-left: auto; }"
+        appendLine builder ".slice-block__footer-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: none; white-space: nowrap; cursor: pointer; }"
+        appendLine builder ".slice-block__footer-toggle:hover { background: rgba(255, 255, 255, 1.0); }"
+        appendLine builder ".slice-block__footer-badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 7px; border-radius: 999px; border: 1px solid #c6d4e2; background: rgba(255, 255, 255, 0.94); color: #566d86; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; white-space: nowrap; }"
+        appendLine builder "@media (max-width: 1200px) { .path-document { --slice-card-width: 216px; padding-left: 8px; padding-right: 8px; } }"
+        appendLine builder "@media (max-width: 900px) { .path-document { --slice-card-width: 208px; } .path-document__row { column-gap: 8px; } }"
+        appendLine builder "</style>"
+
+    /// Returns the current self-contained style block used by the slice renderer.
+    let renderStyleBlock () =
+        let builder = StringBuilder()
+        renderStyles builder
+        builder.ToString()
+
+    /// Returns the current script block used by the slice renderer.
+    let renderScriptBlock () =
+        let builder = StringBuilder()
+        renderScript builder
+        builder.ToString()
+
+    /// Renders one slice card as an embeddable HTML fragment.
+    let renderSliceCardHtml options (sliceCard: PathSliceCard) =
+        let builder = StringBuilder()
+        renderSliceCard builder options sliceCard
+        builder.ToString()
+
+    /// Renders a full self-contained HTML document for the supplied PATH row.
+    let renderDocument options (pathRow: PathRowState) =
+        let builder = StringBuilder()
+
+        appendLine builder "<!DOCTYPE html>"
+        appendLine builder "<html lang=\"en\">"
+        appendLine builder "<head>"
+        appendLine builder "<meta charset=\"utf-8\">"
+        appendLine builder "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        appendLine builder $"<title>{htmlEncode options.DocumentTitle}</title>"
+        renderStyles builder
+        appendLine builder "</head>"
+        appendLine builder "<body>"
+        appendLine builder $"<main class=\"path-document\">"
+        appendLine builder "<header class=\"path-document__header\">"
+        appendLine builder $"<h1 class=\"path-document__title\">{htmlEncode pathRow.Title}</h1>"
+        appendLine builder $"<p class=\"path-document__description\">{htmlEncode pathRow.Description}</p>"
+        appendLine builder "<div class=\"path-document__header-actions\">"
+        appendLine builder "<button type=\"button\" class=\"path-document__action\" data-action=\"expand-properties\">Expand All Properties</button>"
+        appendLine builder "<button type=\"button\" class=\"path-document__action\" data-action=\"collapse-properties\">Collapse All Properties</button>"
+        appendLine builder "<button type=\"button\" class=\"path-document__action\" data-action=\"expand-width\">Expand All Width</button>"
+        appendLine builder "<button type=\"button\" class=\"path-document__action\" data-action=\"collapse-width\">Collapse All Width</button>"
+        appendLine builder "</div>"
+        appendLine builder "</header>"
+        appendLine builder $"<section class=\"path-document__row\" data-base-columns=\"{pathRow.SliceCards.Length}\" style=\"--current-slice-columns: {pathRow.SliceCards.Length};\">"
+        pathRow.SliceCards |> List.iter (renderSliceCard builder options)
+        appendLine builder "</section>"
+
+        appendLine builder "</main>"
+        appendLine builder (renderScriptBlock ())
+        appendLine builder "</body>"
+        appendLine builder "</html>"
+
+        builder.ToString()

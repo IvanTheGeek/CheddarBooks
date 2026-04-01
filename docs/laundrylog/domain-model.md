@@ -6,14 +6,18 @@ This note captures the current domain language and the core functional requireme
 
 The current domain language should prefer:
 
+- command: `CaptureLaundryLocation`
 - command: `LogLaundryExpense`
+- event: `LaundryLocationCaptured`
 - event: `LaundryExpenseLogged`
 
 The current understanding is that:
 
 - the expense is the key business fact
 - washer, dryer, and supplies are expense types, not separate event kinds
+- cash, card, app, and points are the first payment-method choices we currently expect
 - session context is useful in the UI and workflow, but is not more important than the expense fact itself
+- durable event time should use UTC as the model/storage basis, with localization deferred to views
 
 ## Functional Requirements
 
@@ -29,13 +33,13 @@ LaundryLog must support:
 5. calculating entry total from quantity and unit price
 6. capturing payment method
 7. showing running session total
-8. logging multiple entries during one laundry outing
+8. logging multiple entries during one laundry session
 
 ## UX Pressure On The Domain Model
 
 The domain model should stay compatible with:
 
 - low-friction mobile entry
-- repeated entry within one outing
+- repeated entry within one session
 - enough detail for later reporting
 - a UI that can show session context without making session context the primary business fact

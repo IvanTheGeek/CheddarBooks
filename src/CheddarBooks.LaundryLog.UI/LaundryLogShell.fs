@@ -27,7 +27,7 @@ module LaundryLogView =
     let summary =
         function
         | LaundryLogView.NewSession -> "Establish laundry location context before logging expenses."
-        | LaundryLogView.EntryForm -> "Log repeatable laundry expenses within the current outing."
+        | LaundryLogView.EntryForm -> "Log repeatable laundry expenses within the current session."
 
     /// Returns the current LaundryLog workflow stages represented by the view.
     let flowStages =

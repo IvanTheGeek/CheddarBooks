@@ -2,5 +2,5 @@
 
 See:
 
-- `./cheddarbooks-docs/README.md`
-- `./laundrylog/introduction.md`
+- [`cheddarbooks-docs/README.md`](cheddarbooks-docs/README.md)
+- [`laundrylog/introduction.md`](laundrylog/introduction.md)

@@ -10,6 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="PrimitiveStateShapes.fs" />
+    <Compile Include="PrimitiveStateExamples.fs" />
+    <Compile Include="ScreenHtmlRenderer.fs" />
+    <Compile Include="ScreenPathHtmlRenderer.fs" />
+    <Compile Include="SliceStateMappings.fs" />
+    <Compile Include="SliceHtmlRenderer.fs" />
+    <Compile Include="NmPathHtmlRenderer.fs" />
     <Compile Include="LaundryLogShell.fs" />
   </ItemGroup>
 </Project>

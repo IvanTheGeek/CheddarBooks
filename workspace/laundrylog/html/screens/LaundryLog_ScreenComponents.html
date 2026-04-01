@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LaundryLog Screen Components</title>
+<style>
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: #f8f9fa; color: #2d3748; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+.ll-document { padding: 14px 16px 28px; max-width: 1040px; margin: 0 auto; }
+.ll-document__header { margin-bottom: 14px; display: flex; flex-direction: column; gap: 3px; }
+.ll-document__eyebrow { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #0e5883; }
+.ll-document__title { margin: 0; font-size: 0.96rem; line-height: 1.06; font-weight: 700; }
+.ll-document__description { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.28; }
+.ll-primary-surface { display: flex; justify-content: center; margin-bottom: 22px; }
+.ll-primary-surface .ll-screen-surface { width: 100%; max-width: 380px; }
+.ll-primary-surface .ll-phone-screen { max-width: 380px; }
+.ll-primary-surface .ll-screen-surface__name { font-size: 0.68rem; }
+.ll-primary-surface .ll-screen-surface__note { font-size: 0.74rem; }
+.ll-supporting-surfaces { display: flex; flex-direction: column; gap: 10px; }
+.ll-supporting-surfaces__title { margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
+.ll-screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 320px)); gap: 18px; align-items: start; }
+.ll-screen-surface { display: flex; flex-direction: column; gap: 8px; }
+.ll-screen-surface__name { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em; color: #0e5883; text-transform: uppercase; }
+.ll-screen-surface__note { margin: 0; color: #64748b; font-size: 0.72rem; line-height: 1.25; }
+.ll-phone-screen { width: 100%; max-width: 360px; min-height: 667px; box-sizing: border-box; background: transparent; display: flex; flex-direction: column; gap: 0; }
+.ll-phone-screen--tall { min-height: 980px; }
+.ll-screen-body { padding: 0.85rem; }
+.ll-location-context { margin: 0 0 1rem; color: #64748b; font-size: 0.82rem; font-weight: 600; }
+.ll-header { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; padding: 0.9rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; border-radius: 0.75rem 0.75rem 0 0; }
+.ll-header__text { display: flex; flex-direction: column; gap: 0.125rem; }
+.ll-header__title { margin: 0; font-size: 1.5rem; font-weight: 700; line-height: 1.05; }
+.ll-header__subtitle { margin: 0; font-size: 0.75rem; opacity: 0.95; font-weight: 500; color: rgba(255,255,255,0.95); }
+.ll-header__badge { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.3); }
+.ll-panel { background: white; border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 0.625rem; }
+.ll-panel--compact { padding: 0.8rem; }
+.ll-panel--location { gap: 0.5rem; }
+.ll-panel__title { margin: 0; font-size: 0.875rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.ll-field__label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-location-section { display: flex; gap: 0.625rem; align-items: stretch; }
+.ll-location-input { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ll-location-info { font-size: 0.68rem; color: #64748b; margin-top: 0.2rem; font-weight: 500; }
+.ll-text-input { width: 100%; padding: 0.85rem 0.9rem; border: 2px solid #e2e8f0; border-radius: 0.75rem; font-size: 0.95rem; color: #2d3748; transition: border-color 0.2s; font-weight: 500; }
+.ll-text-input:focus { outline: none; border-color: #ffcc80; }
+.ll-text-input::placeholder { color: #8aa0b7; }
+.ll-gps-button { flex: 0 0 56px; width: 56px; min-height: 52px; border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.ll-gps-button:active { transform: scale(0.97); background: #fff8e1; border-color: #ffcc80; }
+.ll-primary-action-row { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.15rem; }
+.ll-button { width: 100%; border: none; border-radius: 0.75rem; min-height: 60px; padding: 0.85rem 1rem; font-size: 1.02rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.45rem; }
+.ll-button:disabled { cursor: not-allowed; }
+.ll-button--primary { background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%); color: white; box-shadow: 0 4px 12px rgba(255, 204, 128, 0.4); }
+.ll-button--supporting { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }
+.ll-button--secondary { background: white; border: 3px solid #e2e8f0; color: #475569; box-shadow: none; }
+.ll-button--disabled { background: #cbd5e1; color: #475569; box-shadow: none; }
+.ll-button--success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.28); }
+.ll-option-group { display: grid; gap: 0.625rem; }
+.ll-option-group--machine { grid-template-columns: repeat(3, 1fr); }
+.ll-option-group--payment { grid-template-columns: repeat(2, 1fr); }
+.ll-option-group--detail { grid-template-columns: repeat(2, 1fr); margin-top: 0.25rem; }
+.ll-chip { border: 2px solid #e2e8f0; background: white; border-radius: 0.75rem; color: #475569; cursor: pointer; transition: all 0.2s; }
+.ll-chip--tile { min-height: 58px; padding: 0.75rem 0.45rem; font-size: 0.875rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.18rem; }
+.ll-option-group--payment .ll-chip--tile { min-height: 54px; padding: 0.65rem 0.4rem; }
+.ll-chip--detail { min-height: 48px; padding: 0.75rem 0.6rem; font-size: 0.82rem; font-weight: 600; }
+.ll-chip--selected { background: #fff8e1; border-color: #ffcc80; color: #f57c00; }
+.ll-chip__icon { font-size: 1rem; line-height: 1; }
+.ll-chip__label { line-height: 1.1; }
+.ll-two-up { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.ll-stepper { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }
+.ll-stepper__button { width: 72px; height: 72px; border: none; background: #ffcc80; color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(255, 204, 128, 0.3); }
+.ll-stepper__button:active { transform: scale(0.95); background: #ffb74d; }
+.ll-stepper__value { font-size: 3rem; font-weight: 700; color: #2d3748; min-width: 80px; width: 80px; text-align: center; padding: 0.5rem; border: 3px solid transparent; border-radius: 0.5rem; background: transparent; }
+.ll-money-input-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr) 72px; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.ll-money-input { display: flex; align-items: center; justify-content: center; gap: 0.25rem; min-width: 0; border: 0; background: transparent; overflow: visible; }
+.ll-money-input__currency { font-size: 1.5rem; font-weight: 700; color: #64748b; padding: 0; }
+.ll-money-input__field { width: 100%; max-width: 140px; min-width: 0; padding: 0.875rem 0.5rem; border: 3px solid #e2e8f0; border-radius: 0.75rem; font-size: 1.5rem; font-weight: 700; color: #2d3748; text-align: center; background: white; }
+.ll-quarter-row { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.ll-quarter-button { width: 72px; height: 72px; border: none; background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%); color: #4a4a4a; border-radius: 50%; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; border: 3px solid #a8a8a8; position: relative; font-family: 'Courier New', monospace; }
+.ll-quarter-button::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; border: 1px dashed rgba(128, 128, 128, 0.3); }
+.ll-quarter-button__sign { font-size: 1.25rem; font-weight: 900; margin-right: -0.125rem; z-index: 1; }
+.ll-quarter-button__coin { font-size: 1.125rem; font-weight: 700; z-index: 1; }
+.ll-quarter-button:active { transform: scale(0.95); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.5); }
+.ll-quick-fill-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
+.ll-chip--quick-fill { padding: 0.875rem 0.5rem; border: 2px solid #ffcc80; background: #fff8e1; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 600; color: #f57c00; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ll-chip__amount { font-size: 0.9375rem; font-weight: 600; }
+.ll-chip__subtext { font-size: 0.625rem; opacity: 0.8; display: block; margin-top: 0.25rem; }
+.ll-entry-total { background: #f1f5f9; padding: 1rem; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.ll-entry-total__label { font-size: 0.875rem; font-weight: 600; color: #64748b; }
+.ll-entry-total__amount { font-size: 1.75rem; font-weight: 700; color: #2d3748; }
+.ll-button--submit { min-height: 56px; padding-top: 0.7rem; padding-bottom: 0.7rem; }
+.ll-status-chip-row { display: grid; grid-template-columns: repeat(var(--status-chip-count, 1), minmax(0, 1fr)); gap: 0.3rem; align-items: center; width: 100%; }
+.ll-status-chip { min-width: 0; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.22rem; padding: 0.28rem 0.5rem; background: rgba(255, 255, 255, 0.92); border-radius: 999px; font-size: 0.74rem; font-weight: 600; color: #475569; box-shadow: none; line-height: 1; white-space: nowrap; }
+.ll-status-chip__icon { opacity: 0.9; }
+.ll-status-chip__label { min-width: 0; color: inherit; overflow: hidden; text-overflow: ellipsis; }
+.ll-status-chip__mark { font-weight: 800; font-size: 0.68rem; }
+.ll-status-chip--ready .ll-status-chip__mark { color: #16a34a; }
+.ll-status-chip--needs-attention .ll-status-chip__mark { color: #dc2626; }
+.ll-summary-bar { width: 100%; max-width: 100%; box-sizing: border-box; background: #fff8e1; padding: 0.8rem 1rem; border: 2px solid #ffcc80; display: flex; justify-content: space-between; align-items: center; margin: 0.6rem 0 1.2rem; border-radius: 0.5rem; }
+.ll-summary-bar__label { font-size: 0.875rem; font-weight: 600; color: #f57c00; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-summary-bar__value { font-size: 1.5rem; font-weight: 700; color: #f57c00; }
+.ll-feedback-banner { border-radius: 0.75rem; background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 700; }
+.ll-recent-entries { margin-top: 0; }
+.ll-recent-entries__title { font-size: 0.875rem; font-weight: 600; color: #64748b; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.ll-entry-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.ll-entry-card { background: white; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #cbd5e1; }
+.ll-entry-card__topline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.ll-entry-card__title { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }
+.ll-entry-card__amount { font-size: 1.5rem; font-weight: 700; color: #2d3748; white-space: nowrap; }
+.ll-entry-card__detail { margin: 0; font-size: 0.8125rem; color: #64748b; font-weight: 500; }
+.ll-empty-state { margin: 0; font-size: 0.75rem; color: #94a3b8; font-weight: 500; }
+@media (max-width: 920px) { .ll-document { padding-left: 12px; padding-right: 12px; } .ll-screen-grid { grid-template-columns: 1fr; } .ll-primary-surface .ll-screen-surface, .ll-primary-surface .ll-phone-screen { max-width: 100%; } }
+</style>
+</head>
+<body>
+<main class="ll-document">
+<header class="ll-document__header">
+<div class="ll-document__eyebrow">Mobile Source Of Truth</div>
+<h1 class="ll-document__title">LaundryLog Screen Components</h1>
+<p class="ll-document__description">Deterministic HTML/CSS proving ground for the current LaundryLog screens.</p>
+</header>
+<section class="ll-primary-surface">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - v7 Primary</div>
+<p class="ll-screen-surface__note">recovered Claude-era mobile source of truth</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$4.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-entry" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<div class="ll-entry-list">
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$11.25</span>
+<h4 class="ll-entry-card__title">2:34 PM</h4>
+</div>
+<p class="ll-entry-card__detail">3 Washers @ $3.75 • Credit Card</p>
+</article>
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$6.00</span>
+<h4 class="ll-entry-card__title">2:38 PM</h4>
+</div>
+<p class="ll-entry-card__detail">3 Dryers @ $2.00 • Credit Card</p>
+</article>
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$2.50</span>
+<h4 class="ll-entry-card__title">2:40 PM</h4>
+</div>
+<p class="ll-entry-card__detail">1 Supplies @ $2.50 • Cash</p>
+</article>
+</div>
+</section>
+</div>
+</section>
+</article>
+</section>
+<section class="ll-supporting-surfaces">
+<h2 class="ll-supporting-surfaces__title">Supporting State Variants</h2>
+<div class="ll-screen-grid">
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.NewSession - Awaiting Location</div>
+<p class="ll-screen-surface__note">manual location entry before the first expense</p>
+<section class="ll-phone-screen">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" placeholder="Enter location...">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--primary" data-control-id="set-location" disabled>Set Location</button>
+</div>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.NewSession - Ready To Set</div>
+<p class="ll-screen-surface__note">manual location entered and ready to confirm</p>
+<section class="ll-phone-screen">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Enter location...">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--primary" data-control-id="set-location">Set Location</button>
+</div>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Ready At Location</div>
+<p class="ll-screen-surface__note">location captured and the expense form is ready for the first selection</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-expense" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✗</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Washer Draft</div>
+<p class="ll-screen-surface__note">first expense draft inside the current location context</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+<div class="ll-field">
+<div class="ll-field__label">Choose Card</div>
+<div class="ll-option-group ll-option-group--detail">
+<button type="button" class="ll-chip ll-chip--detail ll-chip--selected" data-choice-id="card-visa-1234">Visa •1234</button>
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-business-8890">Business MC •8890</button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--primary" data-control-id="log-expense">
+Log Expense
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Card Details Expanded</div>
+<p class="ll-screen-surface__note">card selected and the additional payment section is disclosed</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$2.75</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.50</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+<div class="ll-field">
+<div class="ll-field__label">Choose Card</div>
+<div class="ll-option-group ll-option-group--detail">
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-visa-1234">Visa •1234</button>
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-business-8890">Business MC •8890</button>
+<button type="button" class="ll-chip ll-chip--detail" data-choice-id="card-company-4421">Fleet Card •4421</button>
+</div>
+</div>
+</section>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--disabled" data-control-id="log-expense" disabled>
+<div class="ll-status-chip-row" style="--status-chip-count: 3;">
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-location"><span class="ll-status-chip__icon">&#128205;</span><span class="ll-status-chip__label">Location</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--ready" data-control-id="status-type"><span class="ll-status-chip__icon">&#127754;</span><span class="ll-status-chip__label">Type</span><span class="ll-status-chip__mark">✓</span></div>
+<div class="ll-status-chip ll-status-chip--needs-attention" data-control-id="status-payment"><span class="ll-status-chip__icon">&#128179;</span><span class="ll-status-chip__label">Payment</span><span class="ll-status-chip__mark">✗</span></div>
+</div>
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$0.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<p class="ll-empty-state">No entries yet in this session.</p>
+</section>
+</div>
+</section>
+</article>
+<article class="ll-screen-surface">
+<div class="ll-screen-surface__name">Screen.EntryForm - Logged Success</div>
+<p class="ll-screen-surface__note">entry logged and the surface is ready for the next quick entry</p>
+<section class="ll-phone-screen ll-phone-screen--tall">
+<header class="ll-header">
+<div class="ll-header__text">
+<h2 class="ll-header__title">🧺 LaundryLog</h2>
+<p class="ll-header__subtitle">by CheddarBooks</p>
+</div>
+<div class="ll-header__badge">🧀</div>
+</header>
+<div class="ll-screen-body">
+<section class="ll-panel ll-panel--location">
+<h3 class="ll-panel__title">📍 Location</h3>
+<div class="ll-location-section">
+<div class="ll-location-input">
+<div class="ll-field">
+<input id="location-input" class="ll-text-input" type="text" value="Love&#39;s #123 - Springfield, OH" placeholder="Tap &#128205; or enter location">
+</div>
+<div class="ll-location-info">GPS will check personal &amp; community data</div>
+</div>
+<button type="button" class="ll-gps-button" data-control-id="use-gps-location">📍</button>
+</div>
+</section>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--machine">
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="washer"><span class="ll-chip__icon">&#127754;</span><span class="ll-chip__label">Washer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="dryer"><span class="ll-chip__icon">&#128293;</span><span class="ll-chip__label">Dryer</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="supplies"><span class="ll-chip__icon">&#129524;</span><span class="ll-chip__label">Supplies</span></button>
+</div>
+</div>
+</section>
+<div class="ll-two-up">
+<section class="ll-panel"><h3 class="ll-panel__title">Quantity</h3>
+<div class="ll-field">
+<div class="ll-field__label">Quantity</div>
+<div class="ll-stepper">
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-decrement" disabled>-</button>
+<div class="ll-stepper__value">1</div>
+<button type="button" class="ll-stepper__button" data-control-id="quantity-stepper-increment">+</button>
+</div>
+</div>
+</section>
+<section class="ll-panel"><h3 class="ll-panel__title">Unit Price</h3>
+<div class="ll-field">
+<div class="ll-field__label">Unit Price</div>
+<div class="ll-money-input-grid">
+<button type="button" class="ll-quarter-button ll-quarter-button--decrease" data-control-id="price-quarter-down" aria-label="Adjust by −25&#162;"><span class="ll-quarter-button__sign">−</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+<div class="ll-money-input">
+<span class="ll-money-input__currency">$</span>
+<input class="ll-money-input__field" type="text" data-control-id="price-input" value="3.00" placeholder="0.00">
+</div>
+<button type="button" class="ll-quarter-button ll-quarter-button--increase" data-control-id="price-quarter-up" aria-label="Adjust by +25&#162;"><span class="ll-quarter-button__sign">+</span><span class="ll-quarter-button__coin">25&#162;</span></button>
+</div>
+<div class="ll-quick-fill-row">
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Historical</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.00</span>
+<span class="ll-chip__subtext">Last used</span>
+</button>
+<button type="button" class="ll-chip ll-chip--quick-fill">
+<span class="ll-chip__amount">$3.25</span>
+<span class="ll-chip__subtext">Community</span>
+</button>
+</div>
+</div>
+<div class="ll-entry-total">
+<span class="ll-entry-total__label">Entry Total</span>
+<span class="ll-entry-total__amount">$3.00</span>
+</div>
+</section>
+</div>
+<section class="ll-panel ll-panel--compact">
+<div class="ll-field">
+<div class="ll-option-group ll-option-group--payment">
+<button type="button" class="ll-chip ll-chip--tile ll-chip--selected" data-choice-id="cash"><span class="ll-chip__icon">&#128181;</span><span class="ll-chip__label">Cash</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="card"><span class="ll-chip__icon">&#128179;</span><span class="ll-chip__label">Card</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="app"><span class="ll-chip__icon">&#128241;</span><span class="ll-chip__label">App</span></button>
+<button type="button" class="ll-chip ll-chip--tile" data-choice-id="points"><span class="ll-chip__icon">⭐</span><span class="ll-chip__label">Points</span></button>
+</div>
+</div>
+</section>
+<div class="ll-feedback-banner" data-control-id="entry-logged">✓ Entry logged — $5.00 &#183; CASH</div>
+<div class="ll-primary-action-row">
+<button type="button" class="ll-button ll-button--submit ll-button--success" data-control-id="log-expense">
+✓ Logged!
+</button>
+</div>
+<div class="ll-summary-bar">
+<span class="ll-summary-bar__label">Session Total</span>
+<span class="ll-summary-bar__value">$5.00</span>
+</div>
+<section class="ll-recent-entries">
+<h3 class="ll-recent-entries__title">Today's Entries</h3>
+<div class="ll-entry-list">
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$3.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:10</h4>
+</div>
+<p class="ll-entry-card__detail">1 Washer @ $3.00 • Cash</p>
+</article>
+<article class="ll-entry-card">
+<div class="ll-entry-card__topline">
+<span class="ll-entry-card__amount">$2.00</span>
+<h4 class="ll-entry-card__title">2026-03-28 01:13</h4>
+</div>
+<p class="ll-entry-card__detail">1 Dryer @ $2.00 • Cash</p>
+</article>
+</div>
+</section>
+</div>
+</section>
+</article>
+</div>
+</section>
+</main>
+</body>
+</html>

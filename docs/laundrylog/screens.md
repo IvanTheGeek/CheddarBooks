@@ -2,14 +2,19 @@
 
 These notes describe the first concrete LaundryLog screen surfaces and screen states currently visible in the imported design and workflow discussions.
 
-Primary source threads include:
+For the broader design rationale behind these screens, including the longer concept-page iteration thread, see [Concept UI Page](concept-ui-page.md).
 
-- [`019d174e-e9e9-7732-8fb0-053fb558797f.toml`](../../../../NEXUS-EventStore/projections/conversations/019d174e-e9e9-7732-8fb0-053fb558797f.toml)
-- [`019d174e-ea7b-71ca-91ea-5f3ad56b32fd.toml`](../../../../NEXUS-EventStore/projections/conversations/019d174e-ea7b-71ca-91ea-5f3ad56b32fd.toml)
+For the first reusable interaction-primitive interpretation of these screens, see [FnHCI Primitive Map](fnhci-primitive-map.md).
+
+Primary source discussion history still exists upstream in `NEXUS-EMERGING`, but the local durable summary to use in this extracted repo is:
+
+- [Concept UI Page](concept-ui-page.md)
 
 ## Screen Model
 
 Current direction is to treat each meaningful visual state as a full screen or board, built from reusable components.
+
+In the current LaundryLog language, the "current session" is a user-facing window over recent laundry entries, not necessarily a first-class stored event.
 
 That means screen work should stay aligned with:
 
@@ -17,13 +22,19 @@ That means screen work should stay aligned with:
 - user decision milestones
 - reusable component composition
 
+These screens should therefore be read as distilled working screens from the broader concept-page effort, not as isolated mockups with no history behind them.
+
 ## Current Named Screens
 
 ### Screen.NewSession
 
 Purpose:
 
-- begin a laundry outing by establishing location context
+- capture or confirm the location before the first expense entry
+
+Current example screen:
+
+![Set Location screen](ScreenShots/S_SetLocation.png)
 
 Current expected elements:
 
@@ -36,12 +47,17 @@ Important state behavior:
 - `Set Location` hidden when there is no draft location
 - `Set Location` visible when a location has been entered
 - GPS is future-facing and should not block the first manual path
+- once a location is captured, it should stay visible until the user changes it
 
 ### Screen.EntryForm
 
 Purpose:
 
 - capture one expense entry inside the current location/session context
+
+Current example screen:
+
+![Log Laundry Expense screen](ScreenShots/S_LogLaundryExpense.png)
 
 Current likely elements:
 
@@ -60,8 +76,9 @@ Current likely elements:
 Current direction:
 
 - location is the first or top-most information
-- session context depends on location
+- current laundry context depends on location
 - location should remain obvious once set
+- future GPS help should propose a better location rather than silently overwriting the current one
 
 ### Machine Type Section
 
@@ -105,6 +122,7 @@ Current direction:
 Current direction:
 
 - running session total should remain visible and easy to scan
+- it should reflect the current session window derived from recent entries
 - it should not feel secondary to the line-entry controls
 
 ## Screen State Progression
@@ -114,7 +132,7 @@ Current screen-state thinking includes at least:
 1. New session, no location yet
 2. Location entered, ready to set
 3. Entry form active under chosen location
-4. Repeated entry within the same ongoing outing
+4. Repeated entry within the same ongoing session
 
 ## Future Likely Screens
 

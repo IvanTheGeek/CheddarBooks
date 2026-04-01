@@ -20,7 +20,7 @@ It is trying to support one very practical real-world workflow:
 - log expenses as they happen
 - retain enough context for later recordkeeping
 
-## Workflow 1: Start Session With Manual Location
+## Workflow 1: Capture Location
 
 Current first path:
 
@@ -28,30 +28,35 @@ Current first path:
 2. enter location manually
 3. reveal `Set Location` once the location is present
 4. confirm location
-5. move into the entry form
+5. capture that location as the durable current context
+6. move into the entry form
 
 This is the current happy-path foundation.
-GPS lookup is intentionally deferred for the first path.
+GPS lookup and location matching are intentionally deferred behind the same durable location result for the first path.
+Once captured, the location should remain the active context until the user changes it.
 
-## Workflow 2: Log One Expense Entry
+## Workflow 2: Log Washer Then Dryer Entries
 
 Current line-entry workflow:
 
-1. choose expense type:
-   - washer
-   - dryer
-   - supplies
+1. choose `washer`
 2. enter quantity
 3. enter unit price
 4. choose payment method
 5. review calculated line total
-6. log the expense
+6. log the washer expense
+7. choose `dryer`
+8. enter quantity
+9. enter unit price
+10. choose payment method
+11. review calculated line total
+12. log the dryer expense
 
-This should work for the most common case with as little friction as possible.
+This should work for the most common first complete case with as little friction as possible.
 
-## Workflow 3: Repeat Entry During One Laundry Outing
+## Workflow 3: Repeat Entry During One Laundry Session
 
-Current understanding is that a laundry outing often lasts for multiple hours and includes multiple entries at the same location.
+Current understanding is that a laundry session often lasts for multiple hours and includes multiple entries at the same location.
 
 That means the workflow is:
 
@@ -62,6 +67,8 @@ That means the workflow is:
 5. watch session total accumulate
 
 This is why batch-style entry is more important than a separate single-entry mode.
+
+If future GPS assistance is available, it should help suggest or refine location rather than automatically replacing the current active location.
 
 ## Workflow 4: Batch Entry As The Primary Mode
 
@@ -106,9 +113,9 @@ That means:
 
 The current path work already suggests a first sequence:
 
-- `Path1.1-NewSession`
-- `Path1.2-LocationEntered`
-- `Path1.3-EntryForm`
+- `Path1.1-LocationCaptured`
+- `Path1.2-WasherLogged`
+- `Path1.3-DryerLogged`
 
 That vocabulary is useful because it links:
 
