@@ -48,6 +48,7 @@ This repo should preserve the distinction between:
 Short version:
 
 - do not leave important app discoveries only in chat
+- do not guess from memory, old chat, screenshots, or stale assumptions when the current repo state can be inspected directly; verify the actual docs, code, tests, generated artifacts, and branch/worktree shape before acting
 - keep local app docs up to date when local behavior or understanding changes
 - use bootstrap provenance as traceable history, not as the only explanation of the repo
 - treat context packs and current-focus docs as views, not as the deepest source truth
@@ -79,6 +80,7 @@ When local app understanding changes:
 - update tests when app behavior changes
 - when code, renderer, UI, HTML, CSS, or visible behavior changes, add or update tests by default
 - if a relevant test is not added or updated, say why explicitly
+- for now, default to `main` as the active branch and merge accepted side work back quickly instead of keeping local or remote side branches alive
 - record discoveries durably if they will matter later
 - keep README, foundation docs, and LaundryLog docs locally navigable
 

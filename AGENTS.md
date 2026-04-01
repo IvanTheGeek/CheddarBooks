@@ -16,10 +16,12 @@ Read in this order before substantial work:
 Working rules:
 
 - do not rely on chat memory alone for app understanding
+- do not guess from memory, old chat, screenshots, or stale assumptions when the current repo state can be inspected directly; verify the actual docs, code, tests, generated artifacts, and branch/worktree shape before acting
 - keep local durable docs current when local app understanding changes
 - use local docs for app meaning and upstream NEXUS doctrine only where it is truly foundational
 - keep scratch, durable docs, bootstrap provenance, and derived views distinct
 - if a discovery will matter later, record it durably here
+- for now, keep `main` as the default active branch and merge accepted side work back into `main` promptly instead of leaving extra branches alive
 - when code, renderer, or visible behavior changes, add or update tests by default
 - if a relevant test is not added or updated, say why explicitly
 - for UI, HTML, CSS, and screen work, inspect the actual source and current generated artifact before changing behavior
